@@ -41,7 +41,7 @@
 
 #include <sqlite3.h>
 #include "portability.h"
-#include "pinyin/syllable.h"
+#include "pinyin/trie/syllable.h"
 #include "lexicon/pytrie.h"
 #include "imi_defines.h"
 

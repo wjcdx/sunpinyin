@@ -41,7 +41,7 @@
 
 #include "pytrie.h"
 #include "pytrie_gen.h"
-#include "../slm/slm.h"
+#include "../../slm/slm.h"
 #include "trie_writer.h"
 
 class CUnigramSorter : public CWordEvaluator {

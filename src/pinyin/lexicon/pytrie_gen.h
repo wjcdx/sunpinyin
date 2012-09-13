@@ -2,7 +2,7 @@
 #ifndef _SUNPINYIN_PYTRIE_GEN_H__
 #define _SUNPINYIN_PYTRIE_GEN_H__
 
-#include "../portability.h"
+#include "portability.h"
 
 #include <string>
 #include <vector>

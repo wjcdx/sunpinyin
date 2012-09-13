@@ -33,22 +33,22 @@ slmsource = [
     'src/slm/tslmendian/slm_file.cpp',
     'src/slm/sim_dict.cpp',
     'src/portability.cpp',
-    'src/lexicon/trie_writer.cpp',
-    'src/lexicon/genpyt.cpp',
-    'src/lexicon/pytrie_gen.cpp',
-    'src/lexicon/pytrie.cpp',
-    'src/pinyin/pinyin_data.cpp',
+    'src/pinyin/lexicon/trie_writer.cpp',
+    'src/pinyin/lexicon/genpyt.cpp',
+    'src/pinyin/lexicon/pytrie_gen.cpp',
+    'src/pinyin/lexicon/pytrie.cpp',
+    'src/pinyin/trie/pinyin_data.cpp',
     ]
 
 imesource = [
     'src/portability.cpp',
     'src/slm/slm.cpp',
-    'src/lexicon/pytrie.cpp',
-    'src/pinyin/pinyin_data.cpp',
-    'src/pinyin/pinyin_seg.cpp',
-    'src/pinyin/shuangpin_data.cpp',
-    'src/pinyin/shuangpin_seg.cpp',
-    'src/pinyin/hunpin_seg.cpp',
+    'src/pinyin/lexicon/pytrie.cpp',
+    'src/pinyin/trie/pinyin_data.cpp',
+    'src/pinyin/trie/pinyin_seg.cpp',
+    'src/pinyin/trie/shuangpin_data.cpp',
+    'src/pinyin/trie/shuangpin_seg.cpp',
+    'src/pinyin/trie/hunpin_seg.cpp',
     'src/ime-core/imi_context.cpp',
     'src/ime-core/imi_data.cpp',
     'src/ime-core/lattice_states.cpp',
@@ -78,9 +78,9 @@ headers = [
     'src/slm/sim_slmbuilder.h',
     'src/slm/tslmendian/slm_file.h',
     'src/slm/tslmendian/writer.h',
-    'src/lexicon/pytrie_gen.h',
-    'src/lexicon/trie_writer.h',
-    'src/lexicon/pytrie.h',
+    'src/pinyin/lexicon/pytrie_gen.h',
+    'src/pinyin/lexicon/trie_writer.h',
+    'src/pinyin/lexicon/pytrie.h',
     'src/ime-core/imi_view_classic.h',
     'src/ime-core/imi_uiobjects.h',
     'src/ime-core/lattice_states.h',
@@ -99,16 +99,16 @@ headers = [
     'src/ime-core/imi_defines.h',
     'src/ime-core/imi_view.h',
     'src/portability.h',
-    'src/pinyin/segmentor.h',
-    'src/pinyin/shuangpin_seg.h',
-    'src/pinyin/datrie.h',
-    'src/pinyin/quanpin_trie.h',
-    'src/pinyin/pinyin_seg.h',
-    'src/pinyin/pinyin_data.h',
-    'src/pinyin/syllable.h',
-    'src/pinyin/shuangpin_data.h',
-    'src/pinyin/hunpin_seg.h',
-    'src/pinyin/datrie_impl.h',
+    'src/pinyin/trie/segmentor.h',
+    'src/pinyin/trie/shuangpin_seg.h',
+    'src/pinyin/trie/datrie.h',
+    'src/pinyin/trie/quanpin_trie.h',
+    'src/pinyin/trie/pinyin_seg.h',
+    'src/pinyin/trie/pinyin_data.h',
+    'src/pinyin/trie/syllable.h',
+    'src/pinyin/trie/shuangpin_data.h',
+    'src/pinyin/trie/hunpin_seg.h',
+    'src/pinyin/trie/datrie_impl.h',
     'src/sunpinyin.h',
     ]
 
@@ -408,10 +408,10 @@ if not GetOption('clean') and not GetOption('help'):
 #==============================compile==============================
 #
 env.Object(slmsource)
-env.Command('src/pinyin/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/quanpin_trie.h')
-env.Command('src/pinyin/pinyin_info.h', 'python/pinyin_info_gen.py',
-            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/pinyin_info.h')
+env.Command('src/pinyin/trie/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/trie/quanpin_trie.h')
+env.Command('src/pinyin/trie/pinyin_info.h', 'python/pinyin_info_gen.py',
+            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/trie/pinyin_info.h')
 
 SConscript(['src/SConscript', 'man/SConscript', 'doc/SConscript'], exports='env')
 
