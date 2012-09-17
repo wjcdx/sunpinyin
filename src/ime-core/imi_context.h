@@ -1,40 +1,3 @@
-// -*- mode: c++ -*-
-/*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2007 Sun Microsystems, Inc. All Rights Reserved.
- *
- * The contents of this file are subject to the terms of either the GNU Lesser
- * General Public License Version 2.1 only ("LGPL") or the Common Development and
- * Distribution License ("CDDL")(collectively, the "License"). You may not use this
- * file except in compliance with the License. You can obtain a copy of the CDDL at
- * http://www.opensource.org/licenses/cddl1.php and a copy of the LGPLv2.1 at
- * http://www.opensource.org/licenses/lgpl-license.php. See the License for the
- * specific language governing permissions and limitations under the License. When
- * distributing the software, include this License Header Notice in each file and
- * include the full text of the License in the License file as well as the
- * following notice:
- *
- * NOTICE PURSUANT TO SECTION 9 OF THE COMMON DEVELOPMENT AND DISTRIBUTION LICENSE
- * (CDDL)
- * For Covered Software in this distribution, this License shall be governed by the
- * laws of the State of California (excluding conflict-of-law provisions).
- * Any litigation relating to this License shall be subject to the jurisdiction of
- * the Federal Courts of the Northern District of California and the state courts
- * of the State of California, with venue lying in Santa Clara County, California.
- *
- * Contributor(s):
- *
- * If you wish your version of this file to be governed by only the CDDL or only
- * the LGPL Version 2.1, indicate your decision by adding "[Contributor]" elects to
- * include this software in this distribution under the [CDDL or LGPL Version 2.1]
- * license." If you don't indicate a single choice of license, a recipient has the
- * option to distribute your version of this file under either the CDDL or the LGPL
- * Version 2.1, or to extend the choice of license to its licensees as provided
- * above. However, if you add LGPL Version 2.1 code and therefore, elected the LGPL
- * Version 2 license, then the option applies only if the new code is made subject
- * to such option by the copyright holder.
- */
 
 #ifndef SUNPY_IMI_CONTEXT_H
 #define SUNPY_IMI_CONTEXT_H
@@ -57,6 +20,7 @@
 #include "imi_data.h"
 #include "ic_history.h"
 #include "userdict.h"
+#include "lattice.h"
 #include "lattice_states.h"
 #include "imi_funcobjs.h"
 
@@ -70,7 +34,6 @@ class CLatticeFrame;
 class CCandidate;
 class CIMIContext;
 
-typedef std::vector<CLatticeFrame>  CLattice;
 typedef std::vector<CCandidate>     CCandidates;
 typedef CCandidates::iterator CCandidatesIter;
 
@@ -136,68 +99,6 @@ protected:
     TLexiconState* m_pLexiconState;
 }; // of CCandidate
 
-class CLatticeFrame {
-    friend class CIMIContext;
-public:
-    enum TYPE {
-        UNUSED                  = 0x0000,      // unused frame
-        TAIL                    = 0x0001,      // tail frame
-
-        CATE_SYLLABLE           = 0x0100,
-        SYLLABLE                = 0x0101,      // pinyin
-        SYLLABLE_SEP            = 0x0102,      // pinyin
-        INCOMPLETE_SYLLABLE     = 0x0104,      // incomplete syllable string
-
-        CATE_OTHER              = 0x0200,
-        ASCII                   = 0x0201,      // english string
-        PUNC                    = 0x0202,      // punctuation
-        SYMBOL                  = 0x0204,      // other symbol
-        DIGITAL                 = 0x0208,      // not implemeted here
-    }; // TYPE
-
-    enum BESTWORD_TYPE {
-        NO_BESTWORD             = 1 << 0,
-        BESTWORD                = 1 << 1,
-        USER_SELECTED           = 1 << 2,
-        IGNORED                 = 1 << 3,
-    }; // BESTWORD_TYPE
-
-    unsigned m_type;
-    unsigned m_bwType;
-    wstring m_wstr;
-
-    CLatticeFrame () : m_type(UNUSED), m_bwType(NO_BESTWORD) {}
-
-    bool isUnusedFrame() const
-    { return m_type == 0; }
-
-    bool isSyllableFrame() const
-    { return(m_type & CATE_SYLLABLE); }
-
-    bool isSyllableSepFrame() const
-    { return((m_type & SYLLABLE_SEP) > CATE_SYLLABLE); }
-
-    bool isTailFrame() const
-    { return(m_type == TAIL); }
-
-    void clear(){
-        m_type = UNUSED;
-        m_bwType = NO_BESTWORD;
-        m_lexiconStates.clear();
-        m_latticeStates.clear();
-        m_wstr.clear();
-        m_bestWords.clear();
-    }
-
-    void print(std::string prefix);
-
-protected:
-    std::map<int, CCandidate>   m_bestWords;
-    CCandidate m_selWord;
-    CLexiconStates m_lexiconStates;
-    CLatticeStates m_latticeStates;
-}; // CLatticeFrame
-
 typedef std::vector<unsigned> TPath;
 
 class CIMIContext
@@ -214,30 +115,32 @@ public:
     void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
     CICHistory * getHistoryMemory() { return m_pHistory; }
 
-    void setHistoryPower(unsigned power)
-    { m_historyPower = power <= 10 ? power : 3; }
-
-    int getHistoryPower()
-    { return m_historyPower; }
-
     void setFullSymbolForwarding(bool value = true) {
-        m_bFullSymbolForwarding = value;
+        this.m_pLatticeMgr->setFullSymbolForwarding(value);
     }
-    bool getFullSymbolForwarding() { return m_bFullSymbolForwarding; }
-    void setGetFullSymbolOp(CGetFullSymbolOp *op) { m_pGetFullSymbolOp = op; }
-    CGetFullSymbolOp& fullSymbolOp() const { return *m_pGetFullSymbolOp; }
+    bool getFullSymbolForwarding() {
+        return this.m_pLatticeMgr->getFullSymbolForwarding();
+    }
+    
+    void setGetFullSymbolOp(CGetFullSymbolOp *op) {
+        this.m_pLatticeMgr->setGetFullSymbolOp(op);
+    }
+    CGetFullSymbolOp& fullSymbolOp() const {
+        return this.m_pLatticeMgr->fullSymbolOp();
+    }
 
     void setFullPunctForwarding(bool value = true) {
-        m_bFullPunctForwarding = value;
+        this.m_pLatticeMgr->setFullPunctForwarding(value);
     }
-    bool getFullPunctForwarding() { return m_bFullPunctForwarding; }
-    void setGetFullPunctOp(CGetFullPunctOp *op) { m_pGetFullPunctOp = op; }
-    CGetFullPunctOp& fullPuncOp() const { return *m_pGetFullPunctOp; }
-
-    void setNonCompleteSyllable(bool value = true) {
-        m_bNonCompleteSyllable = value;
+    bool getFullPunctForwarding() {
+        return this.m_pLatticeMgr->getFullPunctForwarding();
     }
-    bool getNonCompleteSyllable() { return m_bNonCompleteSyllable; }
+    void setGetFullPunctOp(CGetFullPunctOp *op) {
+        this.m_pLatticeMgr->setGetFullPunctOp(op);
+    }
+    CGetFullPunctOp& fullPuncOp() const {
+        return this.m_pLatticeMgr->fullPuncOp();
+    }
 
     void setCharsetLevel(unsigned l) { m_csLevel = l; }
     unsigned getCharsetLevel() { return m_csLevel; }
@@ -249,19 +152,29 @@ public:
 
     CLattice& getLattice() { return m_lattice; }
     bool buildLattice(IPySegmentor *segmentor, bool doSearch = true);
-    bool isEmpty() { return m_tailIdx <= 1; }
-    unsigned getLastFrIdx() { return m_tailIdx - 1; }
+    
+    bool isEmpty() {
+        return this.m_pLatticeMgr->getTailIdx() <= 1;
+    }
+
+    unsigned getLastFrIdx() {
+        return this.m_pLatticeMgr->getTailIdx() - 1;
+    }
 
     // omit next punctuation if the very next symbol is an punctuation
-    void omitNextPunct() { m_bOmitPunct = true; }
+    void omitNextPunct() { this.m_pLatticeMgr->setOmitPunct(true); }
 
     bool searchFrom(unsigned from = 1);
 
-    size_t getMaxBest() const { return m_maxBest; }
+    size_t getMaxBest() const {
+        return this.m_pLatticeMgr->getLatticeFrame(0)
+                   .m_latticeStates.getMaxBest();
+    }
+
     void setMaxBest(size_t maxBest) {
-        m_maxBest = maxBest;
         for (int i = 0; i < MAX_LATTICE_LENGTH; i++) {
-            m_lattice[i].m_latticeStates.setMaxBest(m_maxBest);
+            this.m_pLatticeMgr->getLatticeFrame(i)
+                .m_latticeStates.setMaxBest(maxBest);
         }
     }
 
@@ -320,7 +233,6 @@ public:
 
     void memorize();
     void removeFromHistoryCache(std::vector<unsigned>& wids);
-    void printLattice();
 
     CUserDict* getUserDict() { return m_pUserDict; }
 
@@ -329,22 +241,7 @@ protected:
 
     bool _buildLattice(IPySegmentor::TSegmentVec &segments,
                        unsigned rebuildFrom = 1, bool doSearch = true);
-    void _forwardSyllables(unsigned i, unsigned j,
-                           const IPySegmentor::TSegment& seg);
-    void _forwardSingleSyllable(unsigned i, unsigned j, TSyllable syllable,
-                                const IPySegmentor::TSegment& seg,
-                                bool fuzzy = false);
-    void _forwardSyllableSep(unsigned i, unsigned j);
-    void _forwardString(unsigned i, unsigned j,
-                        const std::vector<unsigned>& strbuf);
-    void _forwardPunctChar(unsigned i, unsigned j, unsigned ch);
-    void _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch);
-    void _forwardTail(unsigned i, unsigned j);
-
-    void _transferBetween(unsigned start, unsigned end, TLexiconState* plxst,
-                          unsigned wid, double ic = 1.0);
-    bool _backTracePaths(const std::vector<TLatticeState>& tail_states,
-                         int rank, TPath& path, TPath& segPath);
+    
     void _clearPaths();
 
     const TWCHAR *_getWstr(unsigned wid);
@@ -353,38 +250,21 @@ protected:
     void _saveHistoryCache();
 
 protected:
-    CLattice m_lattice;
-    unsigned m_tailIdx;
-
     size_t m_nBest;
-    size_t m_maxBest;
     size_t m_maxTailCandidateNum;
 
     std::vector<TPath> m_path;
     std::vector<TPath> m_segPath;
 
-    CThreadSlm* m_pModel;
-    CPinyinTrie* m_pPinyinTrie;
-    CUserDict* m_pUserDict;
-    CICHistory* m_pHistory;
-    unsigned m_historyPower;
-
     unsigned m_csLevel;
-
-    bool m_bFullSymbolForwarding;
-    bool m_bOmitPunct;
-    CGetFullSymbolOp  *m_pGetFullSymbolOp;
-
-    bool m_bFullPunctForwarding;
-    CGetFullPunctOp *m_pGetFullPunctOp;
 
     IPySegmentor *m_pPySegmentor;
 
-    bool m_bNonCompleteSyllable;
     bool m_bDynaCandiOrder;
 
     unsigned m_candiStarts;
     unsigned m_candiEnds;
+    CLatticeManager* m_pLatticeMgr;
 }; // CIMIContext
 
 #endif

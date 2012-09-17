@@ -199,6 +199,7 @@ public:
     CLatticeStates() : m_size(0), m_maxBest(2) {}
 
     void setMaxBest(size_t maxBest) { m_maxBest = maxBest; }
+    size_t getMaxBest() { return m_maxBest; }
 
     void clear();
     void add(const TLatticeState& state);
