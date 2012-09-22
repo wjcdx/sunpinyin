@@ -15,7 +15,8 @@
  * more words further, and what bone is its starting bone.
  */
 struct TLexiconState {
-    const CPinyinTrie::TWordIdInfo *getWords(unsigned &num);
+    virtual const CPinyinTrie::TWordIdInfo *getWords(unsigned &num) = 0;
+	virtual const double getWeight() = 0;
     void print(std::string prefix) const;
 };
 

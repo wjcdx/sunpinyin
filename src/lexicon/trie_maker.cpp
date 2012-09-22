@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include "pytrie_gen.h"
+#include "trie_generator.h"
 #include "pinyin_data.h"
 #include "trie_writer.h"
 
@@ -33,13 +33,13 @@ skipNonSpace(const char* p)
 }
 
 static void
-insertWordId(CPinyinTrieMaker::CWordSet& idset, CPinyinTrieMaker::TWordId id)
+insertWordId(CTrieMaker::CWordSet& idset, CTrieMaker::TWordId id)
 {
-    CPinyinTrieMaker::CWordSet::const_iterator it = idset.find(id);
+    CTrieMaker::CWordSet::const_iterator it = idset.find(id);
     if (it == idset.end())
         idset.insert(id);
     else {
-        const CPinyinTrieMaker::TWordId& a = *it;
+        const CTrieMaker::TWordId& a = *it;
         if ((a.anony.m_bHide &&
              !id.anony.m_bHide) ||
             (a.anony.m_bHide == id.anony.m_bHide && a.anony.m_cost >
@@ -50,17 +50,17 @@ insertWordId(CPinyinTrieMaker::CWordSet& idset, CPinyinTrieMaker::TWordId id)
     }
 }
 
-struct TSyllableInfo {
-    std::string m_py;
+struct TUnitInfo {
+    std::string m_unit;
     int m_cost;
 
-    TSyllableInfo(const char* py = NULL, int cost = 0) : m_py(py), m_cost(cost)
+    TUnitInfo(const char* unit = NULL, int cost = 0) : m_unit(unit), m_cost(cost)
     {
     }
     bool
-    operator<(const TSyllableInfo& b) const
+    operator<(const TUnitInfo& b) const
     {
-        return m_py < b.m_py;
+        return m_unit < b.m_unit;
     }
 };
 
@@ -126,9 +126,9 @@ bool
 parseLine(char* buf,
           char* word_buf,
           unsigned& id,
-          std::set<TSyllableInfo>& pyset)
+          std::set<TUnitInfo>& unitset)
 {
-    pyset.clear();
+    unitset.clear();
 
     /* ignore the empty lines and comment lines */
     if (*buf == '\n' || *buf == '#')
@@ -158,17 +158,16 @@ parseLine(char* buf,
                 *p++ = 0;
                 cost = -log2(atof(p)/100);
             }
-            pyset.insert(TSyllableInfo(s, cost));
+            unitset.insert(TUnitInfo(s, cost));
         }
         p = (char*)skipSpace(t);
     }
-    return pyset.size() > 0;
+    return unitset.size() > 0;
 }
 
 
-CPinyinTrieMaker::CPinyinTrieMaker()
+CTrieMaker::CTrieMaker()
 {
-    m_RootNode.m_bExpanded = true;
 }
 /**********************************************************
     lexicon文件格式：
@@ -179,19 +178,19 @@ CPinyinTrieMaker::CPinyinTrieMaker()
 **********************************************************/
 
 bool
-CPinyinTrieMaker::constructFromLexicon(const char* fileName)
+CTrieMaker::constructFromLexicon(const char* fileName)
 {
     static char buf[4096];
     static char word_buf[2048];
 
     unsigned id;
     bool suc = true;
-    std::set<TSyllableInfo> pyset;
+    std::set<TUnitInfo> unitset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
-        if (!parseLine(buf, word_buf, id, pyset)) {
+        if (!parseLine(buf, word_buf, id, unitset)) {
             if (word_buf[0] != L'<' && word_buf[0] != 0) {
                 if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
                 m_Lexicon[id] = std::string(word_buf);
@@ -200,23 +199,20 @@ CPinyinTrieMaker::constructFromLexicon(const char* fileName)
         }
         unsigned gbcategory = getPureGBEncoding(word_buf);
 
-        std::set<TSyllableInfo>::const_iterator its = pyset.begin();
-        std::set<TSyllableInfo>::const_iterator ite = pyset.end();
+        std::set<TUnitInfo>::const_iterator its = unitset.begin();
+        std::set<TUnitInfo>::const_iterator ite = unitset.end();
         for (; its != ite; ++its) {
-            const char *pystr = its->m_py.c_str();
+            const char *ustr = its->m_py.c_str();
             if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
             m_Lexicon[id] = std::string(word_buf);
 
-            CPinyinTrieMaker::TWordId wid(id, its->m_cost, false, gbcategory);
-            suc = insertFullPinyinPair(pystr, wid) && suc;
+            CTrieMaker::TWordId wid(id, its->m_cost, false, gbcategory);
+            suc = insertPair(ustr, wid) && suc;
         }
     }
     fclose(fp);
 
     printf("\n    %zd primitive nodes", TNode::m_AllNodes.size());  fflush(stdout);
-
-    threadNonCompletePinyin();
-    printf("\n    %zd total nodes", TNode::m_AllNodes.size());  fflush(stdout);
 
     std::string pyPrefix = "";
     printf("\n");  fflush(stdout);
@@ -224,42 +220,8 @@ CPinyinTrieMaker::constructFromLexicon(const char* fileName)
     return suc;
 }
 
-CPinyinTrieMaker::CNodeList CPinyinTrieMaker::TNode::m_AllNodes;
-CPinyinTrieMaker::TNode::TNode()
-    : m_bExpanded(false), m_bFullSyllableTransfer(false)
-{
-    m_AllNodes.push_back(this);
-}
-
-bool
-CPinyinTrieMaker::PNodeSet::operator<(const PNodeSet& another) const
-{
-    CNodeSet::const_iterator t1 = m_pns->begin();
-    CNodeSet::const_iterator t2 = m_pns->end();
-    CNodeSet::const_iterator a1 = another.m_pns->begin();
-    CNodeSet::const_iterator a2 = another.m_pns->end();
-    for (; t1 != t2 && a1 != a2; ++t1, ++a1) {
-        if (*t1 < *a1) return true;
-        if (*t1 > *a1) return false;
-    }
-    return(a1 != a2);
-}
-
-bool
-CPinyinTrieMaker::PNodeSet::operator==(const PNodeSet& another) const
-{
-    CNodeSet::const_iterator t1 = m_pns->begin();
-    CNodeSet::const_iterator t2 = m_pns->end();
-    CNodeSet::const_iterator a1 = another.m_pns->begin();
-    CNodeSet::const_iterator a2 = another.m_pns->end();
-    for (; t1 != t2 && a1 != a2; ++t1, ++a1) {
-        if (*t1 != *a1) return false;
-    }
-    return(a1 == a2 && t1 != t2);
-}
-
 static void
-parseFullPinyin(const char *pinyin, std::vector<TSyllable> &ret)
+parseUnit(const char *unit, std::vector<TUnit> &ret)
 {
     char *buf = strdup(pinyin);
     char *p = buf, *q = buf;
@@ -268,9 +230,9 @@ parseFullPinyin(const char *pinyin, std::vector<TSyllable> &ret)
     while (*p) {
         if (*p == '\'') {
             *p = '\0';
-            unsigned s = CPinyinData::encodeSyllable(q);
+            unsigned s = m_UnitData::encode(q);
             if (s)
-                ret.push_back(TSyllable(s));
+                ret.push_back(TUnit(s));
             else
                 printf("\nWarning! unrecognized syllable %s", q);
             q = p + 1;
@@ -279,25 +241,23 @@ parseFullPinyin(const char *pinyin, std::vector<TSyllable> &ret)
     }
 
     if (*q) {
-        unsigned s = CPinyinData::encodeSyllable(q);
+        unsigned s = m_UnitData::encode(q);
         if (s)
-            ret.push_back(TSyllable(s));
+            ret.push_back(TUnit(s));
         else
-            printf("\nWarning! unrecognized syllable %s", q);
+            printf("\nWarning! unrecognized unit %s", q);
     }
 
     free(buf);
 }
 
-CPinyinTrieMaker::TNode*
-CPinyinTrieMaker::insertTransfer(TNode* pnode, unsigned s)
+CTrieMaker::TNode*
+CTrieMaker::insertTransfer(TNode* pnode, unsigned s)
 {
     CTrans::const_iterator itt = pnode->m_Trans.find(s);
     CTrans::const_iterator ite = pnode->m_Trans.end();
     if (itt == ite) {
         TNode *p = new TNode();
-        p->m_bFullSyllableTransfer = true;
-        p->m_bExpanded = true;
         pnode->m_Trans[s] = p;
         return p;
     }
@@ -305,17 +265,17 @@ CPinyinTrieMaker::insertTransfer(TNode* pnode, unsigned s)
 }
 
 bool
-CPinyinTrieMaker::insertFullPinyinPair(const char* pinyin, TWordId wid)
+CTrieMaker::insertPair(const char* unit, TWordId wid)
 {
     TNode *pnode = &m_RootNode;
-    std::vector<TSyllable> syllables;
-    parseFullPinyin(pinyin, syllables);
+    std::vector<TUnit> units;
+    parseUnit(unit, units);
 
-    if (syllables.empty())
+    if (units.empty())
         return true;
 
-    std::vector<TSyllable>::const_iterator it = syllables.begin();
-    std::vector<TSyllable>::const_iterator ite = syllables.end();
+    std::vector<TUnit>::const_iterator it = units.begin();
+    std::vector<TUnit>::const_iterator ite = units.end();
 
     for (; it != ite; ++it)
         pnode = insertTransfer(pnode, *it);
@@ -324,113 +284,8 @@ CPinyinTrieMaker::insertFullPinyinPair(const char* pinyin, TWordId wid)
     return true;
 }
 
-CPinyinTrieMaker::TNode*
-CPinyinTrieMaker::addCombinedTransfers(TNode *pnode,
-                                       unsigned s,
-                                       const CNodeSet& nodes)
-{
-    assert(!nodes.empty());
-
-    TNode *p = NULL;
-    if (nodes.size() == 1) {
-        p = *(nodes.begin());
-    } else {
-        p = new TNode();
-        p->m_cmbNodes = nodes;
-        m_StateMap[&p->m_cmbNodes] = p;
-
-        CNodeSet::const_iterator it = nodes.begin();
-        CNodeSet::const_iterator ite = nodes.end();
-        for (; it != ite; ++it) {
-            CWordSet::const_iterator wit  = (*it)->m_WordIdSet.begin();
-            CWordSet::const_iterator wite = (*it)->m_WordIdSet.end();
-
-            for (; wit != wite; ++wit) {
-                CWordSet::iterator tmp = p->m_WordIdSet.find (*wit);
-
-                if (tmp == p->m_WordIdSet.end()) {
-                    p->m_WordIdSet.insert (*wit);
-                } else if (tmp->anony.m_cost > wit->anony.m_cost) {
-                    p->m_WordIdSet.erase (tmp);
-                    p->m_WordIdSet.insert (*wit);
-                }
-            }
-        }
-    }
-
-    pnode->m_Trans[s] = p;
-    return p;
-}
-
-void
-CPinyinTrieMaker::combineInitialTrans(TNode *pnode)
-{
-    std::map<unsigned, CNodeSet> combTrans;
-
-    CTrans::const_iterator itTrans = pnode->m_Trans.begin();
-    CTrans::const_iterator itTransLast = pnode->m_Trans.end();
-    for (; itTrans != itTransLast; ++itTrans) {
-        TSyllable s = (TSyllable)itTrans->first;
-        if (s.initial) {
-            s.final = s.tone = 0;
-            combTrans[s].insert(itTrans->second);
-        }
-    }
-
-    std::map<unsigned, CNodeSet>::const_iterator itCombTrans = combTrans.begin();
-    for (; itCombTrans != combTrans.end(); ++itCombTrans)
-        addCombinedTransfers(pnode, itCombTrans->first, itCombTrans->second);
-}
-
-void
-CPinyinTrieMaker::expandCombinedNode(TNode *pnode)
-{
-    assert(pnode->m_cmbNodes.size() >= 1);
-
-    std::map<unsigned, CNodeSet> combTrans;
-    CNodeSet::const_iterator itNode = pnode->m_cmbNodes.begin();
-    CNodeSet::const_iterator itNodeLast = pnode->m_cmbNodes.end();
-    for (; itNode != itNodeLast; ++itNode) {
-        CTrans::const_iterator itTrans = (*itNode)->m_Trans.begin();
-        CTrans::const_iterator itTransLast = (*itNode)->m_Trans.end();
-        for (; itTrans != itTransLast; ++itTrans)
-            combTrans[itTrans->first].insert(itTrans->second);
-    }
-
-    std::map<unsigned, CNodeSet>::const_iterator itCombTrans = combTrans.begin();
-    for (; itCombTrans != combTrans.end(); ++itCombTrans) {
-        TNode* p = NULL;
-        unsigned s = itCombTrans->first;
-        CNodeSet nodes = itCombTrans->second;
-
-        CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
-        if (itStateMap != m_StateMap.end())
-            p = itStateMap->second;
-        else
-            p = addCombinedTransfers(pnode, s, nodes);
-
-        pnode->m_Trans[s] = p;
-    }
-
-    pnode->m_bExpanded = true;
-}
-
 bool
-CPinyinTrieMaker::threadNonCompletePinyin(void)
-{
-    CNodeList::const_iterator itNode = TNode::m_AllNodes.begin();
-    for (; itNode != TNode::m_AllNodes.end(); ++itNode) {
-        TNode* pnode = *itNode;
-        if (pnode->m_bExpanded)
-            combineInitialTrans(pnode);
-        else
-            expandCombinedNode(pnode);
-    }
-    return true;
-}
-
-bool
-CPinyinTrieMaker::write(const char* fileName, CWordEvaluator* psrt,
+CTrieMaker::write(const char* fileName, CWordEvaluator* psrt,
                         bool revert_endian)
 {
     bool suc = false;
@@ -443,7 +298,7 @@ CPinyinTrieMaker::write(const char* fileName, CWordEvaluator* psrt,
 }
 
 bool
-CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
+CTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 {
     bool suc = true;
     static TWCHAR wbuf[1024];
@@ -459,7 +314,7 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     CNodeList::const_iterator itNodeLast = TNode::m_AllNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         nodeOffsetMap[*itNode] = offset;
-        offset += CPinyinTrie::TNode::size_for((*itNode)->m_Trans.size(),
+        offset += CTrie::TNode::size_for((*itNode)->m_Trans.size(),
                                                (*itNode)->m_WordIdSet.size());
     }
     lexiconOffset = offset;
@@ -481,12 +336,11 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     itNodeLast = TNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        CPinyinTrie::TNode outNode;
+        CTrie::TNode outNode;
         TNode *pnode = *itNode;
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
-        outNode.m_bFullSyllableTransfer = pnode->m_bFullSyllableTransfer;
         outNode.m_csLevel = 0;
 
         CWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
@@ -501,8 +355,8 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         CTrans::const_iterator itTrans = pnode->m_Trans.begin();
         CTrans::const_iterator itTransLast = pnode->m_Trans.end();
         for (; itTrans != itTransLast && suc; ++itTrans) {
-            CPinyinTrie::TTransUnit tru;
-            tru.m_Syllable = itTrans->first;
+            CTrie::TTransUnit tru;
+            tru.m_Unit = itTrans->first;
             tru.m_Offset = nodeOffsetMap[itTrans->second];
             assert(tru.m_Offset != 0 && tru.m_Offset < lexiconOffset);
             suc = f.write(tru);
@@ -520,7 +374,7 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         CWordVec::const_iterator itv = vec.begin();
         CWordVec::const_iterator itve = vec.end();
         for (; itv != itve && suc; ++itv) {
-            CPinyinTrie::TWordIdInfo wi;
+            TWordIdInfo wi;
             wi.m_id = itv->m_id.anony.m_id;
             assert(wi.m_id < nWord);
             wi.m_csLevel = itv->m_id.anony.m_csLevel;

@@ -4,7 +4,7 @@
 
 class CLatticeManager {
 public:
-	virtual void buildLexiconStates(IPySegmentor::TSegmentVec &segments, unsigned rebuildFrom);
+	virtual void buildLexiconStates(IPySegmentor::TSegmentVec &segments, unsigned rebuildFrom) = 0;
 	bool buildLatticeStates(int rebuildFrom, unsigned csLevel);
 	bool backTracePaths();
 

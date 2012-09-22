@@ -38,7 +38,7 @@ static double exp2_tbl[32] = {
 };
 
 bool
-CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel)
+CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel, bool affectCandidates)
 {
     for (; rebuildFrom <= m_tailIdx; ++rebuildFrom) {
         CLatticeFrame &fr = m_lattice[rebuildFrom];
@@ -71,10 +71,9 @@ CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel)
             // only selected the word with higher unigram probablities, and
             // narrow the search deepth and lower the initial score for fuzzy
             // syllables
-            int maxsz = it->m_bFuzzy ? MAX_LEXICON_TRIES /
-                        2 : MAX_LEXICON_TRIES;
+            double ic = lxst.getWeight();
+            int maxsz = (int)(ic * MAX_LEXICON_TRIES);
 
-            double ic = it->m_bFuzzy ? 0.5 : 1.0;
 
             int sz = (int) word_num < maxsz ? (int) word_num : maxsz;
             int i = 0, count = 0;
@@ -134,7 +133,7 @@ CLatticeManager::_transferBetween(unsigned start, unsigned end,
     for (; it != ite; ++it) {
         // for 1-length lattice states, replace ending_word_id (comma)
         // with none_word_id (recognized by CThreadSlm)
-    unsigned _wid = wid;
+    	unsigned _wid = wid;
         if (wid == ENDING_WORD_ID && it->m_pBackTraceNode && it->m_pBackTraceNode->m_frIdx == 0)
             _wid = NONE_WORD_ID;
 

@@ -10,18 +10,10 @@
 #include <set>
 #include <list>
 
-#include "pytrie.h"
+#include "trie.h"
+#include "CWordEvaluator.h"
 
-class CWordEvaluator {
-public:
-    virtual double
-    getCost(unsigned int wid) = 0;
-
-    virtual bool
-    isSeen(unsigned int wid) = 0;
-};
-
-class CPinyinTrieMaker {
+class CTrieMaker {
 public:
     class TNode;
     class TWordInfo;
@@ -121,11 +113,8 @@ protected:
 public:
         static CNodeList m_AllNodes;
 public:
-        bool m_bExpanded;
-        bool m_bFullSyllableTransfer;
         CWordSet m_WordIdSet;
         CTrans m_Trans;
-        CNodeSet m_cmbNodes;
 public:
         TNode();
     };
@@ -136,18 +125,15 @@ protected:
     CLexicon m_Lexicon;
 
 public:
-    CPinyinTrieMaker();
+    CTrieMaker();
 
-    ~CPinyinTrieMaker() {} //forget this
+    ~CTrieMaker() {} //forget this
 
     bool
     constructFromLexicon(const char* fileName);
 
     bool
-    insertFullPinyinPair(const char* pinyin, TWordId wid);
-
-    bool
-    threadNonCompletePinyin(void);
+    insertPair(const char* unit, TWordId wid);
 
     bool
     write(const char* fileName, CWordEvaluator* psrt, bool revert_endian);
@@ -158,15 +144,6 @@ public:
 protected:
     TNode*
     insertTransfer(TNode* pnode, unsigned s);
-
-    TNode*
-    addCombinedTransfers(TNode *pnode, unsigned s, const CNodeSet& nodes);
-
-    void
-    combineInitialTrans(TNode *pnode);
-
-    void
-    expandCombinedNode(TNode *pnode);
 };
 
 #endif
