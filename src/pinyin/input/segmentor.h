@@ -5,11 +5,11 @@
 #include "syllable.h"
 #include <vector>
 
-struct IPySegmentor {
+struct IPySegmentor : ISegmentor {
     enum ESegmentType
     { SYLLABLE, SYLLABLE_SEP, INVALID, STRING };
 
-    struct TSegment {
+    struct TSegment : ISegmentor::TSegment {
         TSegment (ESegmentType type = SYLLABLE) : m_type(type),
                                                   m_inner_fuzzy(0) {}
         TSegment (unsigned syllable,

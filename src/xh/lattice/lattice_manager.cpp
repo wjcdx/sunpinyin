@@ -7,11 +7,11 @@
 #include "lexicon_states.h"
 
 void
-CPYLatticeManager::buildLexiconStates(IPySegmentor::TSegmentVec &segments,
+CXhLatticeManager::buildLexiconStates(ISegmentor::TSegmentVec &segments,
                            unsigned rebuildFrom)
 {
-    IPySegmentor::TSegmentVec::const_iterator it = segments.begin();
-    IPySegmentor::TSegmentVec::const_iterator ite = segments.end();
+    ISegmentor::TSegmentVec::const_iterator it = segments.begin();
+    ISegmentor::TSegmentVec::const_iterator ite = segments.end();
 
     unsigned i, j = 0;
     for (; it != ite; ++it) {
@@ -24,16 +24,11 @@ CPYLatticeManager::buildLexiconStates(IPySegmentor::TSegmentVec &segments,
         if (j >= this.getLatticesCapacity())
             break;
 
-        if (it->m_type == IPySegmentor::SYLLABLE)
-            _forwardSyllables(i, j, *it);
-        else if (it->m_type == IPySegmentor::SYLLABLE_SEP)
-            _forwardSyllableSep(i, j);
-        else
-            _forwardString(i, j, it->m_syllables);
+		(*it).forward(i, j);
         m_bOmitPunct = false;
     }
 
-    _forwardTail(j, j + 1);
+    TTailSegment.forward(j, j + 1);
     m_tailIdx = j + 1;
 }
 

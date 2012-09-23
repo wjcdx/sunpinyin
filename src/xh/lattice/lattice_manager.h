@@ -1,5 +1,5 @@
-#ifndef SUNPY_PYLATTICE_MANAGER_H
-#define SUNPY_PYLATTICE_MANAGER_H
+#ifndef SUNPY_XHLATTICE_MANAGER_H
+#define SUNPY_XHLATTICE_MANAGER_H
 
 class CXhLatticeManager : CLatticeManager {
 public:

@@ -2,11 +2,22 @@
 #define SUNPY_XH_DATA_H
 
 class XhData {
+	struct XhKeyMapPair {
+	public:
+		int getKey() {return key;}
+		char *getName() {return name;}
+	private:
+		int key;
+		char *name;
+	};
 
-    TUnit encode(const char *); 
+public:
+    TUnit encode(const char *name); 
     const char *decode(TUnit, const char **i = NULL,
-			const char **f = NULL);	
-
+			const char **f = NULL);
+private:
+	XhKeyMapPair &findPair(const char *name);
+	XhKeyMapPair &findPair(int key);
 }
 
 #endif
