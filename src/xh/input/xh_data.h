@@ -15,6 +15,9 @@ public:
     TUnit encode(const char *name); 
     const char *decode(TUnit, const char **i = NULL,
 			const char **f = NULL);
+
+	bool isPattern(unsigned ch);
+	bool isStroke(unsigned ch);
 private:
 	XhKeyMapPair &findPair(const char *name);
 	XhKeyMapPair &findPair(int key);
