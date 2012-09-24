@@ -4,8 +4,7 @@
 struct TXhSyllableSegment : TSegment {
 
 protected:
-	bool lastCharIsNum = false;
-	unsigned m_CheckPointNum;
+	unsigned m_FwdStrokeNum;
 	std::vector<TrieBranch> m_TrieBranches;
 }
 

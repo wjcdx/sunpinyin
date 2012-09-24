@@ -17,17 +17,16 @@ TXhSyllableSegment::_forwardSingleSyllable(TSyllable syllable)
 {
 	if (isdigit(syllable)) {
 		_forwardNumber(syllable);
-		this.lastCharIsNum = true;
+		this.m_FwdStrokeNum = syllable;
 	} else {
 		_forwardStroke(syllable);
-		this.lastCharIsNum = false;
+		this.m_FwdStrokeNum = 1;
 	}
 }
 
 void
 TXhSyllableSegment::_forwardNumber(unsigned n)
 {
-	m_CheckPointNum = n;
 }
 
 void
@@ -37,7 +36,7 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::vector<TrieBranch>::iterator ite = this.m_TrieBranches.end();
 
 	for (; it != ite; it++) {
-		if(_forwardBranch(*it, syllable)) {
+		if(!it->newAdded && _forwardBranch(*it, syllable)) {
 			it->erase();
 		}
 	}
@@ -47,38 +46,22 @@ bool
 TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 						TSyllable &syllable)
 {
-    std::vector<CheckPoint>::iterator it = branch.getCheckPoints().begin();
-    std::vector<CheckPoint>::iterator ite = branch.getCheckPoints().end();
+	PathVec fwdPaths;
 
-	for (; it != ite; it++) {
-		std::vector<CheckPoint> cpset;
+	branch.getCheckPoint().forward(syllable, fwdPaths, m_FwdStrokeNum);
 
-		(*it).forward(syllable, cpset);
-		if (cpset.size() == 1) {
-			it->historify();
-			it->setTNode(cpset.front().m_TNode);
-		} else if (cpset.size() > 1 ){
-			it->historify();
+	PathVec::iterator it = fwdPaths.begin();
+	PathVec::iterator ite = fwdPaths.end();
 
-			std::vector<CheckPoint>::iterator nit = branch.getCheckPoints().begin();
-			std::vector<CheckPoint>::iterator nite = branch.getCheckPoints().end();
-			for (; nit != nite; nit++) {
-				TrieBranch &new_br = branch.copy();
-				new_br.getCheckPoints().back().setTNode(nit->m_TNode);
-				new_br.collectBranchPathInfo();
-				m_TrieBranches.push_bach(new_br);
-			}
-		} else {
-			(*it).erase();
-		}
+	for (it++; it != ite; it++) {
+		TrieBranch b(branch);
+
+		b.addPathInfo(*it);
+		b.newAdded = true;
+		m_TrieBranches.push_back(b);
 	}
-
-	if (branch.getCheckPoints().size() < branch.getCheckPointNum()) {
-		return false;
-	} else {
-		branch.collectBranchPathInfo();
-		return true;
-	}
+	Path &p = fwdPathes.front();
+	branch.addPathInfo(p);
 }
 
 void

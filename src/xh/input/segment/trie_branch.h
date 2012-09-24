@@ -12,6 +12,7 @@ public:
 	void historify() { footprints.push_back(m_TNode); }
 	bool forward(TSyllable &syllable, CheckPointVec cpset);
 	void setTNode(TNode *n) { m_TNode = n; }
+	bool findTNode(TNode *node, TSyllable syllable, BranchPath &pathes);
 };
 
 struct BranchPath {
@@ -29,13 +30,16 @@ public:
 	}
 };
 
+typedef std::vector<BranchPath> PathVec;
+
 typedef BranchPath SearchPath;
 
 struct TrieBranch {
-	std::vector<CheckPoints> checkPoints;
+	CheckPoints checkPoint;
 	BranchPath m_Path;
+	bool newAdded;
 };
 
-typedef std::vector<TrieBranch> TrieBranchVec;
+typedef std::vector<TrieBranch> BranchVec;
 
 #endif
