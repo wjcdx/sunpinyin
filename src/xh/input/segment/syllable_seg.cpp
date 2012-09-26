@@ -49,13 +49,13 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	bool suc = false;
 	PathVec fwdPaths;
 
-	suc = branch.getCheckPoint().forward(m_Path, syllable, fwdPaths, m_FwdStrokeNum, m_NumMeet);
+	suc = branch.forward(syllable, m_FwdStrokeNum, m_NumMet, fwdPaths);
 	
 	if (!suc)
 		return false;
 
-	if (!m_NumMeet && m_FwdStrokeNum > 1) {
-		m_NumMeet = true;
+	if (!m_NumMet && m_FwdStrokeNum > 1) {
+		m_NumMet = true;
 	}
 
 	PathVec::iterator it = fwdPaths.begin();
@@ -85,15 +85,15 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j, TSyllable syllab
 	seg_path.push_back(this.m_start);
 	seg_path.push_back(this.m_start + this.m_len);
 
-    std::vector<TrieBranch>::iterator it = this.m_TrieBranches.begin();
-    std::vector<TrieBranch>::iterator ite = this.m_TrieBranches.end();
+    BranchVec::iterator it = this.m_TrieBranches.begin();
+    BranchVec::iterator ite = this.m_TrieBranches.end();
 	for (; it != ite; it++) {
-		std::vector<CTrie::TNode *> &nodes = it->getTNodes();
+		PathNodeVec &nodes = (*it).getPathNodes();
 
-		std::vector<CTrie::TNode>::iterator nit = nodes.begin();
-		std::vector<CTrie::TNode>::iterator nite = nodes.end();
+		PathNodeVec::iterator nit = nodes.begin();
+		PathNodeVec::iterator nite = nodes.end();
         for (; nit != nite; nit++) {
-			TLexiconState new_lxst = TLexiconState(i, *nit, syls, seg_path);
+			TLexiconState new_lxst = TLexiconState(i, (*nit).getTNode(), syls, seg_path);
 			fr.m_lexiconStates.push_back(new_lxst);
 		}
 	}

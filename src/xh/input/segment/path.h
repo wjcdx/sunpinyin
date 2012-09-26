@@ -1,31 +1,7 @@
 #ifndef SUNPY_BRANCH_PATH_H
 #define SUNPY_BRANCH_PATH_H
 
-struct PathNode;
-typedef std::vector<PathNode> PathNodeVec;
-
-struct PathNode {
-	enum Flag {
-		JUMPED,
-		HISTORY,
-		FUTURE,
-		JUSTNOW,
-		CHECKPOINT,
-		END 
-	};
-	TrieThreadModel::TTransmit *m_Trans;
-	TrieThreadModel::TNode *m_TNode;
-	unsigned flag;
-
-public:
-	bool forward(TSyllable &syllable, PathNodeVec cpset);
-	void setTNode(TNode *n) { m_TNode = n; }
-	bool findTNode(TNode *node, TSyllable syllable, BranchPath &pathes);
-	bool isEnd() { return (flag == END); }
-	bool transFrom(TSyllable s) { return (m_Trans == s); }
-};
-
-struct BranchPath {
+struct Path {
 private:
 	PathNodeVec m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
@@ -44,6 +20,10 @@ public:
 
 	PathNode &getNow() {
 		return m_Now;
+	}
+	
+	PathNodeVec &getPathNodes() {
+		return m_Nodes;
 	}
 
 	PathNode &next(PathNode &n) {
@@ -73,15 +53,33 @@ public:
 			c++;
 		return c;
 	}
+
+public:
+	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathVec &paths);
+
+private:
+	CheckPointVec cpset;
+	int getRepeaterStatus(int count, CheckPointVec &cphooks);
+	void forwardCheckPoint();
+	int getSameRepNumber(CheckPoint &cp);
+	void iterateRepeaters(int count);
+	void findCheckPoints(TSyllable syllable);
+	void labelPath();
+	bool checkNumInPath(TSyllable syllable, int num);
+	bool checkNumInPaths(PathVec paths, TSyllable syllable, int num);
 };
 
-typedef std::vector<BranchPath> PathVec;
+typedef std::vector<Path> PathVec;
 
 struct TrieBranch {
-	BranchPath m_Path;
+	Path m_Path;
 	bool newAdded;
+
 public:
-	void addPathInfo(BranchPath &path) {
+	bool forward(TSyllable s, int num, bool numMet, PathVec &paths) {
+		return m_Path.forward(s, num, numMet, paths);
+	}
+	void addPathInfo(Path &path) {
 		PathNodeVec::iterator it = path.m_Nodes.begin();
 		PathNodeVec::iterator ite = path.m_Nodes.end();
 		m_Path.add(*it);
