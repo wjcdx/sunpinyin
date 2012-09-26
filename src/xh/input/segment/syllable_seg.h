@@ -4,7 +4,8 @@
 struct TXhSyllableSegment : TSegment {
 
 protected:
-	unsigned m_FwdStrokeNum;
+	unsigned m_FwdStrokeNum = 1;
+	bool m_NumMeet = false;
 	std::vector<TrieBranch> m_TrieBranches;
 }
 

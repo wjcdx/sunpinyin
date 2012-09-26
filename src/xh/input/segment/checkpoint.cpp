@@ -1,67 +1,108 @@
 #include "checkpoint.h" 
 bool
-CheckPoint::forward(TSyllable syllable, PathVec &paths, int num)
+PathNode::forward(BranchPath &path, TSyllable syllable, PathVec &paths, int num, bool pathInfoFull)
 {
-	PathVec fwdPaths;
+	bool suc = false;
 
-	findSubNode(m_TNode, syllable, fwdPaths, num);
-	//add into or remove from fwdPathes;
-	checkNumInPath(fwdPaths, syllable, num);
-
-	PathVec::iterator it = fwdPaths.begin();
-	PathVec::iterator ite = fwdPaths.end();
-
-	for (; it != ite; it++) {
-		paths.push_back(fwdPaths);
+	if (pathInfoFull) {
+		PathNode &cp = path.next(syllable);
+		if (cp == NULL || cp.isEnd()) {
+			return false;
+		} 
+		path.forward();
+		return true;
 	}
-	return true;
+
+	if (num == 1) {
+		suc = findNextSubNode(m_TNode, syllable, paths);
+	} else {
+		suc = findAllSubNode(m_TNode, syllable, num, paths);
+		if (!suc)
+			return false;
+
+		//add into or remove from fwdPathes;
+		suc = checkNumInPaths(fwdPaths, syllable, num);
+	}
+
+	return suc;
 }
 
 bool
-CheckPoint::findSubNode(TNode *node, TSyllable syllable, PathVec &paths, int num)
+PathNode::findNextSubNode(TNode *node, TSyllable syllable, PathVec &paths)
 {
-	std::vector<TNode *> children = node.getChildren(syllable);
+	PathNodeVec children = node.getChildren(syllable);
+	if (children.empty()) {
+		return false;
+	}
 
-	std::vector<TNode *>::iterator nit = children.begin();
-	std::vector<TNode *>::iterator nite = children.end();
+	PathNodeVec::iterator nit = children.begin();
+	PathNodeVec::iterator nite = children.end();
 	for (; nit != nite; nit++) {
-		if (nit->syllable == syllable) {
-			num -= 1;
-			if (num > 0) {
-				PathVec subPaths;
-				findSubNode(*nit, syllable, subPaths, num);
+		if ((*nit).transFrom(syllable)) {
+			(*nit).flag = JUSTNOW;
 
-				std::vector<BranchPath>::iterator pit = subPaths.begin();
-				std::vector<BranchPath>::iterator pite = subPaths.end();
-				for (; pit != pite; pit++) {
-					(*pit).push_front(nit);
-					paths.push_back(*pit);
-				}
-			} else {
-				BranchPath path;
-				path.push_front(*nit);
-				paths.push_back(path);
-				return true;
-			}
+			BranchPath path;
+			path.push_front(nit);
+			paths.push_back(path);
 		} else {
+			(*nit).flag = JUMPED;
+			
+			bool suc = false;
 			PathVec subPaths;
-			findSubNode(*nit, syllable, subPaths, num);
+			suc = findNextSubNode((*nit).m_TNode, syllable, subPaths);
+			if (!suc)
+				continue;
 
-			std::vector<BranchPath>::iterator pit = subPaths.begin();
-			std::vector<BranchPath>::iterator pite = subPaths.end();
+			PathVec::iterator pit = subPaths.begin();
+			PathVec::iterator pite = subPaths.end();
 			for (; pit != pite; pit++) {
 				(*pit).push_front(nit);
 				paths.push_back(*pit);
 			}
 		}
 	}
-	return false;
+	return !paths.empty();
 }
 
 bool
-hasCountPiecesInFirstHalf(int count, int num)
+PathNode::findAllSubNode(TNode *node, TSyllable syllable, int num, PathVec &paths)
 {
-	return ((count + 1) >= num);
+	PathNodeVec children = node.getChildren(syllable);
+	if (children.empty()) {
+		BranchPath path;
+		PathNode node;
+		node.flag = END;
+		path.push_front(node);
+		paths.push_back(path);
+		return true;
+	}
+
+	PathNodeVec::iterator nit = children.begin();
+	PathNodeVec::iterator nite = children.end();
+	for (; nit != nite; nit++) {
+		if ((*nit).transFrom(syllable)) {
+			(*nit).flag = FUTURE;
+			num -= 1;
+		} else {
+			(*nit).flag = CHECKPOINT;
+		}
+
+		bool suc = false;
+		PathVec subPaths;
+		suc = findAllSubNode((*nit).m_TNode, syllable, num, subPaths);
+		if (!suc)
+			continue;
+
+		PathVec::iterator pit = subPaths.begin();
+		PathVec::iterator pite = subPaths.end();
+		for (; pit != pite; pit++) {
+			if ((*pit).getTransNum(syllable) < num)
+				continue;
+			(*pit).push_front(nit);
+			paths.push_back(*pit);
+		}
+	}
+	return !paths.empty();
 }
 
 /**
@@ -87,7 +128,7 @@ getRepeaterStatus(BranchPath &path, CheckPointVec &cpset, int count, CheckPointV
 	CheckPointVec::iterator ite = cpset.end();
 	CheckPoint &cp = *it;
 	for (cp = *it, it++; it != ite; cp = *it, it++) {
-		if (path.next(cp.m_TNode) == it->m_Start) {
+		if (path.next(cp.m_PNode) == it->m_Start) {
 			c++;
 			cphooks.push_back(cp);
 		} else {
@@ -107,7 +148,7 @@ forwardCheckPoint(BranchPath &path, CheckPointVec &cpset)
 	CheckPointVec::iterator it = cpset.begin();
 	CheckPointVec::iterator ite = cpset.end();
 	for (; it != ite; it++) {
-		(*it).m_TNode = path.next((*it).m_TNode);
+		(*it).m_PNode = path.next((*it).m_PNode);
 	}
 }
 
@@ -115,14 +156,14 @@ int
 getSameRepNumber(BranchPath &path, CheckPoint &cp, CheckPointVec &cpset)
 {
 	int c = 0;
-	TNode *n1 = cp.m_TNode;
+	PathNode *n1 = cp.m_PNode;
 
 	CheckPointVec::iterator it = cpset.begin();
 	CheckPointVec::iterator ite = cpset.end();
 	for (; it != ite; it++) {
 		if (*it = cp)
 			continue;
-		if (n1 == it->m_TNode) {
+		if (n1 == it->m_PNode) {
 			c++;
 		}
 	}
@@ -149,91 +190,77 @@ iterateRepeaters(BranchPath &path, CheckPointVec &cpset, int count)
 	}
 }
 
-bool
-findSubPath(BranchPath &path, TNode *node, SyllableVec &syls, int i, PathVec &fwdPaths)
+CheckPointVec
+findNodesBySyllable(TSyllable syllable)
 {
-	PathVec subPaths;
-	if (findSubNode(node, syls.get(i), subPaths, 1)) {
-		PathVec::iterator it = subPaths.begin();
-		PathVec::iterator ite = subPaths.end();
-		for (; it != ite; it++) {
-			i += 1;
-			if (i < syls.size()) {
-				PathVec paths;
-				if (findSubPath(path, (*it).front().m_TNode, syls, i, paths)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
+	CheckPointVec cpset;
+
+	PathNodeVec::iterator it = m_Nodes.begin();
+	PathNodeVec::iterator ite = m_Nodes.begin();
+	for (; it != ite; it++) {
+		if ((*it).flag == CHECKPOINT) {
+			CheckPoint cp((*it).m_Node);
+			cpset.push_back(cp);
 		}
-	} else {
-		return false;
 	}
+	return cpset;
 }
 
-bool
-checkNumInPathSecondHalf(BranchPath &path, CheckPoint &cp, CheckPointVec &fwdPaths)
+void
+labelPath(BranchPath &path, CheckPointVec &cpset)
 {
-	SyllableVec syls = cp.getTransmits();
-	return findSubPath(path, path.next(cp.m_TNode), syls, fwdPaths);
+	CheckPointVec::iterator it = cpset.begin();
+	CheckPointVec::iterator ite = cpset.end();
+
+	CheckPoint &cp = *it;
+	PathNode &node = path.getNow();
+	for (; node != *it.m_Start; node = path.next(node)) {
+		node.flag = JUMPED;
+	}
+
+	for (; it != ite; it++) {
+		cp = *it;
+		node = cp.Start;
+		for (; node != cp.m_PNode; node = path.next(node)) {
+			node.flag = HISTORY;
+		}
+	}
+	cp.m_PNode.flag = JUSTNOW;
 }
 
 bool
-checkNumInPath(BranchPath &path, TSyllable syllable, int num, BranchPathVec &fwdPaths)
+checkNumInPath(BranchPath &path, TSyllable syllable, int num)
 {
 	int stat = 0;
 	CheckPointVec cpset = path.findNodesBySyllable(syllable);
+	if (cpset.size() < num)
+		return false;
 
-	//search first half for num-1 cphooks
 	while (true) {
 		CheckPointVec cphooks;
-		stat = getRepeaterStatus(path, cpset, num-1, cphooks);
+		stat = getRepeaterStatus(path, cpset, num, cphooks);
 		if (stat == 1) {
-			goto OUT;
+			lablePath(path, cpset);
+			return true;
 		} else if (stat == -1) {
 			return false;
 		}
-		iterateRepeaters(path, cpset, num-1);
-	}
-
-OUT:
-	if (cphooks.size() >= num) {
-		return true;
-	} else if (cphooks.size() == num -1) {
-		CheckPoint &lastHook = cphooks.back();
-		CheckPoint &lastChkp = cphooks.back();
-		if (path.next(lastHook.m_TNode) == lastChkp.m_Start) {
-			return checkNumInPathSecondHalf(path, lastHook, fwdPaths);
-		}
+		iterateRepeaters(path, cpset, num);
 	}
 	return false;
 }
 
 bool
-CheckPoint::checkNumInPaths(PathVec paths, TSyllable syllable, int num)
+PathNode::checkNumInPaths(PathVec paths, TSyllable syllable, int num)
 {
-	if (num == 1)
-		return true;
-
 	PathVec::iterator it = paths.begin();
 	PathVec::iterator ite = paths.end();
 	for (; it != ite; it++) {
-		PathVec fwdPaths;
-		if (!checkNumInPath(path, syllable, num, fwdPaths)) {
-			(*it).erase();
-		} else {
-			PathVec::iterator sit = subPaths.begin();
-			PathVec::iterator site = subPaths.end();
-			
-			for (; sit != site; sit++) {
-				paths.push_back(*sit);
-			}
+		BranchPath &path = *it;
+		if (!checkNumInPath(path, syllable, num)) {
+			path.erase();
 		}
 	}
-
-	return true;
+	return !paths.empty();
 }
 

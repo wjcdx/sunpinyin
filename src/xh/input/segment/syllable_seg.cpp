@@ -46,9 +46,17 @@ bool
 TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 						TSyllable &syllable)
 {
+	bool suc = false;
 	PathVec fwdPaths;
 
-	branch.getCheckPoint().forward(syllable, fwdPaths, m_FwdStrokeNum);
+	suc = branch.getCheckPoint().forward(m_Path, syllable, fwdPaths, m_FwdStrokeNum, m_NumMeet);
+	
+	if (!suc)
+		return false;
+
+	if (!m_NumMeet && m_FwdStrokeNum > 1) {
+		m_NumMeet = true;
+	}
 
 	PathVec::iterator it = fwdPaths.begin();
 	PathVec::iterator ite = fwdPaths.end();
@@ -62,6 +70,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	}
 	Path &p = fwdPathes.front();
 	branch.addPathInfo(p);
+	return true;
 }
 
 void
