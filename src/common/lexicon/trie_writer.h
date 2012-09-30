@@ -99,7 +99,7 @@ public:
 };
 
 template <>
-bool revert_write<CPinyinTrie::TTransUnit> (const CPinyinTrie::TTransUnit& t,
+bool revert_write<TTransUnit> (const TTransUnit& t,
                                             FILE *fp);
 
 #endif //__SUNPINYIN_PYTRIE_WRITER_H__

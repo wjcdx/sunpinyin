@@ -36,14 +36,14 @@ slmsource = [
     'src/pinyin/lexicon/trie_writer.cpp',
     'src/pinyin/lexicon/genpyt.cpp',
     'src/pinyin/lexicon/pytrie_gen.cpp',
-    'src/pinyin/lexicon/pytrie.cpp',
+    'src/pinyin/lexicon/CPyTrie.cpp',
     'src/pinyin/trie/pinyin_data.cpp',
     ]
 
 imesource = [
     'src/portability.cpp',
     'src/slm/slm.cpp',
-    'src/pinyin/lexicon/pytrie.cpp',
+    'src/pinyin/lexicon/CPyTrie.cpp',
     'src/pinyin/trie/pinyin_data.cpp',
     'src/pinyin/trie/pinyin_seg.cpp',
     'src/pinyin/trie/shuangpin_data.cpp',
@@ -401,8 +401,8 @@ def DoConfigure():
     if GetOS() != 'Darwin':
         env.ParseConfig('pkg-config sqlite3 --libs --cflags')
 
-if not GetOption('clean') and not GetOption('help'):
-    DoConfigure()
+#if not GetOption('clean') and not GetOption('help'):
+#    DoConfigure()
 
 #
 #==============================compile==============================

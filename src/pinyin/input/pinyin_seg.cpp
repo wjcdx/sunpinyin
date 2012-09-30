@@ -111,7 +111,7 @@ CGetFuzzySegmentsOp::operator ()(IPySegmentor::TSegmentVec& segs,
                 xi_str.push_back(*it);
 #endif
 
-            unsigned xi_syl = CPinyinData::encodeSyllable(xi_str.c_str());
+            unsigned xi_syl = CPinyinData::encode(xi_str.c_str());
 
             if (0 == xi_syl)
                 goto RETURN;

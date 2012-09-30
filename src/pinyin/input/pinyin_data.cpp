@@ -11,7 +11,7 @@ pytab_entry_compare(const char *s, TPyTabEntry *v)
 }
 
 TSyllable
-CPinyinData::encodeSyllable(const char *pinyin)
+CPinyinData::encode(const char *pinyin)
 {
     typedef int (*bsearch_compare)(const void*, const void*);
     TPyTabEntry *e = (TPyTabEntry*)bsearch(pinyin, pinyin_table,
@@ -26,7 +26,7 @@ CPinyinData::encodeSyllable(const char *pinyin)
 }
 
 const char *
-CPinyinData::decodeSyllable(TSyllable s, const char **i, const char **f)
+CPinyinData::decode(TSyllable s, const char **i, const char **f)
 {
     if (i) *i = initials[s.initial];
     if (f) *f = finals[s.final];

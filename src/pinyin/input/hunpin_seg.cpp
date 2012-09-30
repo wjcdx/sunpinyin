@@ -48,7 +48,7 @@ CHunpinSegmentor::_encode(const char* buf, int ret)
     s.m_syllables.clear();
     s.m_type = IPySegmentor::SYLLABLE;
     for (; iter != iter_end; iter++) {
-        s.m_syllables.push_back(s_shpData.encodeSyllable(iter->c_str()));
+        s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
     }
 
     return s.m_start;
@@ -72,7 +72,7 @@ CHunpinSegmentor::_encode(const char* buf)
     s.m_syllables.clear();
     s.m_type = IPySegmentor::SYLLABLE;
     for (; iter != iter_end; iter++) {
-        s.m_syllables.push_back(s_shpData.encodeSyllable(iter->c_str()));
+        s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
     }
 
     return s.m_start;

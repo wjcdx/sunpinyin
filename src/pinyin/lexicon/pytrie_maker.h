@@ -10,24 +10,10 @@
 #include <set>
 #include <list>
 
-#include "pytrie.h"
+#include "trie.h"
+#include "CPyTrie.h"
 
-class CPinyinTrieMaker : CTrieMaker  {
-public:
-    typedef std::set<TWordId>               CWordSet;
-    typedef std::vector<TWordInfo>          CWordVec;
-    typedef std::map<unsigned, TNode*>      CTrans;
-    typedef std::set<TNode*>                CNodeSet;
-    typedef std::list<TNode*>               CNodeList;
-    typedef std::vector<std::string>        CLexicon;
-
-    typedef std::map<PNodeSet, TNode*>     CStateMap;
-
-protected:
-    CStateMap m_StateMap;
-    TNode m_RootNode;
-    CLexicon m_Lexicon;
-
+class CPyTrieMaker : CTrieMaker  {
 public:
     CPinyinTrieMaker();
 
@@ -35,9 +21,6 @@ public:
 
     bool
     constructFromLexicon(const char* fileName);
-
-    bool
-    insertFullPinyinPair(const char* pinyin, TWordId wid);
 
     bool
     threadNonCompletePinyin(void);

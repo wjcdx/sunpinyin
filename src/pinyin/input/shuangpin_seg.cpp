@@ -257,7 +257,7 @@ CShuangpinSegmentor::_encode(const char* buf, char ch, bool isComplete)
         s.m_syllables.clear();
         s.m_type = IPySegmentor::SYLLABLE;
         for (; iter != iter_end; iter++) {
-            s.m_syllables.push_back(s_shpData.encodeSyllable(iter->c_str()));
+            s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
         }
         m_nLastValidPos += 1;
         return s.m_start;
@@ -268,7 +268,7 @@ CShuangpinSegmentor::_encode(const char* buf, char ch, bool isComplete)
         m_nLastValidPos += 1;
 
         for (; iter != iter_end; ++iter) {
-            TSyllable syl = s_shpData.encodeSyllable(iter->c_str());
+            TSyllable syl = s_shpData.encode(iter->c_str());
             if ((int)syl != 0) {
                 s.m_syllables.push_back(syl);
                 m_segs.push_back(s);

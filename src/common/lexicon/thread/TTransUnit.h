@@ -1,11 +1,11 @@
 #ifndef SUNPY_TTRANSUNIT_H
 #define SUNPY_TTRANSUNIT_H
 
-#include "unit.h"
-namespace TrieThreadModel {
+#include "TUnit.h"
 
+namespace TrieThreadModel {
 	struct TTransUnit {
-		CUnit m_Unit;
+		TUnit m_Unit;
 		unsigned m_Offset;
 	};
 }

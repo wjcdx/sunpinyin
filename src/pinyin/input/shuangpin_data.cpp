@@ -249,7 +249,7 @@ CShuangpinData::~CShuangpinData()
 }
 
 TSyllable
-CShuangpinData::encodeSyllable(const char *pinyin)
+CShuangpinData::encode(const char *pinyin)
 {
     std::map<std::string, TSyllable>::iterator iter;
     iter = m_codingmap.find(pinyin);
@@ -260,7 +260,7 @@ CShuangpinData::encodeSyllable(const char *pinyin)
 }
 
 const char *
-CShuangpinData::decodeSyllable(TSyllable s, const char **i, const char **f)
+CShuangpinData::decode(TSyllable s, const char **i, const char **f)
 {
     return NULL;
 }

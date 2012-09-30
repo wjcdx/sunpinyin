@@ -4,7 +4,6 @@
 #define WORD_ID_WIDTH       24
 
 namespace TrieThreadModel {
-
 	struct TWordIdInfo {
 #ifdef WORDS_BIGENDIAN
 		unsigned m_bSeen    : 1;

@@ -4,7 +4,6 @@
 #include <deque>
 
 #include "trie.h"
-#include "pinyin_data.h"
 
 using TrieThreadModel;
 
@@ -13,7 +12,7 @@ using TrieThreadModel;
 #endif
 
 bool
-CTrie::isValid(const TNode* pnode,
+CTrie::isValid(const TThreadNode* pnode,
                      bool allowNonComplete,
                      unsigned csLevel)
 {
@@ -121,7 +120,7 @@ CTrie::print(FILE *fp) const
 }
 
 void
-CTrie::print(const TNode* pRoot, std::string& prefix, FILE *fp) const
+CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
 {
     static char buf[1024];
     if (pRoot->m_nWordId > 0) {
@@ -152,7 +151,7 @@ CTrie::print(const TNode* pRoot, std::string& prefix, FILE *fp) const
     const TTransUnit* ptrans = pRoot->getTrans();
     for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit;
-        const TNode *pch = transfer(pRoot, u);
+        const TThreadNode *pch = transfer(pRoot, u);
         const char *str = m_UnitData::decode(u);
         if (!str) break;
         prefix = prefix + str + '\'';

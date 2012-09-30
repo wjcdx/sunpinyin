@@ -7,8 +7,11 @@
 #endif
 
 #include "portability.h"
-#include "unit.h"
+#include "TUnit.h"
+#include "TThreadNode.h"
+#include "TTransUnit.h"
 #include "TWordIdInfo.h"
+#include "CUnitData.h"
 #include <map>
 
 class CTrie {
@@ -27,16 +30,16 @@ public:
     free(void);
 
     virtual bool
-    isValid(const TNode* pnode, bool allowNonComplete, unsigned csLevel = 0);
+    isValid(const TThreadNode* pnode, bool allowNonComplete, unsigned csLevel = 0);
 
     unsigned int getRootOffset() const
     { return 3 * sizeof(unsigned int); }
 
-    const TNode*getRootNode() const
-    { return (TNode *) (m_mem + getRootOffset()); }
+    const TThreadNode*getRootNode() const
+    { return (TThreadNode *) (m_mem + getRootOffset()); }
 
-    const TNode*nodeFromOffset(unsigned int offset) const
-    { return (offset < getRootOffset()) ? NULL : ((TNode *) (m_mem + offset)); }
+    const TThreadNode*nodeFromOffset(unsigned int offset) const
+    { return (offset < getRootOffset()) ? NULL : ((TThreadNode *) (m_mem + offset)); }
 
     unsigned int getWordCount(void) const
     { return *(unsigned int *) m_mem; }
@@ -47,10 +50,10 @@ public:
     unsigned int getStringOffset(void) const
     { return *(unsigned int *) (m_mem + 2 * sizeof(unsigned int)); }
 
-    inline const TNode*transfer(const TNode* pnode, unsigned s) const
+    inline const TThreadNode*transfer(const TThreadNode* pnode, unsigned s) const
     { return nodeFromOffset(pnode->transfer(s)); }
 
-    inline const TNode*transfer(unsigned s) const
+    inline const TThreadNode*transfer(unsigned s) const
     { return transfer(getRootNode(), s); }
 
     unsigned int
@@ -78,7 +81,7 @@ protected:
     CUnitData m_UnitData;
 
     void
-    print(const TNode* pRoot, std::string& prefix, FILE *fp) const;
+    print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const;
 };
 
 #endif /* __SUNPINYIN_PYTRIE_H__*/

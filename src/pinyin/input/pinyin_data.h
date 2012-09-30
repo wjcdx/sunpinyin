@@ -8,8 +8,8 @@
 class CPinyinData
 {
 public:
-    static TSyllable encodeSyllable(const char *);
-    static const char *decodeSyllable(TSyllable,
+    static TSyllable encode(const char *);
+    static const char *decode(TSyllable,
                                       const char **i = NULL,
                                       const char **f = NULL);
 

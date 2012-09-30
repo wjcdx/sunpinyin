@@ -1,17 +1,18 @@
 #ifndef SUNPY_TREE_PNODESET_H
 #define SUNPY_TREE_PNODESET_H
 
-namespace TrieTreeModel {
+#include "CTreeNode.h"
 
+namespace TrieTreeModel {
     class PNodeSet {
 public:
-        PNodeSet(const CNodeSet *pns) : m_pns(pns) { }
+        PNodeSet(const CTreeNodeSet *pns) : m_pns(pns) { }
 
         PNodeSet(const PNodeSet& another) : m_pns(another.m_pns) { }
 
-        const CNodeSet*operator->(void) { return m_pns; }
+        const CTreeNodeSet*operator->(void) { return m_pns; }
 
-        const CNodeSet&operator*(void) { return *m_pns; }
+        const CTreeNodeSet&operator*(void) { return *m_pns; }
 
         bool
         operator<(const PNodeSet& another) const;
@@ -20,7 +21,7 @@ public:
         operator==(const PNodeSet& another) const;
 
 protected:
-        const CNodeSet *    m_pns;
+        const CTreeNodeSet *    m_pns;
     };
 }
 

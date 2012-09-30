@@ -16,7 +16,9 @@
 #include "pinyin_data.h"
 #include "trie_writer.h"
 
-CPinyinTrieMaker::CPinyinTrieMaker()
+using namespace TrieTreeModel;
+
+CPyTrieMaker::CPyTrieMaker()
 {
     this.m_UnitData = CPinyinData();
     m_RootNode.m_bExpanded = true;
@@ -30,7 +32,7 @@ CPinyinTrieMaker::CPinyinTrieMaker()
 **********************************************************/
 
 bool
-CPinyinTrieMaker::constructFromLexicon(const char* fileName)
+CPyTrieMaker::constructFromLexicon(const char* fileName)
 {
     static char buf[4096];
     static char word_buf[2048];
@@ -58,16 +60,16 @@ CPinyinTrieMaker::constructFromLexicon(const char* fileName)
             if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
             m_Lexicon[id] = std::string(word_buf);
 
-            CPinyinTrieMaker::TWordId wid(id, its->m_cost, false, gbcategory);
+            TTreeWordId wid(id, its->m_cost, false, gbcategory);
             suc = insertPair(pystr, wid) && suc;
         }
     }
     fclose(fp);
 
-    printf("\n    %zd primitive nodes", TNode::m_AllNodes.size());  fflush(stdout);
+    printf("\n    %zd primitive nodes", CPyTreeNode::m_AllNodes.size());  fflush(stdout);
 
     threadNonCompletePinyin();
-    printf("\n    %zd total nodes", TNode::m_AllNodes.size());  fflush(stdout);
+    printf("\n    %zd total nodes", CPyTreeNode::m_AllNodes.size());  fflush(stdout);
 
     std::string pyPrefix = "";
     printf("\n");  fflush(stdout);
@@ -75,13 +77,13 @@ CPinyinTrieMaker::constructFromLexicon(const char* fileName)
     return suc;
 }
 
-CPinyinTrieMaker::TNode*
-CPinyinTrieMaker::insertTransfer(TNode* pnode, unsigned s)
+CPyTreeNode*
+CPyTrieMaker::insertTransfer(CPyTreeNode* pnode, unsigned s)
 {
     CTrans::const_iterator itt = pnode->m_Trans.find(s);
     CTrans::const_iterator ite = pnode->m_Trans.end();
     if (itt == ite) {
-        TNode *p = new TNode();
+        CPyTreeNode *p = new CPyTreeNode();
         p->m_bFullSyllableTransfer = true;
         p->m_bExpanded = true;
         pnode->m_Trans[s] = p;
@@ -90,29 +92,29 @@ CPinyinTrieMaker::insertTransfer(TNode* pnode, unsigned s)
     return itt->second;
 }
 
-CPinyinTrieMaker::TNode*
-CPinyinTrieMaker::addCombinedTransfers(TNode *pnode,
+CPyTreeNode*
+CPyTrieMaker::addCombinedTransfers(CPyTreeNode *pnode,
                                        unsigned s,
-                                       const CNodeSet& nodes)
+                                       const CTreeNodeSet& nodes)
 {
     assert(!nodes.empty());
 
-    TNode *p = NULL;
+    CPyTreeNode *p = NULL;
     if (nodes.size() == 1) {
         p = *(nodes.begin());
     } else {
-        p = new TNode();
+        p = new CPyTreeNode();
         p->m_cmbNodes = nodes;
         m_StateMap[&p->m_cmbNodes] = p;
 
-        CNodeSet::const_iterator it = nodes.begin();
-        CNodeSet::const_iterator ite = nodes.end();
+        CTreeNodeSet::const_iterator it = nodes.begin();
+        CTreeNodeSet::const_iterator ite = nodes.end();
         for (; it != ite; ++it) {
-            CWordSet::const_iterator wit  = (*it)->m_WordIdSet.begin();
-            CWordSet::const_iterator wite = (*it)->m_WordIdSet.end();
+            CTreeWordSet::const_iterator wit  = (*it)->m_WordIdSet.begin();
+            CTreeWordSet::const_iterator wite = (*it)->m_WordIdSet.end();
 
             for (; wit != wite; ++wit) {
-                CWordSet::iterator tmp = p->m_WordIdSet.find (*wit);
+                CTreeWordSet::iterator tmp = p->m_WordIdSet.find (*wit);
 
                 if (tmp == p->m_WordIdSet.end()) {
                     p->m_WordIdSet.insert (*wit);
@@ -129,9 +131,9 @@ CPinyinTrieMaker::addCombinedTransfers(TNode *pnode,
 }
 
 void
-CPinyinTrieMaker::combineInitialTrans(TNode *pnode)
+CPyTrieMaker::combineInitialTrans(CPyTreeNode *pnode)
 {
-    std::map<unsigned, CNodeSet> combTrans;
+    std::map<unsigned, CTreeNodeSet> combTrans;
 
     CTrans::const_iterator itTrans = pnode->m_Trans.begin();
     CTrans::const_iterator itTransLast = pnode->m_Trans.end();
@@ -143,19 +145,19 @@ CPinyinTrieMaker::combineInitialTrans(TNode *pnode)
         }
     }
 
-    std::map<unsigned, CNodeSet>::const_iterator itCombTrans = combTrans.begin();
+    std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
     for (; itCombTrans != combTrans.end(); ++itCombTrans)
         addCombinedTransfers(pnode, itCombTrans->first, itCombTrans->second);
 }
 
 void
-CPinyinTrieMaker::expandCombinedNode(TNode *pnode)
+CPyTrieMaker::expandCombinedNode(CPyTreeNode *pnode)
 {
     assert(pnode->m_cmbNodes.size() >= 1);
 
-    std::map<unsigned, CNodeSet> combTrans;
-    CNodeSet::const_iterator itNode = pnode->m_cmbNodes.begin();
-    CNodeSet::const_iterator itNodeLast = pnode->m_cmbNodes.end();
+    std::map<unsigned, CTreeNodeSet> combTrans;
+    CTreeNodeSet::const_iterator itNode = pnode->m_cmbNodes.begin();
+    CTreeNodeSet::const_iterator itNodeLast = pnode->m_cmbNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         CTrans::const_iterator itTrans = (*itNode)->m_Trans.begin();
         CTrans::const_iterator itTransLast = (*itNode)->m_Trans.end();
@@ -163,11 +165,11 @@ CPinyinTrieMaker::expandCombinedNode(TNode *pnode)
             combTrans[itTrans->first].insert(itTrans->second);
     }
 
-    std::map<unsigned, CNodeSet>::const_iterator itCombTrans = combTrans.begin();
+    std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
     for (; itCombTrans != combTrans.end(); ++itCombTrans) {
-        TNode* p = NULL;
+        CPyTreeNode* p = NULL;
         unsigned s = itCombTrans->first;
-        CNodeSet nodes = itCombTrans->second;
+        CTreeNodeSet nodes = itCombTrans->second;
 
         CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
         if (itStateMap != m_StateMap.end())
@@ -182,11 +184,11 @@ CPinyinTrieMaker::expandCombinedNode(TNode *pnode)
 }
 
 bool
-CPinyinTrieMaker::threadNonCompletePinyin(void)
+CPyTrieMaker::threadNonCompletePinyin(void)
 {
-    CNodeList::const_iterator itNode = TNode::m_AllNodes.begin();
-    for (; itNode != TNode::m_AllNodes.end(); ++itNode) {
-        TNode* pnode = *itNode;
+    CTreeNodeList::const_iterator itNode = CPyTreeNode::m_AllNodes.begin();
+    for (; itNode != CPyTreeNode::m_AllNodes.end(); ++itNode) {
+        CPyTreeNode* pnode = *itNode;
         if (pnode->m_bExpanded)
             combineInitialTrans(pnode);
         else
@@ -196,23 +198,23 @@ CPinyinTrieMaker::threadNonCompletePinyin(void)
 }
 
 bool
-CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
+CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 {
     bool suc = true;
     static TWCHAR wbuf[1024];
 
-    std::map<TNode*, unsigned int> nodeOffsetMap;
+    std::map<CPyTreeNode*, unsigned int> nodeOffsetMap;
 
     unsigned int nWord = m_Lexicon.size();
-    unsigned int nNode = TNode::m_AllNodes.size();
+    unsigned int nNode = CPyTreeNode::m_AllNodes.size();
     unsigned int lexiconOffset;
     unsigned int offset = sizeof(unsigned int) * 3;
 
-    CNodeList::const_iterator itNode = TNode::m_AllNodes.begin();
-    CNodeList::const_iterator itNodeLast = TNode::m_AllNodes.end();
+    CTreeNodeList::const_iterator itNode = CPyTreeNode::m_AllNodes.begin();
+    CTreeNodeList::const_iterator itNodeLast = CPyTreeNode::m_AllNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         nodeOffsetMap[*itNode] = offset;
-        offset += CPinyinTrie::TNode::size_for((*itNode)->m_Trans.size(),
+        offset += CPinyinTrie::CPyTreeNode::size_for((*itNode)->m_Trans.size(),
                                                (*itNode)->m_WordIdSet.size());
     }
     lexiconOffset = offset;
@@ -230,20 +232,20 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     suc = f.write(nNode);
     suc = f.write(lexiconOffset);
 
-    itNode = TNode::m_AllNodes.begin();
-    itNodeLast = TNode::m_AllNodes.end();
+    itNode = CPyTreeNode::m_AllNodes.begin();
+    itNodeLast = CPyTreeNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        CPinyinTrie::TNode outNode;
-        TNode *pnode = *itNode;
+        CPinyinTrie::CPyTreeNode outNode;
+        CPyTreeNode *pnode = *itNode;
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
         outNode.m_bFullSyllableTransfer = pnode->m_bFullSyllableTransfer;
         outNode.m_csLevel = 0;
 
-        CWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
-        CWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();
+        CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
+        CTreeWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast && outNode.m_csLevel < 3; ++itId) {
             if (outNode.m_csLevel < itId->anony.m_csLevel)
                 outNode.m_csLevel = itId->anony.m_csLevel;
@@ -254,14 +256,14 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         CTrans::const_iterator itTrans = pnode->m_Trans.begin();
         CTrans::const_iterator itTransLast = pnode->m_Trans.end();
         for (; itTrans != itTransLast && suc; ++itTrans) {
-            CPinyinTrie::TTransUnit tru;
+            TTransUnit tru;
             tru.m_Syllable = itTrans->first;
             tru.m_Offset = nodeOffsetMap[itTrans->second];
             assert(tru.m_Offset != 0 && tru.m_Offset < lexiconOffset);
             suc = f.write(tru);
         }
 
-        CWordVec vec;
+        CTreeWordVec vec;
         itId = pnode->m_WordIdSet.begin();
         itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast; ++itId)
@@ -270,10 +272,10 @@ CPinyinTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         std::make_heap(vec.begin(), vec.end());
         std::sort_heap(vec.begin(), vec.end());
 
-        CWordVec::const_iterator itv = vec.begin();
-        CWordVec::const_iterator itve = vec.end();
+        CTreeWordVec::const_iterator itv = vec.begin();
+        CTreeWordVec::const_iterator itve = vec.end();
         for (; itv != itve && suc; ++itv) {
-            CPinyinTrie::TWordIdInfo wi;
+            TWordIdInfo wi;
             wi.m_id = itv->m_id.anony.m_id;
             assert(wi.m_id < nWord);
             wi.m_csLevel = itv->m_id.anony.m_csLevel;

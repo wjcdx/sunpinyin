@@ -24,7 +24,6 @@ public:
     }
 
 protected:
-
     CThreadSlm m_Model;
 };
 
