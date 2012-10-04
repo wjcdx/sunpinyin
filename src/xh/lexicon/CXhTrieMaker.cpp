@@ -53,7 +53,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
         std::set<TUnitInfo>::const_iterator its = unitset.begin();
         std::set<TUnitInfo>::const_iterator ite = unitset.end();
         for (; its != ite; ++its) {
-            const char *ustr = its->m_py.c_str();
+            const char *ustr = its->m_ustr.c_str();
             if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
             m_Lexicon[id] = std::string(word_buf);
 
@@ -97,7 +97,7 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     CTreeNodeList::const_iterator itNodeLast = CTreeNode::m_AllNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         nodeOffsetMap[*itNode] = offset;
-        offset += CTreeNode::size_for((*itNode)->m_Trans.size(),
+        offset += TThreadNode::size_for((*itNode)->m_Trans.size(),
                                                (*itNode)->m_WordIdSet.size());
     }
     lexiconOffset = offset;
@@ -119,15 +119,15 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     itNodeLast = CTreeNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        CTrie::CTreeNode outNode;
+        TThreadNode outNode;
         CTreeNode *pnode = *itNode;
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
         outNode.m_csLevel = 0;
 
-        CWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
-        CWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();
+        CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
+        CTreeWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast && outNode.m_csLevel < 3; ++itId) {
             if (outNode.m_csLevel < itId->anony.m_csLevel)
                 outNode.m_csLevel = itId->anony.m_csLevel;
@@ -138,24 +138,24 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         CTrans::const_iterator itTrans = pnode->m_Trans.begin();
         CTrans::const_iterator itTransLast = pnode->m_Trans.end();
         for (; itTrans != itTransLast && suc; ++itTrans) {
-            CTrie::TTransUnit tru;
+            TTransUnit tru;
             tru.m_Unit = itTrans->first;
             tru.m_Offset = nodeOffsetMap[itTrans->second];
             assert(tru.m_Offset != 0 && tru.m_Offset < lexiconOffset);
             suc = f.write(tru);
         }
 
-        CWordVec vec;
+        CTreeWordVec vec;
         itId = pnode->m_WordIdSet.begin();
         itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast; ++itId)
-            vec.push_back(TWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
+            vec.push_back(TTreeWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
                                     psrt->isSeen(*itId)));
         std::make_heap(vec.begin(), vec.end());
         std::sort_heap(vec.begin(), vec.end());
 
-        CWordVec::const_iterator itv = vec.begin();
-        CWordVec::const_iterator itve = vec.end();
+        CTreeWordVec::const_iterator itv = vec.begin();
+        CTreeWordVec::const_iterator itve = vec.end();
         for (; itv != itve && suc; ++itv) {
             TWordIdInfo wi;
             wi.m_id = itv->m_id.anony.m_id;

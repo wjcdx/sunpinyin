@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef _SUNPINYIN_PYTRIE_GEN_H__
-#define _SUNPINYIN_PYTRIE_GEN_H__
+#ifndef _SUNPINYIN_PYTRIE_MAKER_H__
+#define _SUNPINYIN_PYTRIE_MAKER_H__
 
 #include "portability.h"
 
@@ -11,13 +11,16 @@
 #include <list>
 
 #include "trie.h"
-#include "CPyTrie.h"
+#include "trie_maker.h"
+#include "TrieTreeModel.h"
+#include "CWordEvaluator.h"
+#include "CPyTreeNode.h"
 
-class CPyTrieMaker : CTrieMaker  {
+class CPyTrieMaker : public CTrieMaker {
 public:
-    CPinyinTrieMaker();
+    CPyTrieMaker();
 
-    ~CPinyinTrieMaker() {} //forget this
+    ~CPyTrieMaker(); //forget this
 
     bool
     constructFromLexicon(const char* fileName);
@@ -32,17 +35,18 @@ public:
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:
-    TNode*
-    insertTransfer(TNode* pnode, unsigned s);
+    //override
+    CTreeNode*
+    insertTransfer(CTreeNode* pnode, unsigned s);
 
-    TNode*
-    addCombinedTransfers(TNode *pnode, unsigned s, const CNodeSet& nodes);
-
-    void
-    combineInitialTrans(TNode *pnode);
+    CPyTreeNode*
+    addCombinedTransfers(CPyTreeNode *pnode, unsigned s, const CTreeNodeSet& nodes);
 
     void
-    expandCombinedNode(TNode *pnode);
+    combineInitialTrans(CPyTreeNode *pnode);
+
+    void
+    expandCombinedNode(CPyTreeNode *pnode);
 };
 
 #endif

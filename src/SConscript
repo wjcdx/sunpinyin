@@ -33,9 +33,16 @@ env.Program('tslmpack', ['portability.o', 'slm/slm.o',
                      	 'slm/tslmpack/arpa_conv.o', 'slm/tslmpack/arpa_slm.o'])
 
 env.Program('genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer.o',
-                   	   'pinyin/lexicon/trie_writer.o', 'pinyin/lexicon/genpyt.o',
-                   	   'pinyin/lexicon/CPyTrie.o', 'pinyin/lexicon/pytrie_gen.o',
-                   	   'pinyin/trie/pinyin_data.o'])
+                   	   'common/lexicon/trie_writer.o', 'common/lexicon/gentrie.o',
+                   	   'common/lexicon/trie_factory.o', 'common/lexicon/maker_factory.o',
+                   	   'common/lexicon/trie.o', 'common/lexicon/trie_maker.o',
+                   	   'common/lexicon/CUnitData.o',
+                   	   'common/lexicon/tree/PNodeSet.o',
+                   	   'common/lexicon/CUnigramSorter.o',
+                       'xh/lexicon/CXhTrieMaker.o',
+                       'xh/input/xh_data.o',
+                       'pinyin/lexicon/pytrie_maker.o',
+                   	   'pinyin/input/pinyin_data.o'])
 
 env.Program('getwordfreq', ['portability.o', 'slm/slm.o',
                             'slm/getwordfreq/getwordfreq.o'])

@@ -1,5 +1,7 @@
 #include "PNodeSet.h"
 
+using namespace TrieTreeModel;
+
 bool
 PNodeSet::operator<(const PNodeSet& another) const
 {

@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef _SUNPINYIN_PYTRIE_GEN_H__
-#define _SUNPINYIN_PYTRIE_GEN_H__
+#ifndef _SUNPINYIN_TRIE_MAKER_H__
+#define _SUNPINYIN_TRIE_MAKER_H__
 
 #include "portability.h"
 
@@ -11,9 +11,12 @@
 #include <list>
 
 #include "trie.h"
+#include "CUnitData.h"
+#include "TrieTreeModel.h"
 #include "CWordEvaluator.h"
+#include "TUnitInfo.h"
 
-using TrieTreeModel;
+using namespace TrieTreeModel;
 
 class CTrieMaker {
 public:
@@ -22,9 +25,8 @@ public:
 
 protected:
     CStateMap m_StateMap;
-    CTreeNode m_RootNode;
+    CTreeNode *m_pRootNode;
     CLexicon m_Lexicon;
-    CUnitData m_UnitData;
 
 public:
     CTrieMaker();
@@ -33,6 +35,21 @@ public:
 
     virtual bool
     constructFromLexicon(const char* fileName);
+    
+    bool
+    insertPair(const char* unit, TTreeWordId wid);
+    
+    void
+    parseUnit(const char *ustr, std::vector<TUnit> &ret);
+    
+    unsigned
+    getPureGBEncoding(const char* utf8str);
+
+    bool
+    parseLine(char* buf,
+              char* word_buf,
+              unsigned& id,
+              std::set<TUnitInfo>& unitset);
 
     virtual bool
     write(const char* fileName, CWordEvaluator* psrt, bool revert_endian);

@@ -6,31 +6,28 @@
 #include "trie.h"
 
 template <>
-class OtherEndian<CPinyinTrie::TNode>
+class OtherEndian<TThreadNode>
 {
-    struct TNode_BE {
-        unsigned m_other      : 5;
-        unsigned m_bFullSyllableTransfer : 1;
+    struct TThreadNode_BE {
+        unsigned m_other      : 6;
         unsigned m_csLevel    : 2;
         unsigned m_nTransfer  : 12;
         unsigned m_nWordId    : 12;
     };
 
-    struct TNode_LE {
+    struct TThreadNode_LE {
         unsigned m_nWordId    : 12;
         unsigned m_nTransfer  : 12;
         unsigned m_csLevel    : 2;
-        unsigned m_bFullSyllableTransfer : 1;
-        unsigned m_other      : 5;
+        unsigned m_other      : 6;
     };
 public:
-    DEFINE_OTHER_TYPE(TNode);
+    DEFINE_OTHER_TYPE(TThreadNode);
 
-    static TargetType create(const CPinyinTrie::TNode& from){
+    static TargetType create(const TThreadNode& from){
         TargetType to;
         to.m_nTransfer = from.m_nTransfer;
         to.m_nWordId = from.m_nWordId;
-        to.m_bFullSyllableTransfer = from.m_bFullSyllableTransfer;
         to.m_csLevel = from.m_csLevel;
         // we don't care about m_other though
         to.m_other = from.m_other;
@@ -39,37 +36,20 @@ public:
 };
 
 template<>
-class OtherEndian<TSyllable>
+class OtherEndian<TUnit>
 {
-    struct TSyllable_BE {
-        unsigned other    : 12;
-        unsigned initial  : 8;
-        unsigned final    : 8;
-        unsigned tone     : 4;
-    };
-
-    struct TSyllable_LE {
-        unsigned tone     : 4;
-        unsigned final    : 8;
-        unsigned initial  : 8;
-        unsigned other    : 12;
-    };
-
 public:
-    DEFINE_OTHER_TYPE(TSyllable);
+    typedef TUnit TargetType;
 
-    static TargetType create(const TSyllable& from){
+    static TargetType create(const TUnit &from){
         TargetType to;
-        to.other = from.other;
-        to.initial = from.initial;
-        to.final = from.final;
-        to.tone = from.tone;
+        to.m_Unit = from.m_Unit;
         return to;
     }
 };
 
 template <>
-class OtherEndian<CPinyinTrie::TWordIdInfo>
+class OtherEndian<TWordIdInfo>
 {
     struct TWordIdInfo_BE {
         unsigned m_bSeen    : 1;
@@ -88,7 +68,7 @@ class OtherEndian<CPinyinTrie::TWordIdInfo>
 public:
     DEFINE_OTHER_TYPE(TWordIdInfo);
 
-    static TargetType create(const CPinyinTrie::TWordIdInfo& from){
+    static TargetType create(const TWordIdInfo& from){
         TargetType to;
         to.m_id = from.m_id;
         to.m_csLevel = from.m_csLevel;

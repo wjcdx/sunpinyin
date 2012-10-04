@@ -2,6 +2,7 @@
 #define SUNPY_THREAD_TNODE_H
 
 #include "TTransUnit.h"
+#include "TWordIdInfo.h"
 
 namespace TrieThreadModel {
     struct TThreadNode {
@@ -19,11 +20,11 @@ namespace TrieThreadModel {
 
         static unsigned int size_for(unsigned int nTransfer,
                                      unsigned int nWordId)                    {
-            return sizeof(TNode) + sizeof(TTransUnit) * nTransfer +
+            return sizeof(TThreadNode) + sizeof(TTransUnit) * nTransfer +
                    sizeof(TWordIdInfo) * nWordId;
         }
 
-        TNode()
+        TThreadNode()
         { *((unsigned *) this) = 0; }
 
         bool hasChild(void) const

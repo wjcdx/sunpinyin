@@ -1,3 +1,4 @@
+#include "CUnigramSorter.h"
 
 double
 CUnigramSorter::getCost(unsigned int wid)

@@ -1,33 +1,33 @@
-
 #include "xh_data.h"
 
-struct XhKeyMapPair {
-	int key;
-	char *name;
-} xhDataMap = {
+XhKeyMapPair
+CXhData::xhDataMaps[] = {
 	{ 'a', "P01" },
 };
 
-XhKeyMapPair &
-XhData::findPair(const char *name)
+static XhKeyMapPair &
+findPair(std::string name)
 {
+	XhKeyMapPair *p;
+	return *p;
 }
 
-XhKeyMapPair &
-XhData::findPair(int key)
+static XhKeyMapPair &
+findPair(int key)
 {
+	XhKeyMapPair *p;
+	return *p;
 }
 
 TUnit
-XhData::encode(const char *name)
+CXhData::encode(const char *name)
 {
 	return TUnit(findPair(name).getKey());
-
 }
 
 const char *
-XhData::decode(TUnit u)
+CXhData::decode(TUnit u, const char **i, const char **f)
 {
-	return findPair(name).getName();
+	return findPair(u).getName().c_str();
 }
 

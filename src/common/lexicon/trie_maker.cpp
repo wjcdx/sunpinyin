@@ -12,8 +12,10 @@
 
 #include <algorithm>
 
+#include "TrieThreadModel.h"
+#include "TrieTreeModel.h"
+#include "trie.h"
 #include "trie_maker.h"
-#include "CUnitData.h"
 #include "trie_writer.h"
 
 using namespace TrieTreeModel;
@@ -36,9 +38,9 @@ skipNonSpace(const char* p)
 }
 
 static void
-insertWordId(CTrieMaker::CTreeWordSet& idset, TTreeWordId id)
+insertWordId(CTreeWordSet& idset, TTreeWordId id)
 {
-    CTrieMaker::CTreeWordSet::const_iterator it = idset.find(id);
+    CTreeWordSet::const_iterator it = idset.find(id);
     if (it == idset.end())
         idset.insert(id);
     else {
@@ -52,20 +54,6 @@ insertWordId(CTrieMaker::CTreeWordSet& idset, TTreeWordId id)
         }
     }
 }
-
-struct TUnitInfo {
-    std::string m_unit;
-    int m_cost;
-
-    TUnitInfo(const char* unit = NULL, int cost = 0) : m_unit(unit), m_cost(cost)
-    {
-    }
-    bool
-    operator<(const TUnitInfo& b) const
-    {
-        return m_unit < b.m_unit;
-    }
-};
 
 #ifdef HAVE_ICONV_H
 bool
@@ -95,7 +83,7 @@ isCorrectConverted(const char* utf8, iconv_t ic, iconv_t ric)
 
 //return: bit 0x1: contains some gbk out of gb2312, bit 0x2: contains some gb18030 outof gbk
 unsigned
-getPureGBEncoding(const char* utf8str)
+CTrieMaker::getPureGBEncoding(const char* utf8str)
 {
     static iconv_t ic_gb = iconv_open("GB2312", "UTF-8");
     static iconv_t ic_gbk = iconv_open("GBK", "UTF-8");
@@ -118,7 +106,7 @@ getPureGBEncoding(const char* utf8str)
 }
 #else // !HAVE_ICONV_H
 unsigned
-getPureGBEncoding(const char* utf8str)
+CTrieMaker::getPureGBEncoding(const char* utf8str)
 {
     // FIXME
     return 0x3;
@@ -126,7 +114,7 @@ getPureGBEncoding(const char* utf8str)
 #endif // HAVE_ICONV_H
 
 bool
-parseLine(char* buf,
+CTrieMaker::parseLine(char* buf,
           char* word_buf,
           unsigned& id,
           std::set<TUnitInfo>& unitset)
@@ -205,7 +193,7 @@ CTrieMaker::constructFromLexicon(const char* fileName)
         std::set<TUnitInfo>::const_iterator its = unitset.begin();
         std::set<TUnitInfo>::const_iterator ite = unitset.end();
         for (; its != ite; ++its) {
-            const char *ustr = its->m_py.c_str();
+            const char *ustr = its->m_ustr.c_str();
             if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
             m_Lexicon[id] = std::string(word_buf);
 
@@ -219,17 +207,17 @@ CTrieMaker::constructFromLexicon(const char* fileName)
     return suc;
 }
 
-static void
-parseUnit(const char *unit, std::vector<TUnit> &ret)
+void
+CTrieMaker::parseUnit(const char *ustr, std::vector<TUnit> &ret)
 {
-    char *buf = strdup(pinyin);
+    char *buf = strdup(ustr);
     char *p = buf, *q = buf;
     ret.clear();
 
     while (*p) {
         if (*p == '\'') {
             *p = '\0';
-            unsigned s = m_UnitData::encode(q);
+            unsigned s = CUnitData::encode(q);
             if (s)
                 ret.push_back(TUnit(s));
             else
@@ -240,7 +228,7 @@ parseUnit(const char *unit, std::vector<TUnit> &ret)
     }
 
     if (*q) {
-        unsigned s = m_UnitData::encode(q);
+        unsigned s = CUnitData::encode(q);
         if (s)
             ret.push_back(TUnit(s));
         else
@@ -266,7 +254,7 @@ CTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 bool
 CTrieMaker::insertPair(const char* unit, TTreeWordId wid)
 {
-    CTreeNode *pnode = &m_RootNode;
+    CTreeNode *pnode = m_pRootNode;
     std::vector<TUnit> units;
     parseUnit(unit, units);
 
@@ -309,11 +297,11 @@ CTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     unsigned int lexiconOffset;
     unsigned int offset = sizeof(unsigned int) * 3;
 
-    CNodeList::const_iterator itNode = CTreeNode::m_AllNodes.begin();
-    CNodeList::const_iterator itNodeLast = CTreeNode::m_AllNodes.end();
+    CTreeNodeList::const_iterator itNode = CTreeNode::m_AllNodes.begin();
+    CTreeNodeList::const_iterator itNodeLast = CTreeNode::m_AllNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         nodeOffsetMap[*itNode] = offset;
-        offset += CTreeNode::size_for((*itNode)->m_Trans.size(),
+        offset += TThreadNode::size_for((*itNode)->m_Trans.size(),
                                                (*itNode)->m_WordIdSet.size());
     }
     lexiconOffset = offset;
@@ -335,7 +323,7 @@ CTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     itNodeLast = CTreeNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        CTreeNode outNode;
+        TThreadNode outNode;
         CTreeNode *pnode = *itNode;
 
         outNode.m_nTransfer = pnode->m_Trans.size();
@@ -365,7 +353,7 @@ CTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         itId = pnode->m_WordIdSet.begin();
         itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast; ++itId)
-            vec.push_back(TWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
+            vec.push_back(TTreeWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
                                     psrt->isSeen(*itId)));
         std::make_heap(vec.begin(), vec.end());
         std::sort_heap(vec.begin(), vec.end());

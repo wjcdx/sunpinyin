@@ -1,9 +1,14 @@
 #ifndef SUNPY_TREE_TNODE_H
 #define SUNPY_TREE_TNODE_H
 
+#include <list>
+#include <set>
+#include <map>
 #include "TTreeWordId.h"
 
 namespace TrieTreeModel {
+
+	class CTreeNode;
 
 	typedef std::set<CTreeNode*>                CTreeNodeSet;
 	typedef std::list<CTreeNode*>               CTreeNodeList;

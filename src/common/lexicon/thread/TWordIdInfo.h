@@ -3,6 +3,8 @@
 
 #define WORD_ID_WIDTH       24
 
+#include "string.h"
+
 namespace TrieThreadModel {
 	struct TWordIdInfo {
 #ifdef WORDS_BIGENDIAN

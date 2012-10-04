@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "trie.h"
-#include "trie_generator.h"
-#include "../../slm/slm.h"
+#include "trie_factory.h"
+#include "maker_factory.h"
 #include "trie_writer.h"
 #include "CUnigramSorter.h"
 
@@ -35,6 +34,11 @@ ShowUsage(const char* progname)
     exit(100);
 }
 
+static enum TrieType parse_type(const char *type)
+{
+    return XINGHUA;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -46,7 +50,7 @@ main(int argc, char* argv[])
     const char* slm_file = NULL;
     int build_endian = get_host_endian();
     int opt;
-    enum MakerFacetory:MakerType type;
+    enum TrieType type;
     while ((opt = getopt(argc, argv, "i:o:l:s:e:t:")) != -1) {
         switch (opt) {
         case 'i':
@@ -82,6 +86,7 @@ main(int argc, char* argv[])
     }
     printf("done!\n"); fflush(stdout);
 
+    CUnitData::initialize(type);
     CTrieMaker maker = MakerFactory::getMaker(type);
 
     maker.constructFromLexicon(lexicon_file);

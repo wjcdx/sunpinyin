@@ -2,22 +2,11 @@
 #define SUNPY_TRIE_FACTORY_H
 
 #include "trie_type.h"
+#include "trie.h"
 
 class TrieFactory {
 public:
-
-	CTrie &getTrie(enum TrieType t) 
-	{
-		switch (t) {
-		case PINYIN:
-			return new CPyTrie();
-		case XINGHUA:
-			return new CXhTrie();
-		}
-	}
-
-
-}
-
+	static CTrie getTrie(enum TrieType t);
+};
 
 #endif

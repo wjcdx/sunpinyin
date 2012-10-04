@@ -1,6 +1,7 @@
 #ifndef SUNPY_TREE_TWORDINFO_H
 #define SUNPY_TREE_TWORDINFO_H
 
+#include <vector>
 #include "TTreeWordId.h"
 
 namespace TrieTreeModel {

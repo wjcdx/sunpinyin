@@ -1,6 +1,10 @@
 #ifndef SUNPY_TREE_TWORDID_H
 #define SUNPY_TREE_TWORDID_H
 
+#include <set>
+
+#include <TThreadNode.h>
+
 namespace TrieTreeModel {
     union TTreeWordId {
         unsigned int m_all;

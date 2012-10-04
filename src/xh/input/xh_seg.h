@@ -41,7 +41,7 @@ private:
                                 unsigned from = UINT_MAX);
     inline void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);
 
-    XhData &m_trie;
+    CXhData &m_trie;
     std::string m_inputstr;
     wstring m_inputBuf;
     TSegmentVec m_segs;

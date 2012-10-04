@@ -12,16 +12,23 @@
 
 #include <algorithm>
 
-#include "pytrie_gen.h"
-#include "pinyin_data.h"
+#include "pytrie_maker.h"
+#include "CUnitData.h"
 #include "trie_writer.h"
+#include "syllable.h"
+#include "TPyThreadNode.h"
 
 using namespace TrieTreeModel;
 
 CPyTrieMaker::CPyTrieMaker()
 {
-    this.m_UnitData = CPinyinData();
-    m_RootNode.m_bExpanded = true;
+    m_pRootNode = new CPyTreeNode();
+    ((CPyTreeNode *)m_pRootNode)->m_bExpanded = true;
+}
+
+CPyTrieMaker::~CPyTrieMaker()
+{
+    delete m_pRootNode;
 }
 /**********************************************************
     lexicon文件格式：
@@ -39,7 +46,7 @@ CPyTrieMaker::constructFromLexicon(const char* fileName)
 
     unsigned id;
     bool suc = true;
-    std::set<TSyllableInfo> pyset;
+    std::set<TUnitInfo> pyset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
@@ -53,10 +60,10 @@ CPyTrieMaker::constructFromLexicon(const char* fileName)
         }
         unsigned gbcategory = getPureGBEncoding(word_buf);
 
-        std::set<TSyllableInfo>::const_iterator its = pyset.begin();
-        std::set<TSyllableInfo>::const_iterator ite = pyset.end();
+        std::set<TUnitInfo>::const_iterator its = pyset.begin();
+        std::set<TUnitInfo>::const_iterator ite = pyset.end();
         for (; its != ite; ++its) {
-            const char *pystr = its->m_py.c_str();
+            const char *pystr = its->m_ustr.c_str();
             if (m_Lexicon.size() < id + 1) m_Lexicon.resize(id + 1);
             m_Lexicon[id] = std::string(word_buf);
 
@@ -77,8 +84,8 @@ CPyTrieMaker::constructFromLexicon(const char* fileName)
     return suc;
 }
 
-CPyTreeNode*
-CPyTrieMaker::insertTransfer(CPyTreeNode* pnode, unsigned s)
+CTreeNode*
+CPyTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 {
     CTrans::const_iterator itt = pnode->m_Trans.find(s);
     CTrans::const_iterator ite = pnode->m_Trans.end();
@@ -101,7 +108,7 @@ CPyTrieMaker::addCombinedTransfers(CPyTreeNode *pnode,
 
     CPyTreeNode *p = NULL;
     if (nodes.size() == 1) {
-        p = *(nodes.begin());
+        p = (CPyTreeNode *)(&(*(nodes.begin())));
     } else {
         p = new CPyTreeNode();
         p->m_cmbNodes = nodes;
@@ -167,7 +174,7 @@ CPyTrieMaker::expandCombinedNode(CPyTreeNode *pnode)
 
     std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
     for (; itCombTrans != combTrans.end(); ++itCombTrans) {
-        CPyTreeNode* p = NULL;
+        CTreeNode* p = NULL;
         unsigned s = itCombTrans->first;
         CTreeNodeSet nodes = itCombTrans->second;
 
@@ -188,7 +195,7 @@ CPyTrieMaker::threadNonCompletePinyin(void)
 {
     CTreeNodeList::const_iterator itNode = CPyTreeNode::m_AllNodes.begin();
     for (; itNode != CPyTreeNode::m_AllNodes.end(); ++itNode) {
-        CPyTreeNode* pnode = *itNode;
+        CPyTreeNode* pnode = (CPyTreeNode *)(&(*itNode));
         if (pnode->m_bExpanded)
             combineInitialTrans(pnode);
         else
@@ -203,7 +210,7 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     bool suc = true;
     static TWCHAR wbuf[1024];
 
-    std::map<CPyTreeNode*, unsigned int> nodeOffsetMap;
+    std::map<CTreeNode*, unsigned int> nodeOffsetMap;
 
     unsigned int nWord = m_Lexicon.size();
     unsigned int nNode = CPyTreeNode::m_AllNodes.size();
@@ -214,7 +221,7 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     CTreeNodeList::const_iterator itNodeLast = CPyTreeNode::m_AllNodes.end();
     for (; itNode != itNodeLast; ++itNode) {
         nodeOffsetMap[*itNode] = offset;
-        offset += CPinyinTrie::CPyTreeNode::size_for((*itNode)->m_Trans.size(),
+        offset += TThreadNode::size_for((*itNode)->m_Trans.size(),
                                                (*itNode)->m_WordIdSet.size());
     }
     lexiconOffset = offset;
@@ -236,13 +243,13 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     itNodeLast = CPyTreeNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        CPinyinTrie::CPyTreeNode outNode;
-        CPyTreeNode *pnode = *itNode;
+        TPyThreadNode outNode;
+        CPyTreeNode *pnode = (CPyTreeNode *)(&(*itNode));
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
-        outNode.m_bFullSyllableTransfer = pnode->m_bFullSyllableTransfer;
         outNode.m_csLevel = 0;
+        outNode.setFullSyllableTransfer(pnode->m_bFullSyllableTransfer);
 
         CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
         CTreeWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();
@@ -257,7 +264,7 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         CTrans::const_iterator itTransLast = pnode->m_Trans.end();
         for (; itTrans != itTransLast && suc; ++itTrans) {
             TTransUnit tru;
-            tru.m_Syllable = itTrans->first;
+            tru.m_Unit = itTrans->first;
             tru.m_Offset = nodeOffsetMap[itTrans->second];
             assert(tru.m_Offset != 0 && tru.m_Offset < lexiconOffset);
             suc = f.write(tru);
@@ -267,7 +274,7 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
         itId = pnode->m_WordIdSet.begin();
         itIdLast = pnode->m_WordIdSet.end();
         for (; itId != itIdLast; ++itId)
-            vec.push_back(TWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
+            vec.push_back(TTreeWordInfo(*itId, psrt->getCost(*itId) + itId->anony.m_cost,
                                     psrt->isSeen(*itId)));
         std::make_heap(vec.begin(), vec.end());
         std::sort_heap(vec.begin(), vec.end());

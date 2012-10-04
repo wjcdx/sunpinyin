@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef _SUNPINYIN_PYTRIE_GEN_H__
-#define _SUNPINYIN_PYTRIE_GEN_H__
+#ifndef _SUNPINYIN_XHTRIE_MAKER_H__
+#define _SUNPINYIN_XHTRIE_MAKER_H__
 
 #include "portability.h"
 
@@ -10,23 +10,11 @@
 #include <set>
 #include <list>
 
-#include "CXhTrie.h"
-#include "TThreadNode.h"
+#include "TrieThreadModel.h"
+#include "TrieTreeModel.h"
 #include "CWordEvaluator.h"
 
-class CXhTrieMaker : CXhTrieMaker {
-public:
-    class TThreadNode;
-    class TWordInfo;
-
-    typedef std::vector<std::string>                CLexicon;
-    typedef std::map<PNodeSet, TThreadNode*>        CStateMap;
-
-protected:
-    CStateMap m_StateMap;
-    TThreadNode m_RootNode;
-    CLexicon m_Lexicon;
-
+class CXhTrieMaker : public CTrieMaker {
 public:
     CXhTrieMaker();
 
@@ -36,7 +24,7 @@ public:
     constructFromLexicon(const char* fileName);
 
     bool
-    insertPair(const char* unit, TWordId wid);
+    insertPair(const char* unit, TTreeWordId wid);
 
     bool
     write(const char* fileName, CWordEvaluator* psrt, bool revert_endian);
@@ -45,8 +33,8 @@ public:
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:
-    TThreadNode*
-    insertTransfer(TThreadNode* pnode, unsigned s);
+    CTreeNode*
+    insertTransfer(CTreeNode* pnode, unsigned s);
 };
 
 #endif

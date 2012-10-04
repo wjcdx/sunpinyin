@@ -3,9 +3,9 @@
 
 #include "TThreadNode.h"
 
-using namespace TrieThreadModel;
+namespace TrieThreadModel {
 
-    struct TPyThreadNode : TThreadNode {
+    struct TPyThreadNode : public TThreadNode {
 #if 0
     #ifdef WORDS_BIGENDIAN
         unsigned m_other      : 5;
@@ -30,9 +30,9 @@ using namespace TrieThreadModel;
 		}
 		void setOther(unsigned v) {
     #ifdef WORDS_BIGENDIAN
-			return ((m_other & 0x01) | (v << 1));
+			m_other = ((m_other & 0x01) | (v << 1));
 	#else
-			return ((m_other & 0x20) | (v));
+			m_other = ((m_other & 0x20) | (v));
 	#endif
 		}
 		unsigned getFullSyllableTransfer() {
@@ -44,11 +44,13 @@ using namespace TrieThreadModel;
 		}
 		void setFullSyllableTransfer(unsigned v){
     #ifdef WORDS_BIGENDIAN
-			return ((m_other & 0xFE) | (v));
+			m_other = ((m_other & 0xFE) | (v));
 	#else
-			return ((m_other & 0xDF) | (v << 5));
+			m_other = ((m_other & 0xDF) | (v << 5));
 	#endif
 		}
     };
+
+}
 
 #endif

@@ -1,18 +1,16 @@
 // -*- mode: c++ -*-
-#ifndef __SUNPINYIN_PYTRIE_H__
-#define __SUNPINYIN_PYTRIE_H__
+#ifndef __SUNPINYIN_TRIE_H__
+#define __SUNPINYIN_TRIE_H__
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#include "portability.h"
-#include "TUnit.h"
-#include "TThreadNode.h"
-#include "TTransUnit.h"
-#include "TWordIdInfo.h"
-#include "CUnitData.h"
 #include <map>
+
+#include "portability.h"
+#include "TrieThreadModel.h"
+#include "CUnitData.h"
 
 class CTrie {
 public:
@@ -77,13 +75,11 @@ protected:
     TWCHAR               **m_words;
 
     std::map<wstring, unsigned>  m_SymbolMap;
-
-    CUnitData m_UnitData;
-
+    
     void
     print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const;
 };
 
-#endif /* __SUNPINYIN_PYTRIE_H__*/
+#endif /* __SUNPINYIN_TRIE_H__*/
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

@@ -5,7 +5,7 @@
 
 #include "trie.h"
 
-using TrieThreadModel;
+using namespace TrieThreadModel;
 
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
@@ -152,7 +152,7 @@ CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
     for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit;
         const TThreadNode *pch = transfer(pRoot, u);
-        const char *str = m_UnitData::decode(u);
+        const char *str = CUnitData::decode(TUnit(u));
         if (!str) break;
         prefix = prefix + str + '\'';
         print(pch, prefix, fp);

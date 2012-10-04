@@ -3,7 +3,8 @@
 
 #include "CTreeNode.h"
 
-	class CPyTreeNode : CTreeNode {
+namespace TrieTreeModel {
+	class CPyTreeNode : public CTreeNode {
 	public:
 		bool m_bExpanded;
 		bool m_bFullSyllableTransfer;
@@ -16,5 +17,6 @@
 			m_AllNodes.push_back(this);
 		}
 	};
+}
 
 #endif

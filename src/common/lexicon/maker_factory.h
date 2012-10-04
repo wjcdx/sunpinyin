@@ -2,21 +2,13 @@
 #define SUNPY_MAKER_FACTORY_H
 
 #include "trie_type.h"
+#include "pytrie_maker.h"
+#include "CXhTrieMaker.h"
 
 class MakerFactory {
 public:
-	CTrieMaker &getMaker(enum TrieType t) 
-	{
-		switch (t) {
-		case PINYIN:
-			return new CTriePyMaker();
-		case XINGHUA:
-			return new CTrieXhMaker();
-		}
-	}
-
-
-}
+	static CTrieMaker getMaker(enum TrieType t);
+};
 
 
 #endif
