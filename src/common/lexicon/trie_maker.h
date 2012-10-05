@@ -37,7 +37,7 @@ public:
     constructFromLexicon(const char* fileName);
     
     bool
-    insertPair(const char* unit, TTreeWordId wid);
+    insertPair(const char* ustr, TTreeWordId wid);
     
     void
     parseUnit(const char *ustr, std::vector<TUnit> &ret);

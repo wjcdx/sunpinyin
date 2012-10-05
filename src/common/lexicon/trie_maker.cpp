@@ -156,6 +156,8 @@ CTrieMaker::parseLine(char* buf,
     return unitset.size() > 0;
 }
 
+//initialize m_AllNodes;
+CTreeNodeList CTreeNode::m_AllNodes;
 
 CTrieMaker::CTrieMaker()
 {
@@ -252,11 +254,11 @@ CTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 }
 
 bool
-CTrieMaker::insertPair(const char* unit, TTreeWordId wid)
+CTrieMaker::insertPair(const char* ustr, TTreeWordId wid)
 {
     CTreeNode *pnode = m_pRootNode;
     std::vector<TUnit> units;
-    parseUnit(unit, units);
+    parseUnit(ustr, units);
 
     if (units.empty())
         return true;

@@ -29,9 +29,6 @@ public:
     threadNonCompletePinyin(void);
 
     bool
-    write(const char* fileName, CWordEvaluator* psrt, bool revert_endian);
-
-    bool
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:

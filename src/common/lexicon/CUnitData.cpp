@@ -2,6 +2,14 @@
 #include "pinyin_data.h"
 #include "xh_data.h"
 
+TrieType CUnitData::m_type = XINGHUA;
+
+void
+CUnitData::initialize(TrieType t)
+{
+	m_type = t;
+}
+
 TUnit
 CUnitData::encode(const char *str)
 {

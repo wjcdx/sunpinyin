@@ -24,12 +24,6 @@ public:
     constructFromLexicon(const char* fileName);
 
     bool
-    insertPair(const char* unit, TTreeWordId wid);
-
-    bool
-    write(const char* fileName, CWordEvaluator* psrt, bool revert_endian);
-
-    bool
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:

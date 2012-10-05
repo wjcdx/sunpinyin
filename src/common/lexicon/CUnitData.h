@@ -9,12 +9,12 @@ using namespace TrieThreadModel;
 
 class CUnitData {
 public:
-	static void initialize(enum TrieType t) { m_type = t; }
+	static void initialize(TrieType t);
     static TUnit encode(const char *str);
     static const char *decode(TUnit u, const char **i = NULL,
 			const char **f = NULL);
 private:
-	static enum TrieType m_type;
+	static TrieType m_type;
 };
 
 #endif
