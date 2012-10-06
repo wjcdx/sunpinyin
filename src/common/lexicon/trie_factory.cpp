@@ -1,14 +1,22 @@
 #include "trie_factory.h"
 
-CTrie
-TrieFactory::getTrie(enum TrieType t) 
+CTrie* TrieFactory::m_Trie;
+
+CTrie*
+TrieFactory::getTrie(TrieType t) 
 {
 	switch (t) {
+	/*
 	case PINYIN:
-		//return CPyTrie();
+		m_Trie = new CPyTrie();
+		break;
 	case XINGHUA:
-		//return CXhTrie();
+		m_Trie = new CXhTrie();
+		break;
+	*/
+	default:
+		m_Trie = new CTrie();
 		break;
 	}
-	return CTrie();
+	return m_Trie;
 }

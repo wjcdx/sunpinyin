@@ -1,14 +1,24 @@
 #include "maker_factory.h"
+#include "stdio.h"
 
-CTrieMaker
-MakerFactory::getMaker(enum TrieType t) 
+CTrieMaker *MakerFactory::m_Maker;
+
+CTrieMaker *
+MakerFactory::getMaker(TrieType t) 
 {
 	switch (t) {
 	case PINYIN:
-		return CPyTrieMaker();
+		printf("new CPyTrieMaker\n");
+		m_Maker = new CPyTrieMaker();
+		break;
 	case XINGHUA:
-		return CXhTrieMaker();
+		printf("new CXhTrieMaker\n");
+		m_Maker = new CXhTrieMaker();
+		break;
+	default:
+		m_Maker = new CTrieMaker();
+		break;
 	}
-	return CTrieMaker();
+	return m_Maker;
 }
 

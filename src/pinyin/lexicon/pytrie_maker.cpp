@@ -22,14 +22,13 @@ using namespace TrieTreeModel;
 
 CPyTrieMaker::CPyTrieMaker()
 {
-    m_RootNode = *(new CPyTreeNode());
-    //m_pRootNode = new CPyTreeNode();
-    ((CPyTreeNode *)&m_RootNode)->m_bExpanded = true;
+    m_pRootNode = new CPyTreeNode();
+    ((CPyTreeNode *)m_pRootNode)->m_bExpanded = true;
 }
 
 CPyTrieMaker::~CPyTrieMaker()
 {
-    //delete m_RootNode;
+    delete m_pRootNode;
 }
 /**********************************************************
     lexicon文件格式：
@@ -50,6 +49,7 @@ CPyTrieMaker::constructFromLexicon(const char* fileName)
     std::set<TUnitInfo> pyset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
+    printf("CPyTrieMaker...\n");
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, pyset)) {
@@ -75,6 +75,11 @@ CPyTrieMaker::constructFromLexicon(const char* fileName)
     fclose(fp);
 
     printf("\n    %zd primitive nodes", CPyTreeNode::m_AllNodes.size());  fflush(stdout);
+
+    CTreeNodeList::const_iterator itNode = CPyTreeNode::m_AllNodes.begin();
+    printf("\n    %p", *itNode++);  fflush(stdout);
+    printf("\n    %p", *itNode);  fflush(stdout);
+
 
     threadNonCompletePinyin();
     printf("\n    %zd total nodes", CPyTreeNode::m_AllNodes.size());  fflush(stdout);
@@ -109,7 +114,7 @@ CPyTrieMaker::addCombinedTransfers(CPyTreeNode *pnode,
 
     CPyTreeNode *p = NULL;
     if (nodes.size() == 1) {
-        p = (CPyTreeNode *)(&(*(nodes.begin())));
+        p = (CPyTreeNode *)(*(nodes.begin()));
     } else {
         p = new CPyTreeNode();
         p->m_cmbNodes = nodes;
@@ -196,7 +201,7 @@ CPyTrieMaker::threadNonCompletePinyin(void)
 {
     CTreeNodeList::const_iterator itNode = CPyTreeNode::m_AllNodes.begin();
     for (; itNode != CPyTreeNode::m_AllNodes.end(); ++itNode) {
-        CPyTreeNode* pnode = (CPyTreeNode *)(&(*itNode));
+        CPyTreeNode* pnode = (CPyTreeNode *)(*itNode);
         if (pnode->m_bExpanded)
             combineInitialTrans(pnode);
         else
@@ -245,7 +250,7 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 
     for (; itNode != itNodeLast && suc; ++itNode) {
         TPyThreadNode outNode;
-        CPyTreeNode *pnode = (CPyTreeNode *)(&(*itNode));
+        CPyTreeNode *pnode = (CPyTreeNode *)(*itNode);
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();

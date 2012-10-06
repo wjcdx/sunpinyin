@@ -3,7 +3,7 @@
 XhKeyMapPair
 CXhData::xhDataMaps[] = {
 	{ 'a', "P01" },
-	{ 0, NULL },
+	{ 0, "" },
 };
 
 XhKeyMapPair

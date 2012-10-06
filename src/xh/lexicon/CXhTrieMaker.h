@@ -18,7 +18,7 @@ class CXhTrieMaker : public CTrieMaker {
 public:
     CXhTrieMaker();
 
-    ~CXhTrieMaker() {} //forget this
+    ~CXhTrieMaker(); //forget this
 
     bool
     constructFromLexicon(const char* fileName);

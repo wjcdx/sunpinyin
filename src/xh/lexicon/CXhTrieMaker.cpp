@@ -19,8 +19,12 @@
 
 CXhTrieMaker::CXhTrieMaker()
 {
-    //m_pRootNode = new CTreeNode();
-    CTreeNode m_RootNode;
+    m_pRootNode = new CTreeNode();
+}
+
+CXhTrieMaker::~CXhTrieMaker()
+{
+    delete m_pRootNode;
 }
 /**********************************************************
     lexicon文件格式：

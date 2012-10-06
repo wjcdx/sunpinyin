@@ -181,6 +181,7 @@ CTrieMaker::constructFromLexicon(const char* fileName)
     std::set<TUnitInfo> unitset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
+    printf("CTrieMaker...\n");
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, unitset)) {
@@ -256,8 +257,7 @@ CTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 bool
 CTrieMaker::insertPair(const char* ustr, TTreeWordId wid)
 {
-    //CTreeNode *pnode = m_pRootNode;
-    CTreeNode *pnode = &m_RootNode;
+    CTreeNode *pnode = m_pRootNode;
     std::vector<TUnit> units;
     parseUnit(ustr, units);
 

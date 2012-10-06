@@ -14,7 +14,6 @@ namespace TrieTreeModel {
 		CPyTreeNode()
 			: m_bExpanded(false), m_bFullSyllableTransfer(false)
 		{
-			m_AllNodes.push_back(this);
 		}
 	};
 }

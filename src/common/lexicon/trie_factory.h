@@ -6,7 +6,9 @@
 
 class TrieFactory {
 public:
-	static CTrie getTrie(enum TrieType t);
+	static CTrie *getTrie(TrieType t);
+private:
+	static CTrie *m_Trie;
 };
 
 #endif

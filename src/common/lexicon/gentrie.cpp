@@ -56,7 +56,7 @@ main(int argc, char* argv[])
     const char* slm_file = NULL;
     int build_endian = get_host_endian();
     int opt;
-    enum TrieType type;
+    TrieType type;
     while ((opt = getopt(argc, argv, "i:o:l:s:e:t:")) != -1) {
         switch (opt) {
         case 'i':
@@ -93,12 +93,12 @@ main(int argc, char* argv[])
     printf("done!\n"); fflush(stdout);
 
     CUnitData::initialize(type);
-    CTrieMaker maker = MakerFactory::getMaker(type);
+    CTrieMaker *maker = MakerFactory::getMaker(type);
 
-    maker.constructFromLexicon(lexicon_file);
+    maker->constructFromLexicon(lexicon_file);
 
     printf("Writing out..."); fflush(stdout);
-    maker.write(result_file, &srt, get_host_endian() != build_endian);
+    maker->write(result_file, &srt, get_host_endian() != build_endian);
     printf("done!\n"); fflush(stdout);
 
     srt.close();
@@ -111,11 +111,11 @@ main(int argc, char* argv[])
     }
 
     printf("Printing the lexicon out to log_file..."); fflush(stdout);
-    CTrie t = TrieFactory::getTrie(type);
-    t.load(result_file);
+    CTrie *t = TrieFactory::getTrie(type);
+    t->load(result_file);
 
     FILE *fp = fopen(log_file, "w");
-    t.print(fp);
+    t->print(fp);
     fclose(fp);
 
     printf("done!\n");

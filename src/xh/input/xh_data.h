@@ -9,7 +9,7 @@ using namespace TrieThreadModel;
 
 struct XhKeyMapPair {
 public:
-	XhKeyMapPair() : key(0), name(NULL) {}
+	XhKeyMapPair() : key(0), name() {}
 	XhKeyMapPair(int key, string name): key(key), name(name) {}
 	int getKey() {return key;}
 	string getName() {return name;}

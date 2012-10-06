@@ -7,7 +7,9 @@
 
 class MakerFactory {
 public:
-	static CTrieMaker getMaker(enum TrieType t);
+	static CTrieMaker *getMaker(TrieType t);
+private:
+	static CTrieMaker *m_Maker;
 };
 
 

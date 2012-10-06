@@ -25,8 +25,7 @@ public:
 
 protected:
     CStateMap m_StateMap;
-    //CTreeNode *m_pRootNode;
-    CTreeNode m_RootNode;
+    CTreeNode *m_pRootNode;
     CLexicon m_Lexicon;
 
 public:
@@ -59,7 +58,7 @@ public:
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:
-    CTreeNode*
+    virtual CTreeNode*
     insertTransfer(CTreeNode* pnode, unsigned s);
 };
 
