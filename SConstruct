@@ -440,11 +440,13 @@ libname = '%s.%d' % (libname_soname, abi_minor)
 lib = None
 
 if GetOS() != 'Darwin':
-    lib = env.SharedLibrary(libname, SHLIBSUFFIX='', source=imesource,
-                            parse_flags='-Wl,-soname=%s' % libname_soname)
+    #lib = env.SharedLibrary(libname, SHLIBSUFFIX='', source=imesource,
+    #                        parse_flags='-Wl,-soname=%s' % libname_soname)
+    lib = None
 else:
     # TODO: add install_name on Darwin?
-    lib = env.SharedLibrary('sunpinyin', source=imesource)
+    #lib = env.SharedLibrary('sunpinyin', source=imesource)
+    lib = None
 
 def DoInstall():
     lib_target = None
@@ -477,7 +479,7 @@ def DoInstall():
     env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
     Mkdir(datadir)
 
-DoInstall()
+#DoInstall()
 env.Alias('install', [
     'install-bin', 'install-man1', 'install-doc', 'install-headers', 'install-lib'
 ])

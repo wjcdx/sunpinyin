@@ -256,7 +256,8 @@ CTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 bool
 CTrieMaker::insertPair(const char* ustr, TTreeWordId wid)
 {
-    CTreeNode *pnode = m_pRootNode;
+    //CTreeNode *pnode = m_pRootNode;
+    CTreeNode *pnode = &m_RootNode;
     std::vector<TUnit> units;
     parseUnit(ustr, units);
 

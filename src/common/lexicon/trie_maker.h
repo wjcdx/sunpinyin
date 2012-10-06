@@ -25,7 +25,8 @@ public:
 
 protected:
     CStateMap m_StateMap;
-    CTreeNode *m_pRootNode;
+    //CTreeNode *m_pRootNode;
+    CTreeNode m_RootNode;
     CLexicon m_Lexicon;
 
 public:

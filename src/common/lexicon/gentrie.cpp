@@ -24,19 +24,25 @@ ShowUsage(const char* progname)
     fprintf(
         stderr,
         "Usage:\n"
-        "    %s -i lexicon_file -o result_file -l log_file -s slm_file [-e le|be]\n",
+        "    %s -i lexicon_file -o result_file -l log_file -s slm_file [-e le|be] -t py|xh\n",
         progname);
     fprintf(
         stderr,
         "Description:\n"
-        "    This program is used to generate the PINYIN Lexicon. It Only works on zh_CN.utf8 locale\n"
+        "    This program is used to generate the Lexicon(py for PINYIN, while xh for XINGHUA).\n"
+        "    It Only works on zh_CN.utf8 locale\n"
         "\n");
     exit(100);
 }
 
-static enum TrieType parse_type(const char *type)
+static TrieType parse_type(const char *type)
 {
-    return XINGHUA;
+    if (strcmp(type, "py") == 0) {
+        return PINYIN;
+    } else if (strcmp(type, "xh") == 0) {
+        return XINGHUA;
+    }
+    return INVALID;
 }
 
 int
@@ -74,7 +80,7 @@ main(int argc, char* argv[])
         }
     }
     if (!lexicon_file || !result_file || !log_file || !slm_file ||
-        build_endian == -1 || type < 0) {
+        build_endian == -1 || type == INVALID) {
         ShowUsage(argv[0]);
     }
 

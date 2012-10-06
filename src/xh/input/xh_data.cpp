@@ -3,20 +3,29 @@
 XhKeyMapPair
 CXhData::xhDataMaps[] = {
 	{ 'a', "P01" },
+	{ 0, NULL },
 };
 
-static XhKeyMapPair &
-findPair(std::string name)
+XhKeyMapPair
+CXhData::findPair(std::string name)
 {
-	XhKeyMapPair *p;
-	return *p;
+	XhKeyMapPair *p = xhDataMaps;
+	for (; p->getKey() != 0; p++) {
+		if (p->getName() == name)
+		return *p;
+	}
+	return XhKeyMapPair();
 }
 
-static XhKeyMapPair &
-findPair(int key)
+XhKeyMapPair
+CXhData::findPair(int key)
 {
-	XhKeyMapPair *p;
-	return *p;
+	XhKeyMapPair *p = xhDataMaps;
+	for (; p->getKey() != 0; p++) {
+		if (p->getKey() == key)
+		return *p;
+	}
+	return XhKeyMapPair();
 }
 
 TUnit

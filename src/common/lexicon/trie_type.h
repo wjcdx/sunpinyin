@@ -2,6 +2,7 @@
 #define SUNPY_TRIETYPE_H
 
 enum TrieType {
+	INVALID,
 	PINYIN,
 	XINGHUA
 };

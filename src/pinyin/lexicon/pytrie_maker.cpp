@@ -22,13 +22,14 @@ using namespace TrieTreeModel;
 
 CPyTrieMaker::CPyTrieMaker()
 {
-    m_pRootNode = new CPyTreeNode();
-    ((CPyTreeNode *)m_pRootNode)->m_bExpanded = true;
+    m_RootNode = *(new CPyTreeNode());
+    //m_pRootNode = new CPyTreeNode();
+    ((CPyTreeNode *)&m_RootNode)->m_bExpanded = true;
 }
 
 CPyTrieMaker::~CPyTrieMaker()
 {
-    delete m_pRootNode;
+    //delete m_RootNode;
 }
 /**********************************************************
     lexicon文件格式：
