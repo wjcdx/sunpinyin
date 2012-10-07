@@ -6,26 +6,26 @@ CXhData::xhDataMaps[] = {
 	{ 0, "" },
 };
 
-XhKeyMapPair
+XhKeyMapPair &
 CXhData::findPair(std::string name)
 {
 	XhKeyMapPair *p = xhDataMaps;
 	for (; p->getKey() != 0; p++) {
 		if (p->getName() == name)
-		return *p;
+			return *p;
 	}
-	return XhKeyMapPair();
+	return *p;
 }
 
-XhKeyMapPair
+XhKeyMapPair &
 CXhData::findPair(int key)
 {
 	XhKeyMapPair *p = xhDataMaps;
 	for (; p->getKey() != 0; p++) {
 		if (p->getKey() == key)
-		return *p;
+			return *p;
 	}
-	return XhKeyMapPair();
+	return *p;
 }
 
 TUnit

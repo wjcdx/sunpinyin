@@ -45,6 +45,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     std::set<TUnitInfo> unitset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
+    printf("CXhTrieMaker..."); fflush(stdout);
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, unitset)) {

@@ -26,7 +26,7 @@ Makefile.in.in
 *.a
 *.bz2
 .libs
-cscope.out
+cscope.*
 
 .sconf_temp/*
 .sconsign.dblite

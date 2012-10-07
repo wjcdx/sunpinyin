@@ -16,7 +16,6 @@
 #include "CUnitData.h"
 #include "trie_writer.h"
 #include "syllable.h"
-#include "TPyThreadNode.h"
 
 using namespace TrieTreeModel;
 
@@ -97,7 +96,6 @@ CPyTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
     CTrans::const_iterator ite = pnode->m_Trans.end();
     if (itt == ite) {
         CPyTreeNode *p = new CPyTreeNode();
-        p->m_bFullSyllableTransfer = true;
         p->m_bExpanded = true;
         pnode->m_Trans[s] = p;
         return p;
@@ -249,13 +247,12 @@ CPyTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
     itNodeLast = CPyTreeNode::m_AllNodes.end();
 
     for (; itNode != itNodeLast && suc; ++itNode) {
-        TPyThreadNode outNode;
+        TThreadNode outNode;
         CPyTreeNode *pnode = (CPyTreeNode *)(*itNode);
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
         outNode.m_csLevel = 0;
-        outNode.setFullSyllableTransfer(pnode->m_bFullSyllableTransfer);
 
         CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
         CTreeWordSet::const_iterator itIdLast = pnode->m_WordIdSet.end();

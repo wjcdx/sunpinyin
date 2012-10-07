@@ -224,7 +224,7 @@ CTrieMaker::parseUnit(const char *ustr, std::vector<TUnit> &ret)
             if (s)
                 ret.push_back(TUnit(s));
             else
-                printf("\nWarning! unrecognized syllable %s", q);
+                printf("\nWarning! unrecognized unit %s", q);
             q = p + 1;
         }
         p++;

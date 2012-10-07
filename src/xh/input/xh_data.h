@@ -27,8 +27,8 @@ public:
 	bool isPattern(unsigned ch);
 	bool isStroke(unsigned ch);
 
-	static XhKeyMapPair findPair(string name);
-	static XhKeyMapPair findPair(int key);
+	static XhKeyMapPair &findPair(string name);
+	static XhKeyMapPair &findPair(int key);
 private:
 	static XhKeyMapPair xhDataMaps[];
 };
