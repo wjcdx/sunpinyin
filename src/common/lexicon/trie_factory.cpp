@@ -1,9 +1,10 @@
+#include "trie.h"
 #include "trie_factory.h"
 
 CTrie* TrieFactory::m_Trie;
 
 CTrie*
-TrieFactory::getTrie(TrieType t) 
+TrieFactory::getTrie(CTrie::TrieType t) 
 {
 	switch (t) {
 	/*

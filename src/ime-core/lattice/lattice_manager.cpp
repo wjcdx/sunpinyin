@@ -1,5 +1,9 @@
+#include "trie.h"
 #include "lattice.h"
 #include "lattice_manager.h"
+
+CLattice CLatticeManager::m_lattice;
+CTrie *CLatticeManager::m_pTrie;
 
 void
 CLatticeManager::printLattice()

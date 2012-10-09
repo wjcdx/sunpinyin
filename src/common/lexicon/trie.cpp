@@ -4,6 +4,7 @@
 #include <deque>
 
 #include "trie.h"
+#include "CUnitData.h"
 
 using namespace TrieThreadModel;
 

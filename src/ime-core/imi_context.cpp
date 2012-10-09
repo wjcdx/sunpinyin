@@ -54,7 +54,7 @@ void
 CIMIContext::setCoreData(CIMIData *pCoreData)
 {
     m_pModel = pCoreData->getSlm();
-    m_pPinyinTrie = pCoreData->getPinyinTrie();
+    m_pPinyinTrie = pCoreData->getTrie();
 }
 
 void

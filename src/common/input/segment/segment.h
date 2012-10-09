@@ -1,14 +1,17 @@
 #ifndef SUNPY_SEGMENT_H
 #define SUNPY_SEGMENT_H
 
+#include <vector>
+
 struct TSegment {
-	TSegment (ESegmentType type = SYLLABLE) : m_type(type),
-											  m_inner_fuzzy(0) {}
+	enum ESegmentType
+	{ SYLLABLE, SYLLABLE_SEP, INVALID, STRING };
+
+	TSegment () {}
 	TSegment (unsigned syllable,
 			  unsigned start,
-			  unsigned length,
-			  ESegmentType type = SYLLABLE)
-		: m_start(start), m_len(length), m_type(type), m_inner_fuzzy(0)
+			  unsigned length)
+		: m_start(start), m_len(length), m_type(SYLLABLE)
 	{ m_syllables.push_back(syllable); }
 
 	bool operator <(const TSegment& other) const {
@@ -23,15 +26,16 @@ struct TSegment {
 
 	// if segment is a STRING type, m_syllables may contain the string buffer without the '\0'
 	std::vector<unsigned>           m_syllables;
-	std::vector<unsigned>           m_fuzzy_syllables;
 	unsigned m_start        : 16;
 	unsigned m_len          : 8;
-	ESegmentType m_type         : 7;
-	bool m_inner_fuzzy  : 1;
+	unsigned m_type         : 7;
 
 public:
-	virtual void forward(unsigned i, unsigned j) = 0;
+	virtual void forward(unsigned i, unsigned j);
 };
+
+// it requires the segments are sorted by its m_start field
+typedef std::vector<TSegment>  TSegmentVec;
 
 #endif
 

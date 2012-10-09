@@ -5,8 +5,10 @@
 #include <vector>
 #include <map>
 #include "portability.h"
-#include "imi_data.h"
-#include "pinyin/trie/pinyin_seg.h"
+#include "trie.h"
+#include "TrieThreadModel.h"
+
+using namespace TrieThreadModel;
 
 /**
  * This class is used to record lexicon state (pinyin trie nodes)
@@ -15,9 +17,25 @@
  * more words further, and what bone is its starting bone.
  */
 struct TLexiconState {
-    virtual const CPinyinTrie::TWordIdInfo *getWords(unsigned &num) = 0;
-	virtual const double getWeight() = 0;
-    void print(std::string prefix) const;
+	typedef std::vector<TWordIdInfo> TWordIdInfoVec;
+public:
+    virtual const TWordIdInfo *getWords(unsigned &num);
+	virtual const double getWeight();
+    virtual void print(std::string prefix) const;
+
+    TLexiconState (unsigned start, unsigned wid)
+    : m_start(start), m_pNode(NULL) {
+        m_words.push_back(wid);
+        m_seg_path.push_back(start);
+        m_seg_path.push_back(start + 1); 
+    }
+	
+public:
+	TThreadNode *m_pNode;
+	TWordIdInfoVec m_words;
+	// accumulated segments,  may contain fuzzy segments
+	std::vector<unsigned> m_seg_path;
+	unsigned m_start;
 };
 
 /**

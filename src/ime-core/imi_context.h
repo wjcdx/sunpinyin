@@ -51,33 +51,6 @@ public:
     void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
     CICHistory * getHistoryMemory() { return m_pHistory; }
 
-    void setFullSymbolForwarding(bool value = true) {
-        this.m_pLatticeMgr->setFullSymbolForwarding(value);
-    }
-    bool getFullSymbolForwarding() {
-        return this.m_pLatticeMgr->getFullSymbolForwarding();
-    }
-    
-    void setGetFullSymbolOp(CGetFullSymbolOp *op) {
-        this.m_pLatticeMgr->setGetFullSymbolOp(op);
-    }
-    CGetFullSymbolOp& fullSymbolOp() const {
-        return this.m_pLatticeMgr->fullSymbolOp();
-    }
-
-    void setFullPunctForwarding(bool value = true) {
-        this.m_pLatticeMgr->setFullPunctForwarding(value);
-    }
-    bool getFullPunctForwarding() {
-        return this.m_pLatticeMgr->getFullPunctForwarding();
-    }
-    void setGetFullPunctOp(CGetFullPunctOp *op) {
-        this.m_pLatticeMgr->setGetFullPunctOp(op);
-    }
-    CGetFullPunctOp& fullPuncOp() const {
-        return this.m_pLatticeMgr->fullPuncOp();
-    }
-
     void setCharsetLevel(unsigned l) { m_csLevel = l; }
     unsigned getCharsetLevel() { return m_csLevel; }
 
@@ -98,7 +71,7 @@ public:
     }
 
     // omit next punctuation if the very next symbol is an punctuation
-    void omitNextPunct() { this.m_pLatticeMgr->setOmitPunct(true); }
+    void omitNextPunct() { CFullCharManager::omitNextPunct(true); }
 
     bool searchFrom(unsigned from = 1);
 

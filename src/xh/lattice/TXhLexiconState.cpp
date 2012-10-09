@@ -1,10 +1,9 @@
-
-#include "pinyin_data.h"
-#include "lattice_states.h"
+#include "trie.h"
+#include "TXhLexiconState.h"
 #include <algorithm>
 
-const CPinyinTrie::TWordIdInfo*
-TLexiconState::getWords(unsigned &num)
+const TWordIdInfo*
+TXhLexiconState::getWords(unsigned &num)
 {
     num = 0;
 
@@ -13,16 +12,16 @@ TLexiconState::getWords(unsigned &num)
         return &m_words[0];
     }
 
-    if (m_bPinyin && m_pPYNode) {
-        num = m_pPYNode->m_nWordId;
-        return m_pPYNode->getWordIdPtr();
+    if (m_pNode) {
+        num = m_pNode->m_nWordId;
+        return m_pNode->getWordIdPtr();
     }
 
     return NULL;
 }
 
 void
-TLexiconState::print(std::string prefix) const
+TXhLexiconState::print(std::string prefix) const
 {
     printf("%s", prefix.c_str());
     printf("from frame[%d] ", m_start);

@@ -3,18 +3,18 @@
 
 #include "stdio.h"
 #include "TUnit.h"
-#include "trie_type.h"
+#include "trie.h"
 
 using namespace TrieThreadModel;
 
 class CUnitData {
 public:
-	static void initialize(TrieType t);
+	static void initialize(CTrie::TrieType t);
     static TUnit encode(const char *str);
     static const char *decode(TUnit u, const char **i = NULL,
 			const char **f = NULL);
 private:
-	static TrieType m_type;
+	static CTrie::TrieType m_type;
 };
 
 #endif

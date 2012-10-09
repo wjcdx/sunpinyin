@@ -1,47 +1,50 @@
 #ifndef SUNPY_BRANCH_PATH_H
 #define SUNPY_BRANCH_PATH_H
 
+#include "pathnode.h"
+#include "checkpoint.h"
+
 struct Path {
 private:
 	PathNodeVec m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
-	PathNode &m_Now;
+	PathNode *m_Now;
 
 public:
-	void add(PathNode &cp) {
-		PathNode *priv = m_NextMap.back().second();
-		m_NextMap[priv] = n;
-		m_Nodes.push_back(cp);
-		if (cp.flag == JUSTNOW) {
-			m_Now.flag = HISTORY;
-			m_Now = cp;
+	void add(PathNode &node) {
+		PathNode *priv = (*(m_NextMap.end())).second;
+		m_NextMap[priv] = &node;
+		m_Nodes.push_back(node);
+		if (node.flag == JUSTNOW) {
+			m_Now->flag = HISTORY;
+			m_Now = &node;
 		}
 	}
 
 	PathNode &getNow() {
-		return m_Now;
+		return *m_Now;
 	}
 	
 	PathNodeVec &getPathNodes() {
 		return m_Nodes;
 	}
 
-	PathNode &next(PathNode &n) {
-		return m_NextMap[n];
+	PathNode *next(PathNode &n) {
+		return m_NextMap[&n];
 	}
 
-	PathNode &next(TSyllable s) {
-		PathNode &nxt = m_NextMap[m_Now];
-		if (nxt.transFrom(s)) {
+	PathNode *next(TSyllable s) {
+		PathNode *nxt = m_NextMap[m_Now];
+		if (nxt->transFrom(s)) {
 			return nxt;
 		}
 		return NULL;
 	}
 
 	void forward() {
-		PathNode &nxt = m_NextMap[m_Now];
-		m_Now.flag = HISTORY;
-		nxt.flag = JUSTNOW;
+		PathNode *nxt = m_NextMap[m_Now];
+		m_Now->flag = HISTORY;
+		nxt->flag = JUSTNOW;
 		m_Now = nxt;
 	}
 	
@@ -49,8 +52,9 @@ public:
 		int c = 0;
 		PathNodeVec::iterator it = m_Nodes.begin();
 		PathNodeVec::iterator ite = m_Nodes.end();
-		if ((*it).transFrom(s))
-			c++;
+		for (; it != ite; it++)
+			if ((*it).transFrom(s))
+				c++;
 		return c;
 	}
 
@@ -80,9 +84,11 @@ public:
 		return m_Path.forward(s, num, numMet, paths);
 	}
 	void addPathInfo(Path &path) {
-		PathNodeVec::iterator it = path.m_Nodes.begin();
-		PathNodeVec::iterator ite = path.m_Nodes.end();
-		m_Path.add(*it);
+		PathNodeVec::iterator it = path.getPathNodes().begin();
+		PathNodeVec::iterator ite = path.getPathNodes().end();
+		for (; it != ite; it++) {
+			m_Path.add(*it);
+		}
 	}
 };
 

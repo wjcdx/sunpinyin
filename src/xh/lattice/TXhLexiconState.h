@@ -4,8 +4,7 @@
 #include <vector>
 #include <map>
 #include "portability.h"
-#include "imi_data.h"
-#include "pinyin/trie/pinyin_seg.h"
+#include "lexicon_states.h"
 
 struct TXhLexiconState : TLexiconState {
 

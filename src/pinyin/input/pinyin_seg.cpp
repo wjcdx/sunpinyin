@@ -58,17 +58,17 @@ CGetFuzzySegmentsOp::_initMaps()
 }
 
 unsigned
-CGetFuzzySegmentsOp::_invalidateSegments(IPySegmentor::TSegmentVec& fuzzy_segs,
-                                         IPySegmentor::TSegment& seg)
+CGetFuzzySegmentsOp::_invalidateSegments(TSegmentVec& fuzzy_segs,
+                                         TSegment& seg)
 {
     unsigned invalidatedFrom = UINT_MAX;
 
-    IPySegmentor::TSegmentVec::reverse_iterator it = fuzzy_segs.rbegin();
-    IPySegmentor::TSegmentVec::reverse_iterator ite = fuzzy_segs.rend();
+    TSegmentVec::reverse_iterator it = fuzzy_segs.rbegin();
+    TSegmentVec::reverse_iterator ite = fuzzy_segs.rend();
 
     for (; it != ite; it += 2) {
-        IPySegmentor::TSegment& seg1 = *(it + 1);
-        IPySegmentor::TSegment& seg2 = *it;
+        TSegment& seg1 = *(it + 1);
+        TSegment& seg2 = *it;
 
         unsigned r = seg2.m_start + seg2.m_len;
         if (r <= seg.m_start)
@@ -83,11 +83,11 @@ CGetFuzzySegmentsOp::_invalidateSegments(IPySegmentor::TSegmentVec& fuzzy_segs,
 }
 
 unsigned
-CGetFuzzySegmentsOp::operator ()(IPySegmentor::TSegmentVec& segs,
-                                 IPySegmentor::TSegmentVec& fuzzy_segs,
+CGetFuzzySegmentsOp::operator ()(TSegmentVec& segs,
+                                 TSegmentVec& fuzzy_segs,
                                  wstring& input)
 {
-    IPySegmentor::TSegment&  seg = segs.back();
+    TSegment&  seg = segs.back();
     unsigned invalidatedFrom = _invalidateSegments(fuzzy_segs, seg);
 
     unsigned updatedFrom = UINT_MAX;
@@ -116,11 +116,11 @@ CGetFuzzySegmentsOp::operator ()(IPySegmentor::TSegmentVec& segs,
             if (0 == xi_syl)
                 goto RETURN;
 
-            IPySegmentor::TSegment xi = segs.back();
+            TPySyllableSegment xi = *(TPySyllableSegment *)(&segs.back());
             xi.m_len = xi_len;
             xi.m_syllables[0] = xi_syl;
 
-            IPySegmentor::TSegment an = segs.back();
+            TPySyllableSegment an = *(TPySyllableSegment *)(&segs.back());
             an.m_len = an_len;
             an.m_start += xi_len;
             an.m_syllables[0] = an_syl;
@@ -135,7 +135,7 @@ CGetFuzzySegmentsOp::operator ()(IPySegmentor::TSegmentVec& segs,
     }
 
     if (segs.size() >= 2) { // fangan -> fang'an, fan'gan
-        IPySegmentor::TSegment& pre_seg = *(segs.end() - 2);
+        TSegment& pre_seg = *(segs.end() - 2);
 
         CFuzzySyllableMap::iterator pre_it = m_fuzzyPreMap.find(
             pre_seg.m_syllables[0]);
@@ -143,11 +143,11 @@ CGetFuzzySegmentsOp::operator ()(IPySegmentor::TSegmentVec& segs,
 
         if (pre_it != m_fuzzyPreMap.end() && it != m_fuzzyProMap.end() &&
             pre_it->second.first == it->second.first) {
-            IPySegmentor::TSegment fang = segs[segs.size() - 2];
+            TSegment fang = segs[segs.size() - 2];
             fang.m_len++;
             fang.m_syllables[0] = pre_it->second.second;
 
-            IPySegmentor::TSegment an = segs.back();
+            TSegment an = segs.back();
             an.m_start++;
             an.m_len--;
             an.m_syllables[0] = it->second.second;
@@ -346,16 +346,19 @@ CQuanpinSegmentor::_push(unsigned ch)
     int v = m_pytrie.match_longest(m_pystr.rbegin(), m_pystr.rend(), l);
 
     if (l == 0) { // not a valid syllable character, e.g., \', i, u, or A-Z
-        IPySegmentor::ESegmentType seg_type;
-        if (ch == '\'' && m_inputBuf.size() > 1)
-            seg_type = IPySegmentor::SYLLABLE_SEP;
-        else if (islower(ch))
-            seg_type = IPySegmentor::INVALID;
-        else
-            seg_type = IPySegmentor::STRING;
-
+        
+        TSegment *new_seg;
         ret = m_pystr.size() - 1;
-        m_segs.push_back(TSegment(ch, ret, 1, seg_type));
+
+        if (ch == '\'' && m_inputBuf.size() > 1) {
+            new_seg = new TSeperatorSegment(ch, ret, 1);
+        } else if (islower(ch)) {
+            new_seg = new TInvalidSegment(ch, ret, 1);
+        } else {
+            new_seg = new TStringSegment(ch, ret, 1);
+        }
+        m_segs.push_back(*new_seg);
+
     } else if (l == 1) { // possible a new segment
         int last_idx = m_pystr.size() - 2;
         if (last_idx >= 0 && (m_pystr[last_idx] & 0x80)) {
@@ -379,7 +382,7 @@ CQuanpinSegmentor::_push(unsigned ch)
 
         // push the new 1-length segment
         ret = m_pystr.size() - 1;
-        m_segs.push_back(TSegment(v, ret, 1));
+        m_segs.push_back(TPySyllableSegment(v, ret, 1));
     } else if (l == (unsigned) m_segs.back().m_len + 1) {
         // current segment is extensible, e.g., [xia] + n -> [xian]
         TSegment &last_seg = m_segs.back();
@@ -389,7 +392,7 @@ CQuanpinSegmentor::_push(unsigned ch)
     } else {  // other cases
         TSegment &last_seg = m_segs.back();
         int i = 0, isum = last_seg.m_len + 1, lsum = l;
-        TSegmentVec new_segs(1, TSegment(v, m_pystr.size() - l, l));
+        TSegmentVec new_segs(1, TPySyllableSegment(v, m_pystr.size() - l, l));
 
         // e.g., [zh] [o] [n] + g -> [zhonG],
         if (isum < lsum) {
@@ -402,7 +405,7 @@ CQuanpinSegmentor::_push(unsigned ch)
                 v = m_pytrie.match_longest(
                     m_pystr.rbegin() + lsum, m_pystr.rend(), l);
                 TSegment &last_seg = new_segs.back();
-                new_segs.push_back(TSegment(v, last_seg.m_start - l, l));
+                new_segs.push_back(TPySyllableSegment(v, last_seg.m_start - l, l));
                 _addFuzzySyllables(new_segs.back());
                 lsum += l;
             } else {
@@ -441,14 +444,16 @@ CQuanpinSegmentor::_addFuzzySyllables(TSegment& seg)
 {
     assert(seg.m_type == SYLLABLE);
 
-    seg.m_fuzzy_syllables.clear();
+    TPySyllableSegment &pyseg = *(TPySyllableSegment *)(&seg);
 
-    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(seg.m_syllables.front());
+    pyseg.m_fuzzy_syllables.clear();
+
+    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(pyseg.m_syllables.front());
     CSyllables::const_iterator it = fuzzy_set.begin();
     CSyllables::const_iterator ite = fuzzy_set.end();
 
     for (; it != ite; ++it)
-        seg.m_fuzzy_syllables.push_back(*it);
+        pyseg.m_fuzzy_syllables.push_back(*it);
 }
 
 unsigned

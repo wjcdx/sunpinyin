@@ -23,7 +23,7 @@
 #include <vector>
 #include <limits.h>
 
-class CHunpinSegmentor : public IPySegmentor
+class CHunpinSegmentor : public ISegmentor
 {
 public:
     CHunpinSegmentor (EShuangpinType shpType);

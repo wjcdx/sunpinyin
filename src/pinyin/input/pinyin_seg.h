@@ -5,6 +5,7 @@
 #include "portability.h"
 #include "segmentor.h"
 #include "pinyin_data.h"
+#include "segment_types.h"
 #include "datrie.h"
 #include "ime-core/utils.h"
 
@@ -41,8 +42,8 @@ public:
 
     CGetFuzzySegmentsOp () : m_bEnabled(false),
                              m_bInnerFuzzyEnabled(false) { _initMaps(); }
-    unsigned operator ()(IPySegmentor::TSegmentVec&,
-                         IPySegmentor::TSegmentVec&,
+    unsigned operator ()(TSegmentVec&,
+                         TSegmentVec&,
                          wstring&);
 
     void setEnable(bool value = true) { m_bEnabled = value; }
@@ -51,8 +52,8 @@ public:
 
 private:
     void        _initMaps();
-    unsigned    _invalidateSegments(IPySegmentor::TSegmentVec&,
-                                    IPySegmentor::TSegment&);
+    unsigned    _invalidateSegments(TSegmentVec&,
+                                    TSegment&);
 
     bool m_bEnabled;
     bool m_bInnerFuzzyEnabled;
@@ -61,7 +62,7 @@ private:
     CFuzzySyllableMap m_fuzzyProMap;
 };
 
-class CQuanpinSegmentor : public IPySegmentor
+class CQuanpinSegmentor : public ISegmentor
 {
 public:
     CQuanpinSegmentor ();

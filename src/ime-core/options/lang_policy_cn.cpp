@@ -55,11 +55,11 @@ CSimplifiedChinesePolicy::createContext()
 
     pic->setCharsetLevel(m_csLevel);
 
-    pic->setFullSymbolForwarding(m_bEnableFullSymbol);
-    pic->setGetFullSymbolOp(&m_getFullSymbolOp);
+	CFullCharManager::setFullSymbolForwarding(m_bEnableFullSymbol);
+	CFullCharManager::setGetFullSymbolOp(&m_getFullSymbolOp);
 
-    pic->setFullPunctForwarding(m_bEnableFullPunct);
-    pic->setGetFullPunctOp(&m_getFullPunctOp);
+	CFullCharManager::setFullPunctForwarding(m_bEnableFullPunct);
+	CFullCharManager::setGetFullPunctOp(&m_getFullPunctOp);
     return pic;
 }
 

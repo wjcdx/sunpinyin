@@ -1,18 +1,16 @@
+#include "trie.h"
 #include "maker_factory.h"
-#include "stdio.h"
 
 CTrieMaker *MakerFactory::m_Maker;
 
 CTrieMaker *
-MakerFactory::getMaker(TrieType t) 
+MakerFactory::getMaker(CTrie::TrieType t) 
 {
 	switch (t) {
-	case PINYIN:
-		printf("new CPyTrieMaker\n");
+	case CTrie::PINYIN:
 		m_Maker = new CPyTrieMaker();
 		break;
-	case XINGHUA:
-		printf("new CXhTrieMaker\n");
+	case CTrie::XINGHUA:
 		m_Maker = new CXhTrieMaker();
 		break;
 	default:

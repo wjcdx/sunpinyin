@@ -10,10 +10,18 @@
 
 #include "portability.h"
 #include "TrieThreadModel.h"
-#include "CUnitData.h"
+
+using namespace TrieThreadModel;
 
 class CTrie {
 public:
+
+    enum TrieType {
+        INVALID,
+        PINYIN,
+        XINGHUA
+    };
+
     friend class CTrieMaker;
 
     CTrie() : m_Size(0), m_mem(NULL), m_words(NULL) { }

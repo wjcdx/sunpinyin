@@ -1,8 +1,17 @@
 #ifndef SUNPY_LATTICE_H
 #define SUNPY_LATTICE_H
 
+#include <string>
+#include <map>
+
+#include "candidate.h"
+#include "lexicon_states.h"
+#include "lattice_states.h"
+
+
 class CLatticeFrame {
     friend class CIMIContext;
+    friend class CLatticeManager;
 public:
     enum TYPE {
         UNUSED                  = 0x0000,      // unused frame
@@ -59,7 +68,7 @@ public:
 
     void print(std::string prefix);
 
-protected:
+public:
     std::map<int, CCandidate>   m_bestWords;
     CCandidate m_selWord;
     CLexiconStates m_lexiconStates;

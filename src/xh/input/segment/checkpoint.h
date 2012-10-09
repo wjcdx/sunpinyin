@@ -1,5 +1,7 @@
-#ifndef SUNPY_TRIE_BRANCH_H
-#define SUNPY_TRIE_BRANCH_H
+#ifndef SUNPY_CHECK_POINT_H
+#define SUNPY_CHECK_POINT_H
+
+#include "pathnode.h"
 
 struct CheckPoint {
 	PathNode *m_Start;

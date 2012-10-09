@@ -1,20 +1,18 @@
 
-#ifndef SUNPY_PINYIN_SEG_H
-#define SUNPY_PINYIN_SEG_H
+#ifndef SUNPY_XINGHUA_SEG_H
+#define SUNPY_XINGHUA_SEG_H
 
 #include "portability.h"
 #include "segmentor.h"
-#include "pinyin_data.h"
-#include "datrie.h"
-#include "ime-core/utils.h"
+#include "segment_types.h"
 
 #include <algorithm>
 #include <climits>
 
-class CXinghuaSegmentor : public ISegmentor
+class CXhSegmentor : public ISegmentor
 {
 public:
-    CXinghuaSegmentor ();
+    CXhSegmentor ();
 
     virtual TSegmentVec& getSegments(bool req_aux_segs){
         return m_segs;

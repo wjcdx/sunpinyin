@@ -41,8 +41,8 @@
 
 #include <sqlite3.h>
 #include "portability.h"
-#include "pinyin/trie/syllable.h"
-#include "lexicon/pytrie.h"
+#include "syllable.h"
+#include "trie.h"
 #include "imi_defines.h"
 
 class CUserDict
@@ -61,7 +61,7 @@ public:
     void removeWord(unsigned wid);
 
     void getWords(CSyllables &syllables,
-                  std::vector<CPinyinTrie::TWordIdInfo> &result);
+                  std::vector<TWordIdInfo> &result);
 
     const TWCHAR* operator [](unsigned wid);
 

@@ -1,10 +1,9 @@
 #include <cassert>
 #include <functional>
 #include <algorithm>
-#include "pinyin_seg.h"
-#include "quanpin_trie.h"
+#include "segment_types.h"
 
-CXinghuaSegmentor::CXinghuaSegmentor ()
+CXhSegmentor::CXhSegmentor ()
     : m_pGetFuzzySyllablesOp(NULL),
       m_pGetCorrectionPairOp(NULL),
       m_pGetFuzzySegmentsOp(NULL),
@@ -15,7 +14,7 @@ CXinghuaSegmentor::CXinghuaSegmentor ()
 }
 
 bool
-CXinghuaSegmentor::load(const char * trieFileName)
+CXhSegmentor::load(const char * trieFileName)
 {
     return m_trie.load(trieFileName);
 }
@@ -34,7 +33,7 @@ print_inputstr(const std::string inputstr)
 #endif
 
 unsigned
-CXinghuaSegmentor::push(unsigned ch)
+CXhSegmentor::push(unsigned ch)
 {
     m_inputBuf.push_back(ch);
 
@@ -74,7 +73,7 @@ CXinghuaSegmentor::push(unsigned ch)
 }
 
 unsigned
-CXinghuaSegmentor::pop()
+CXhSegmentor::pop()
 {
     if (m_inputstr.empty())
         return m_updatedFrom = 0;
@@ -98,7 +97,7 @@ CXinghuaSegmentor::pop()
 }
 
 unsigned
-CXinghuaSegmentor::insertAt(unsigned idx, unsigned ch)
+CXhSegmentor::insertAt(unsigned idx, unsigned ch)
 {
     unsigned i, j;
     _locateSegment(idx, i, j);
@@ -116,7 +115,7 @@ CXinghuaSegmentor::insertAt(unsigned idx, unsigned ch)
 }
 
 unsigned
-CXinghuaSegmentor::deleteAt(unsigned idx, bool backward)
+CXhSegmentor::deleteAt(unsigned idx, bool backward)
 {
     unsigned i, j;
     if (!backward) idx += 1;
@@ -135,14 +134,14 @@ CXinghuaSegmentor::deleteAt(unsigned idx, bool backward)
 }
 
 unsigned
-CXinghuaSegmentor::clear(unsigned from)
+CXhSegmentor::clear(unsigned from)
 {
     m_inputBuf.resize(from);
     return _clear(from);
 }
 
 unsigned
-CXinghuaSegmentor::_clear(unsigned from)
+CXhSegmentor::_clear(unsigned from)
 {
     unsigned i, j;
     _locateSegment(from, i, j);
@@ -158,7 +157,7 @@ CXinghuaSegmentor::_clear(unsigned from)
 }
 
 void
-CXinghuaSegmentor::_locateSegment(unsigned idx,
+CXhSegmentor::_locateSegment(unsigned idx,
                                   unsigned &strIdx,
                                   unsigned &segIdx)
 {
@@ -177,7 +176,7 @@ CXinghuaSegmentor::_locateSegment(unsigned idx,
 }
 
 unsigned
-CXinghuaSegmentor::_push(unsigned ch)
+CXhSegmentor::_push(unsigned ch)
 {
     unsigned ret;
     m_inputstr.push_back(ch);
@@ -186,32 +185,33 @@ CXinghuaSegmentor::_push(unsigned ch)
         TSegment &last_seg = m_segs.back();
 
         last_seg.m_len += 1;
+        last_seg.m_syllables.push_back(ch);
+
         ret = m_inputstr.size() - l;
 
     } else if (m_trie.isPattern(ch)) {
 
         ret = m_inputstr.size() - 1;
-        m_segs.push_back(TSyllableSegment(ch, ret, 1));
+        m_segs.push_back(TXhSyllableSegment(ch, ret, 1));
 
     } else {
 
-        TSegment &new_seg;
+        TSegment *new_seg;
         ret = m_inputstr.size() - 1;
         if (ch == '\'') {
-            //seg_type = ISegmentor::SYLLABLE_SEP;
-            new_seg = TSeperatorSegment(ch, ret, 1);
+            new_seg = new TSeperatorSegment(ch, ret, 1);
         } else {
-            //seg_type = ISegmentor::STRING;
-            new_seg = TStringSegment(ch, ret, 1);
+            new_seg = new TStringSegment(ch, ret, 1);
         }
-        m_segs.push_back(new_seg);
+        m_segs.push_back(*new_seg);
+        delete new_seg;
     }
 
     return ret;
 }
 
 unsigned
-CXinghuaSegmentor::_updateWith(const std::string& new_pystr, unsigned from)
+CXhSegmentor::_updateWith(const std::string& new_pystr, unsigned from)
 {
     unsigned minUpdatedFrom = from;
     std::string::const_iterator it = new_pystr.begin();

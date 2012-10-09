@@ -1,6 +1,8 @@
 #ifndef SUNPY_CANDIDATE_H
 #define SUNPY_CANDIDATE_H
 
+#include "lattice_states.h"
+
 union TCandiRank {
 public:
     bool operator<(const TCandiRank& b) const

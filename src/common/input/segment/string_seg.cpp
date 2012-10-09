@@ -1,35 +1,20 @@
 #include "string_seg.h"
-
-void
-TStringSegment::forward(unsigned i, unsigned j) 
-{
-	strbuf = this.m_syllables;
-    if (strbuf.size() == 1) {
-        unsigned ch = strbuf[0];       
-        if (ispunct(ch)) {
-            _forwardPunctChar(i, j, ch);   
-        } else {
-            _forwardOrdinaryChar(i, j, ch);
-        }
-    } else{
-        CLatticeFrame &fr = this.getLatticeFrame(j); 
-        fr.m_wstr.assign(strbuf.begin(), strbuf.end());
-        fr.m_lexiconStates.push_back(TLexiconState(i, 0));
-    }
-}
+#include "lattice_manager.h"
+#include "CFullCharManager.h"
+#include "lexicon_states.h"
 
 static void
 _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
 {
-    CLatticeFrame &fr = this.getLatticeFrame(j);
+    CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
 
     wstring wstr;
     unsigned wid = 0;
 
-    if (m_pGetFullPunctOp) {
-        if (m_bFullPunctForwarding && !m_bOmitPunct) {
-            wstr = (*m_pGetFullPunctOp)(ch);
-            wid = m_pPinyinTrie->getSymbolId(wstr);
+    if (CFullCharManager::m_pGetFullPunctOp) {
+        if (CFullCharManager::m_bFullPunctForwarding && !CFullCharManager::m_bOmitPunct) {
+            wstr = (*CFullCharManager::m_pGetFullPunctOp)(ch);
+            wid = CLatticeManager::m_pTrie->getSymbolId(wstr);
         }
     }
 
@@ -46,16 +31,16 @@ _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
 static void
 _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
 {
-    CLatticeFrame &fr = this.getLatticeFrame(j);
+    CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
 
     wstring wstr;
     unsigned wid = 0;
 
-    if (m_pGetFullSymbolOp) {
-        wstr = (*m_pGetFullSymbolOp)(ch);
-        wid = m_pPinyinTrie->getSymbolId(wstr);
+    if (CFullCharManager::m_pGetFullSymbolOp) {
+        wstr = (*CFullCharManager::m_pGetFullSymbolOp)(ch);
+        wid = CLatticeManager::m_pTrie->getSymbolId(wstr);
 
-        if (!m_bFullSymbolForwarding)
+        if (!CFullCharManager::m_bFullSymbolForwarding)
             wstr.clear();
     }
 
@@ -67,5 +52,23 @@ _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
         fr.m_wstr.push_back(ch);
 
     fr.m_lexiconStates.push_back(TLexiconState(i, wid));
+}
+
+void
+TStringSegment::forward(unsigned i, unsigned j) 
+{
+	const std::vector<unsigned>& strbuf = this->m_syllables;
+    if (strbuf.size() == 1) {
+        unsigned ch = strbuf[0];       
+        if (ispunct(ch)) {
+            _forwardPunctChar(i, j, ch);   
+        } else {
+            _forwardOrdinaryChar(i, j, ch);
+        }
+    } else {
+        CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j); 
+        fr.m_wstr.assign(strbuf.begin(), strbuf.end());
+        fr.m_lexiconStates.push_back(TLexiconState(i, 0));
+    }
 }
 

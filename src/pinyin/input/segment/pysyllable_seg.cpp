@@ -1,31 +1,24 @@
 #include "syllable_seg.h"
+#include "TPyLexiconState.h"
+#include "TrieThreadModel.h"
 
-void
-TSyllableSegment::forward(unsigned i, unsigned j)
-{
-    std::vector<unsigned>::const_iterator it = this.m_syllables.begin();
-    std::vector<unsigned>::const_iterator ite = this.m_syllables.end();
-
-    for (; it != ite; ++it)
-        _forwardSingleSyllable(i, j, *it, this);
-}
+using namespace TrieThreadModel;
 
 static void
 _forwardSingleSyllable(unsigned i,
-                                    unsigned j,
-                                    TSyllable syllable,
-                                    const IPySegmentor::TSegment& seg,
-                                    bool fuzzy)
+						unsigned j,
+						TSyllable syllable,
+						bool fuzzy)
 {
-    const CTrie::TNode * pn = NULL;
+    const TThreadNode * pn = NULL;
 
-    CLatticeFrame &fr = this.getLatticeFrame(j);
+    CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
     fr.m_type = CLatticeFrame::SYLLABLE;
 
-    CLexiconStates::iterator it = this.getLatticeFrame(i).m_lexiconStates.begin();
-    CLexiconStates::iterator ite = this.getLatticeFrame(i).m_lexiconStates.end();
+    CLexiconStates::iterator it = CLatticeManager::getLatticeFrame(i).m_lexiconStates.begin();
+    CLexiconStates::iterator ite = CLatticeManager::getLatticeFrame(i).m_lexiconStates.end();
     for (; it != ite; ++it) {
-        TLexiconState &lxst = *it;
+        TPyLexiconState &lxst = *it;
         bool added_from_sysdict = false;
 
         if (lxst.m_pPYNode) {
@@ -41,8 +34,8 @@ _forwardSingleSyllable(unsigned i,
                                                        fuzzy);
                 new_lxst.m_syls.push_back(syllable);
                 new_lxst.m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
-                                                  (seg.m_inner_fuzzy ? 1 : 0);
-                new_lxst.m_seg_path.push_back(seg.m_start + seg.m_len);
+                                                  (this->m_inner_fuzzy ? 1 : 0);
+                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
                 fr.m_lexiconStates.push_back(new_lxst);
             }
         }
@@ -63,8 +56,8 @@ _forwardSingleSyllable(unsigned i,
                                                        fuzzy);
                 new_lxst.m_syls.push_back(syllable);
                 new_lxst.m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
-                                                  (seg.m_inner_fuzzy ? 1 : 0);
-                new_lxst.m_seg_path.push_back(seg.m_start + seg.m_len);
+                                                  (this->m_inner_fuzzy ? 1 : 0);
+                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
                 fr.m_lexiconStates.push_back(new_lxst);
             }
         }
@@ -76,12 +69,23 @@ _forwardSingleSyllable(unsigned i,
         CSyllables syls;
         syls.push_back(syllable);
         std::vector<unsigned> seg_path;
-        seg_path.push_back(seg.m_start);
-        seg_path.push_back(seg.m_start + seg.m_len);
+        seg_path.push_back(this->m_start);
+        seg_path.push_back(this->m_start + this->m_len);
         TLexiconState new_lxst = TLexiconState(i, pn, syls, seg_path, fuzzy);
-        new_lxst.m_num_of_inner_fuzzies = seg.m_inner_fuzzy ? 1 : 0;
+        new_lxst.m_num_of_inner_fuzzies = this->m_inner_fuzzy ? 1 : 0;
         fr.m_lexiconStates.push_back(new_lxst);
     }
+}
+
+
+void
+TPySyllableSegment::forward(unsigned i, unsigned j)
+{
+    std::vector<unsigned>::const_iterator it = this.m_syllables.begin();
+    std::vector<unsigned>::const_iterator ite = this.m_syllables.end();
+
+    for (; it != ite; ++it)
+        _forwardSingleSyllable(i, j, *it, true);
 }
 
 

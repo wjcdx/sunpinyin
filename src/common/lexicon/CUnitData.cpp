@@ -1,11 +1,12 @@
+#include "trie.h"
 #include "CUnitData.h"
 #include "pinyin_data.h"
 #include "xh_data.h"
 
-TrieType CUnitData::m_type = XINGHUA;
+CTrie::TrieType CUnitData::m_type = CTrie::XINGHUA;
 
 void
-CUnitData::initialize(TrieType t)
+CUnitData::initialize(CTrie::TrieType t)
 {
 	m_type = t;
 }
@@ -14,9 +15,9 @@ TUnit
 CUnitData::encode(const char *str)
 {
 	switch(m_type) {
-	case PINYIN:
+	case CTrie::PINYIN:
 		return TUnit((unsigned int)CPinyinData::encode(str));
-	case XINGHUA:
+	case CTrie::XINGHUA:
 		return CXhData::encode(str);
 	default:
 		return TUnit(0);
@@ -28,9 +29,9 @@ CUnitData::decode(TUnit u, const char **i,
 		const char **f)
 {
 	switch(m_type) {
-	case PINYIN:
+	case CTrie::PINYIN:
 		return CPinyinData::decode(TSyllable((unsigned int)u), i, f);
-	case XINGHUA:
+	case CTrie::XINGHUA:
 		return CXhData::decode(u, i, f);
 	default:
 		return NULL;

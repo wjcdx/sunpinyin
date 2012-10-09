@@ -1,10 +1,9 @@
-
 #include "pinyin_data.h"
 #include "lattice_states.h"
 #include <algorithm>
 
-const CPinyinTrie::TWordIdInfo*
-TLexiconState::getWords(unsigned &num)
+const TrieThreadModel::TWordIdInfo*
+TPyLexiconState::getWords(unsigned &num)
 {
     num = 0;
 
@@ -22,7 +21,7 @@ TLexiconState::getWords(unsigned &num)
 }
 
 void
-TLexiconState::print(std::string prefix) const
+TPyLexiconState::print(std::string prefix) const
 {
     printf("%s", prefix.c_str());
     printf("from frame[%d] ", m_start);

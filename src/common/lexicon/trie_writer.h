@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef __SUNPINYIN_PYTRIE_WRITER_H__
-#define __SUNPINYIN_PYTRIE_WRITER_H__
+#ifndef __SUNPINYIN_TRIE_WRITER_H__
+#define __SUNPINYIN_TRIE_WRITER_H__
 
 #include "writer.h"
 #include "trie.h"

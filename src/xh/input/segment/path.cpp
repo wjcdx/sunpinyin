@@ -8,7 +8,7 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathVec &paths)
 	bool suc = false;
 
 	if (pathInfoFull) {
-		PathNode &cp = this.next(syllable);
+		PathNode *cp = next(syllable);
 		if (cp == NULL || cp.isEnd()) {
 			return false;
 		} 
@@ -53,7 +53,7 @@ Path::getRepeaterStatus(int count, CheckPointVec &cphooks)
 	CheckPointVec::iterator ite = cpset.end();
 	CheckPoint &cp = *it;
 	for (cp = *it, it++; it != ite; cp = *it, it++) {
-		if (this.next(cp.m_PNode) == it->m_Start) {
+		if (next(cp.m_PNode) == it->m_Start) {
 			c++;
 			cphooks.push_back(cp);
 		} else {
@@ -73,7 +73,7 @@ Path::forwardCheckPoint()
 	CheckPointVec::iterator it = cpset.begin();
 	CheckPointVec::iterator ite = cpset.end();
 	for (; it != ite; it++) {
-		(*it).m_PNode = this.next((*it).m_PNode);
+		(*it).m_PNode = next((*it).m_PNode);
 	}
 }
 
@@ -136,14 +136,14 @@ Path::labelPath(CheckPointVec &cphooks)
 
 	CheckPoint &cp = *it;
 	PathNode &node = getNow();
-	for (; node != *it.m_Start; node = this.next(node)) {
+	for (; node != *it.m_Start; node = next(node)) {
 		node.flag = JUMPED;
 	}
 
 	for (; it != ite; it++) {
 		cp = *it;
 		node = cp.Start;
-		for (; node != cp.m_PNode; node = this.next(node)) {
+		for (; node != cp.m_PNode; node = next(node)) {
 			node.flag = HISTORY;
 		}
 	}
