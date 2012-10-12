@@ -1,9 +1,11 @@
 #include "trie.h"
 #include "lattice.h"
 #include "lattice_manager.h"
+#include "userdict.h"
 
 CLattice CLatticeManager::m_lattice;
 CTrie *CLatticeManager::m_pTrie;
+CUserDict* CLatticeManager::m_pUserDict;
 
 void
 CLatticeManager::printLattice()
@@ -23,7 +25,14 @@ void
 CLatticeManager::clear()
 {
     _clearFrom(1);
-	this.setTailIdx(1);
+	setTailIdx(1);
+}
+
+void
+CLatticeManager::_clearFrom(unsigned idx) 
+{
+	    for (size_t i = idx; i < m_tailIdx + 1; i++) 
+			        m_lattice[i].clear();
 }
 
 void
@@ -42,8 +51,9 @@ static double exp2_tbl[32] = {
 };
 
 bool
-CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel, bool affectCandidates)
+CLatticeManager::buildLatticeStates(unsigned rebuildFrom, unsigned csLevel)
 {
+	bool affectCandidates;
     for (; rebuildFrom <= m_tailIdx; ++rebuildFrom) {
         CLatticeFrame &fr = m_lattice[rebuildFrom];
 
@@ -64,7 +74,7 @@ CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel, bool affe
         for (; it != ite; ++it) {
             unsigned word_num = 0;
             TLexiconState &lxst = *it;
-            const CPinyinTrie::TWordIdInfo *words = lxst.getWords(word_num);
+            const TWordIdInfo *words = lxst.getWords(word_num);
 
             if (!word_num)
                 continue;
@@ -107,6 +117,7 @@ CLatticeManager::buildLatticeStates(int rebuildFrom, unsigned csLevel, bool affe
             }
         }
     }
+	return affectCandidates;
 }
 
 void

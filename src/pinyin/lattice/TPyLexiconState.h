@@ -13,8 +13,6 @@
  * more words further, and what bone is its starting bone.
  */
 struct TPyLexiconState : TLexiconState {
-    CSyllables m_syls;
-
     //unsigned m_start                 : 16;
     unsigned m_num_of_inner_fuzzies  : 14;
     bool m_bFuzzy                : 1;
@@ -25,12 +23,9 @@ struct TPyLexiconState : TLexiconState {
                    CSyllables& syls,
                    std::vector<unsigned>& seg_path,
                    bool fuzzy = false)
-    : m_syls(syls), 
-        m_num_of_inner_fuzzies(0), m_bFuzzy(fuzzy), m_bPinyin(true) 
+		: TLexiconState(start, pnode, syls, seg_path),
+			m_num_of_inner_fuzzies(0), m_bFuzzy(fuzzy), m_bPinyin(true) 
 	{
-		m_pNode = pnode;
-		m_start = start;
-		m_seg_path = seg_path;
 	}
 
     TPyLexiconState (unsigned start,
@@ -38,13 +33,11 @@ struct TPyLexiconState : TLexiconState {
                    CSyllables &syls,
                    std::vector<unsigned>& seg_path,
                    bool fuzzy = false)
-    : m_syls(syls), m_num_of_inner_fuzzies(0),
-		m_bFuzzy(fuzzy), m_bPinyin(true)
+		: TLexiconState(start, NULL, syls, seg_path),
+			m_num_of_inner_fuzzies(0),
+			m_bFuzzy(fuzzy), m_bPinyin(true)
 	{
-		m_pNode = NULL;
-		m_start = start;
 		m_words = words;
-		m_seg_path = seg_path;
 	}
 
     TPyLexiconState (unsigned start, unsigned wid)

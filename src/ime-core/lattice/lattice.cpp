@@ -1,3 +1,4 @@
+#include "lattice.h"
 
 void
 CLatticeFrame::print(std::string prefix)

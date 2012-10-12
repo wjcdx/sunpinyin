@@ -1,3 +1,4 @@
+#include <string>
 #include "xh_data.h"
 
 XhKeyMapPair

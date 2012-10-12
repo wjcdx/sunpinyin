@@ -16,7 +16,7 @@
 #include <map>
 #include <vector>
 
-#include "pinyin/trie/pinyin_seg.h"
+#include "pinyin_seg.h"
 #include "imi_data.h"
 #include "ic_history.h"
 #include "userdict.h"

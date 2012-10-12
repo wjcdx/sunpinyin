@@ -427,7 +427,7 @@ RETURN:;
                      (*m_pGetFuzzySegmentsOp)(m_segs, m_fuzzy_segs, m_inputBuf));
 
     if (m_pGetFuzzySyllablesOp && m_pGetFuzzySyllablesOp->isEnabled()) {
-        if (m_segs.back().m_type == SYLLABLE)
+        if (m_segs.back().m_type == TSegment::SYLLABLE)
             _addFuzzySyllables(m_segs.back());
 
         if (m_fuzzy_segs.size()) {
@@ -442,7 +442,7 @@ RETURN:;
 void
 CQuanpinSegmentor::_addFuzzySyllables(TSegment& seg)
 {
-    assert(seg.m_type == SYLLABLE);
+    assert(seg.m_type == TSegment::SYLLABLE);
 
     TPySyllableSegment &pyseg = *(TPySyllableSegment *)(&seg);
 

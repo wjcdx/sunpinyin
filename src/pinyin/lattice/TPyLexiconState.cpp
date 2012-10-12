@@ -1,4 +1,5 @@
 #include "pinyin_data.h"
+#include "TPyLexiconState.h"
 #include "lattice_states.h"
 #include <algorithm>
 
@@ -12,9 +13,9 @@ TPyLexiconState::getWords(unsigned &num)
         return &m_words[0];
     }
 
-    if (m_bPinyin && m_pPYNode) {
-        num = m_pPYNode->m_nWordId;
-        return m_pPYNode->getWordIdPtr();
+    if (m_bPinyin && m_pNode) {
+        num = m_pNode->m_nWordId;
+        return m_pNode->getWordIdPtr();
     }
 
     return NULL;
@@ -27,7 +28,7 @@ TPyLexiconState::print(std::string prefix) const
     printf("from frame[%d] ", m_start);
 
     if (m_bPinyin) {
-        printf("%sdict ", m_pPYNode ? "sys" : "usr");
+        printf("%sdict ", m_pNode ? "sys" : "usr");
         if (!m_syls.empty()) {
             printf("pinyin: ");
             CSyllables::const_iterator it = m_syls.begin();

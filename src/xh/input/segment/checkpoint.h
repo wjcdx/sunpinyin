@@ -9,8 +9,13 @@ struct CheckPoint {
 	CheckPoint(PathNode *node) {
 		m_Start = m_PNode = node;
 	}
+
+	bool operator==(CheckPoint &cp) {
+		return (m_Start == cp.m_Start)
+			&& (m_PNode == cp.m_PNode);
+	}
 };
 
-typedef std::vector<CheckPoint> CheckPointVec;
+typedef std::list<CheckPoint> CheckPointList;
 
 #endif

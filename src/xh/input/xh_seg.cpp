@@ -1,14 +1,10 @@
 #include <cassert>
 #include <functional>
 #include <algorithm>
-#include "segment_types.h"
+#include "xh_seg.h"
 
 CXhSegmentor::CXhSegmentor ()
-    : m_pGetFuzzySyllablesOp(NULL),
-      m_pGetCorrectionPairOp(NULL),
-      m_pGetFuzzySegmentsOp(NULL),
-      m_trie(base, check, value, sizeof(base) / sizeof(*base)),
-      m_updatedFrom(0)
+    : m_updatedFrom(0)
 {
     m_segs.reserve(32);
 }
@@ -16,7 +12,8 @@ CXhSegmentor::CXhSegmentor ()
 bool
 CXhSegmentor::load(const char * trieFileName)
 {
-    return m_trie.load(trieFileName);
+    //return m_trie.load(trieFileName);
+    return true;
 }
 
 #ifdef DEBUG
@@ -36,39 +33,6 @@ unsigned
 CXhSegmentor::push(unsigned ch)
 {
     m_inputBuf.push_back(ch);
-
-    if (m_pGetCorrectionPairOp && m_pGetCorrectionPairOp->isEnabled()) {
-        m_inputstr.push_back(ch);
-        unsigned l = 0;
-        const char * v = (*m_pGetCorrectionPairOp)(m_inputstr, l);
-
-        if (v) {
-            unsigned orig_size = m_segs.size();
-            _clear(m_inputstr.size() - l);
-            m_updatedFrom = _updateWith(v);
-
-            if (m_segs.size() >= orig_size) {
-                // does not get better segmentation, revert to original
-                _clear(m_inputstr.size() - strlen(v));
-                std::string new_pystr;
-                std::copy(m_inputBuf.end() - l, m_inputBuf.end(),
-                          back_inserter(new_pystr));
-                m_updatedFrom = _updateWith(new_pystr);
-            } else {
-                if (l != strlen(v)) {
-                    // e.g. uen -> un
-                    m_segs.back().m_len += l - strlen(v);
-                    m_inputstr.resize(m_inputBuf.length());
-                }
-                std::copy(m_inputBuf.end() - l, m_inputBuf.end(),
-                          m_inputstr.end() - l);
-            }
-            return m_updatedFrom;
-        }
-
-        m_inputstr.resize(m_inputstr.size() - 1);
-    }
-
     return m_updatedFrom = _push(ch);
 }
 
@@ -187,7 +151,7 @@ CXhSegmentor::_push(unsigned ch)
         last_seg.m_len += 1;
         last_seg.m_syllables.push_back(ch);
 
-        ret = m_inputstr.size() - l;
+        ret = m_inputstr.size() - 1;
 
     } else if (m_trie.isPattern(ch)) {
 

@@ -3,28 +3,27 @@
 #include "checkpoint.h"
 	
 bool
-Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathVec &paths)
+Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
 
 	if (pathInfoFull) {
 		PathNode *cp = next(syllable);
-		if (cp == NULL || cp.isEnd()) {
+		if (cp == NULL || cp->isEnd()) {
 			return false;
 		} 
-		this.forward();
+		this->forward();
 		return true;
 	}
 
 	if (num == 1) {
-		suc = m_Now.findNextSubNode(syllable, paths);
+		suc = m_Now->findNextSubNode(syllable, paths);
 	} else {
-		suc = m_Now.findAllSubNode(syllable, num, paths);
+		suc = m_Now->findAllSubNode(syllable, num, paths);
 		if (!suc)
 			return false;
-
-		//add into or remove from fwdPathes;
-		suc = checkNumInPaths(fwdPaths, syllable, num);
+		//add into or remove from paths;
+		suc = checkNumInPaths(paths, syllable, num);
 	}
 
 	return suc;
@@ -37,7 +36,7 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathVec &paths)
  * -1: iterate end failed;
  */
 int
-Path::getRepeaterStatus(int count, CheckPointVec &cphooks)
+Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 {
 	int c = 0;
 	int len = cpset.size();
@@ -49,11 +48,11 @@ Path::getRepeaterStatus(int count, CheckPointVec &cphooks)
 	if (len == 1 && count == 1)
 		return 1;
 
-	CheckPointVec::iterator it = cpset.begin();
-	CheckPointVec::iterator ite = cpset.end();
+	CheckPointList::iterator it = cpset.begin();
+	CheckPointList::iterator ite = cpset.end();
 	CheckPoint &cp = *it;
 	for (cp = *it, it++; it != ite; cp = *it, it++) {
-		if (next(cp.m_PNode) == it->m_Start) {
+		if (next(cp.m_PNode) == (*it).m_Start) {
 			c++;
 			cphooks.push_back(cp);
 		} else {
@@ -70,8 +69,8 @@ Path::getRepeaterStatus(int count, CheckPointVec &cphooks)
 void
 Path::forwardCheckPoint()
 {
-	CheckPointVec::iterator it = cpset.begin();
-	CheckPointVec::iterator ite = cpset.end();
+	CheckPointList::iterator it = cpset.begin();
+	CheckPointList::iterator ite = cpset.end();
 	for (; it != ite; it++) {
 		(*it).m_PNode = next((*it).m_PNode);
 	}
@@ -83,12 +82,12 @@ Path::getSameRepNumber(CheckPoint &cp)
 	int c = 0;
 	PathNode *n1 = cp.m_PNode;
 
-	CheckPointVec::iterator it = cpset.begin();
-	CheckPointVec::iterator ite = cpset.end();
+	CheckPointList::iterator it = cpset.begin();
+	CheckPointList::iterator ite = cpset.end();
 	for (; it != ite; it++) {
-		if (*it = cp)
+		if (*it == cp)
 			continue;
-		if (n1 == it->m_PNode) {
+		if (n1 == (*it).m_PNode) {
 			c++;
 		}
 	}
@@ -103,14 +102,14 @@ Path::iterateRepeaters(int count)
 	
 	forwardCheckPoint();
 
-	CheckPointVec::iterator it = cpset.begin();
-	CheckPoint &cp = cpset.back();
-	for (; *it != cp;) {
+	CheckPointList::iterator itn, it = cpset.begin();
+	CheckPointList::iterator ite = cpset.end();
+	for (itn = it; it != ite; it = itn, itn++) {
 		int c = getSameRepNumber(*it);
 		if (c+1 >= count) {
 			it++;
 		} else {
-			(*it).erase();
+			cpset.erase(it);
 		}
 	}
 }
@@ -118,36 +117,36 @@ Path::iterateRepeaters(int count)
 void
 Path::findCheckPoints(TSyllable syllable)
 {
-	PathNodeVec::iterator it = m_Nodes.begin();
-	PathNodeVec::iterator ite = m_Nodes.begin();
+	PathNodeList::iterator it = m_Nodes.begin();
+	PathNodeList::iterator ite = m_Nodes.begin();
 	for (; it != ite; it++) {
-		if ((*it).flag == CHECKPOINT) {
-			CheckPoint cp(*it);
+		if ((*it).flag == PathNode::CHECKPOINT) {
+			CheckPoint cp(&(*it));
 			cpset.push_back(cp);
 		}
 	}
 }
 
 void
-Path::labelPath(CheckPointVec &cphooks)
+Path::labelPath(CheckPointList &cphooks)
 {
-	CheckPointVec::iterator it = cphooks.begin();
-	CheckPointVec::iterator ite = cphooks.end();
+	CheckPointList::iterator it = cphooks.begin();
+	CheckPointList::iterator ite = cphooks.end();
 
 	CheckPoint &cp = *it;
-	PathNode &node = getNow();
-	for (; node != *it.m_Start; node = next(node)) {
-		node.flag = JUMPED;
+	PathNode *node = getNow();
+	for (; node != (*it).m_Start; node = next(node)) {
+		node->flag = PathNode::JUMPED;
 	}
 
 	for (; it != ite; it++) {
 		cp = *it;
-		node = cp.Start;
+		node = cp.m_Start;
 		for (; node != cp.m_PNode; node = next(node)) {
-			node.flag = HISTORY;
+			node->flag = PathNode::HISTORY;
 		}
 	}
-	cp.m_PNode.flag = JUSTNOW;
+	cp.m_PNode->flag = PathNode::JUSTNOW;
 }
 
 bool
@@ -155,12 +154,12 @@ Path::checkNumInPath(TSyllable syllable, int num)
 {
 	int stat = 0;
 
-	this.findCheckPoints(syllable);
-	if (cpset.size() < num)
+	findCheckPoints(syllable);
+	if ((int)cpset.size() < num)
 		return false;
 
 	while (true) {
-		CheckPointVec cphooks;
+		CheckPointList cphooks;
 		stat = getRepeaterStatus(num, cphooks);
 		if (stat == 1) {
 			labelPath(cphooks);
@@ -174,14 +173,13 @@ Path::checkNumInPath(TSyllable syllable, int num)
 }
 
 bool
-Path::checkNumInPaths(PathVec paths, TSyllable syllable, int num)
+Path::checkNumInPaths(PathList paths, TSyllable syllable, int num)
 {
-	PathVec::iterator it = paths.begin();
-	PathVec::iterator ite = paths.end();
+	PathList::iterator it = paths.begin();
+	PathList::iterator ite = paths.end();
 	for (; it != ite; it++) {
-		Path &path = *it;
-		if (!path.checkNumInPath(syllable, num)) {
-			paths.erase(path);
+		if (!(*it).checkNumInPath(syllable, num)) {
+			paths.erase(it);
 		}
 	}
 	return !paths.empty();

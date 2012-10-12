@@ -1,4 +1,3 @@
-
 #ifndef SUNPY_PINYIN_SEG_H
 #define SUNPY_PINYIN_SEG_H
 

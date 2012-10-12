@@ -9,8 +9,8 @@
 
 class CLatticeManager {
 public:
-	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom) = 0;
-	bool buildLatticeStates(int rebuildFrom, unsigned csLevel);
+	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
+	bool buildLatticeStates(unsigned rebuildFrom, unsigned csLevel);
 	bool backTracePaths();
 
 	static CLatticeFrame& getLatticeFrame(unsigned i) {
@@ -32,6 +32,7 @@ public:
 
     void printLattice();
 	void clear();
+	void _clearFrom(unsigned idx);
 	void clearFrom(unsigned idx);
 
 	unsigned getTailIdx() { return m_tailIdx; }
@@ -47,12 +48,12 @@ public:
 public:
 	static CLattice m_lattice;
     static CTrie* m_pTrie;
+    static CUserDict* m_pUserDict;
 
 protected:
     unsigned m_tailIdx;
 
     CThreadSlm* m_pModel;
-    CUserDict* m_pUserDict;
     CICHistory* m_pHistory;
     unsigned m_historyPower;
 };

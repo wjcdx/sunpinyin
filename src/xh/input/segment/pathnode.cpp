@@ -1,43 +1,44 @@
 #include "pathnode.h" 
+#include "path.h" 
 #include "checkpoint.h" 
 
-PathNodeVec
+PathNodeList
 getChildren(TSyllable syllable)
 {
-	PathNodeVec nodes;
+	PathNodeList nodes;
 	return nodes;
 }
 
 bool
-PathNode::findNextSubNode(TSyllable syllable, PathVec &paths)
+PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 {
-	PathNodeVec children = this.getChildren(syllable);
+	PathNodeList children = getChildren(syllable);
 	if (children.empty()) {
 		return false;
 	}
 
-	PathNodeVec::iterator nit = children.begin();
-	PathNodeVec::iterator nite = children.end();
+	PathNodeList::iterator nit = children.begin();
+	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 		if ((*nit).transFrom(syllable)) {
-			(*nit).flag = JUSTNOW;
+			(*nit).flag = PathNode::JUSTNOW;
 
 			Path path;
-			path.push_front(nit);
+			path.add(*nit);
 			paths.push_back(path);
 		} else {
-			(*nit).flag = JUMPED;
+			(*nit).flag = PathNode::JUMPED;
 			
 			bool suc = false;
-			PathVec subPaths;
+			PathList subPaths;
 			suc = (*nit).findNextSubNode(syllable, subPaths);
 			if (!suc)
 				continue;
 
-			PathVec::iterator pit = subPaths.begin();
-			PathVec::iterator pite = subPaths.end();
+			PathList::iterator pit = subPaths.begin();
+			PathList::iterator pite = subPaths.end();
 			for (; pit != pite; pit++) {
-				(*pit).push_front(nit);
+				(*pit).push_front(*nit);
 				paths.push_back(*pit);
 			}
 		}
@@ -46,40 +47,39 @@ PathNode::findNextSubNode(TSyllable syllable, PathVec &paths)
 }
 
 bool
-PathNode::findAllSubNode(TSyllable syllable, int num, PathVec &paths)
+PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths)
 {
-	PathNodeVec children = this.getChildren(syllable);
+	PathNodeList children = getChildren(syllable);
 	if (children.empty()) {
 		Path path;
-		PathNode node;
-		node.flag = END;
+		PathNode node(PathNode::END);
 		path.push_front(node);
 		paths.push_back(path);
 		return true;
 	}
 
-	PathNodeVec::iterator nit = children.begin();
-	PathNodeVec::iterator nite = children.end();
+	PathNodeList::iterator nit = children.begin();
+	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 		if ((*nit).transFrom(syllable)) {
-			(*nit).flag = FUTURE;
+			(*nit).flag = PathNode::FUTURE;
 			num -= 1;
 		} else {
-			(*nit).flag = CHECKPOINT;
+			(*nit).flag = PathNode::CHECKPOINT;
 		}
 
 		bool suc = false;
-		PathVec subPaths;
+		PathList subPaths;
 		suc = (*nit).findAllSubNode(syllable, num, subPaths);
 		if (!suc)
 			continue;
 
-		PathVec::iterator pit = subPaths.begin();
-		PathVec::iterator pite = subPaths.end();
+		PathList::iterator pit = subPaths.begin();
+		PathList::iterator pite = subPaths.end();
 		for (; pit != pite; pit++) {
 			if ((*pit).getTransNum(syllable) < num)
 				continue;
-			(*pit).push_front(nit);
+			(*pit).push_front(*nit);
 			paths.push_back(*pit);
 		}
 	}

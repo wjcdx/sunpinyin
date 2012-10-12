@@ -7,6 +7,7 @@
 #include "portability.h"
 #include "trie.h"
 #include "TrieThreadModel.h"
+#include "syllable.h"
 
 using namespace TrieThreadModel;
 
@@ -23,6 +24,20 @@ public:
 	virtual const double getWeight();
     virtual void print(std::string prefix) const;
 
+	TLexiconState (unsigned start,
+                   const TThreadNode *pnode,
+                   CSyllables& syls,
+                   std::vector<unsigned>& seg_path)
+     : m_start(start), m_pNode(pnode), m_syls(syls), m_seg_path(seg_path)
+    {}   
+
+	TLexiconState (unsigned start,
+				   TWordIdInfoVec &words,
+                   CSyllables& syls,
+                   std::vector<unsigned>& seg_path)
+		: m_start(start), m_pNode(NULL), m_syls(syls), m_words(words),
+		m_seg_path(seg_path) {}
+
     TLexiconState (unsigned start, unsigned wid)
     : m_start(start), m_pNode(NULL) {
         m_words.push_back(wid);
@@ -31,11 +46,14 @@ public:
     }
 	
 public:
-	TThreadNode *m_pNode;
+	unsigned m_start;
+	const TThreadNode *m_pNode;
+
+	CSyllables m_syls;
+
 	TWordIdInfoVec m_words;
 	// accumulated segments,  may contain fuzzy segments
 	std::vector<unsigned> m_seg_path;
-	unsigned m_start;
 };
 
 /**

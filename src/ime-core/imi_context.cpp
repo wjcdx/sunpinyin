@@ -46,7 +46,7 @@ CIMIContext::CIMIContext()
       m_pPySegmentor(NULL), m_bNonCompleteSyllable(true),
       m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0)
 {
-    this.m_pLatticeMgr = CLatticeManager();
+    m_pLatticeMgr = new CLatticeManager();
     setMaxBest(m_maxBest);
 }
 
@@ -88,11 +88,11 @@ CIMIContext::searchFrom(unsigned idx)
 {
     bool affectCandidates = (idx <= m_candiEnds);
 
-    this.m_pLatticeMgr->buildLatticeStates(idx);
-    this.m_pLatticeMgr->backTracePaths();
-    this.backTracePaths();
+    bool affect = m_pLatticeMgr->buildLatticeStates(idx);
+    m_pLatticeMgr->backTracePaths();
+    backTracePaths();
 
-    return affectCandidates;
+    return affect || affectCandidates;
 }
 
 bool

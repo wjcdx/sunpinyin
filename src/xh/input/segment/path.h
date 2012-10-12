@@ -3,34 +3,59 @@
 
 #include "pathnode.h"
 #include "checkpoint.h"
+#include <algorithm>
+#include <list>
 
 struct Path {
 private:
-	PathNodeVec m_Nodes;
+	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
 
 public:
 	void add(PathNode &node) {
-		PathNode *priv = (*(m_NextMap.end())).second;
-		m_NextMap[priv] = &node;
+		PathNode *priv = &m_Nodes.back();
 		m_Nodes.push_back(node);
-		if (node.flag == JUSTNOW) {
-			m_Now->flag = HISTORY;
-			m_Now = &node;
+
+		PathNode *n = &m_Nodes.back();
+		m_NextMap[priv] = n;
+
+		if (n->flag == PathNode::JUSTNOW) {
+			m_Now->flag = PathNode::HISTORY;
+			m_Now = n;
+		}
+	}
+	
+	void push_front(PathNode &node) {
+		PathNode *next = &m_Nodes.front();
+		m_Nodes.push_front(node);
+
+		PathNode *n = &m_Nodes.front();
+		m_NextMap[n] = next;
+
+		if (n->flag == PathNode::JUSTNOW) {
+			m_Now->flag = PathNode::FUTURE;
+			m_Now = n;
 		}
 	}
 
-	PathNode &getNow() {
-		return *m_Now;
+	PathNode *getNow() {
+		return m_Now;
 	}
 	
-	PathNodeVec &getPathNodes() {
+	PathNodeList &getPathNodes() {
 		return m_Nodes;
 	}
 
-	PathNode *next(PathNode &n) {
-		return m_NextMap[&n];
+	PathNode *next(PathNode *node) {
+		PathNodeList::iterator it = m_Nodes.begin();
+		PathNodeList::iterator ite = m_Nodes.end();
+		for (; it != ite; it++) {
+			if (*it == *node) {
+				return m_NextMap[&(*it)];
+			}
+		}
+		return NULL;
 	}
 
 	PathNode *next(TSyllable s) {
@@ -43,15 +68,15 @@ public:
 
 	void forward() {
 		PathNode *nxt = m_NextMap[m_Now];
-		m_Now->flag = HISTORY;
-		nxt->flag = JUSTNOW;
+		m_Now->flag = PathNode::HISTORY;
+		nxt->flag = PathNode::JUSTNOW;
 		m_Now = nxt;
 	}
 	
 	int getTransNum(TSyllable s) {
 		int c = 0;
-		PathNodeVec::iterator it = m_Nodes.begin();
-		PathNodeVec::iterator ite = m_Nodes.end();
+		PathNodeList::iterator it = m_Nodes.begin();
+		PathNodeList::iterator ite = m_Nodes.end();
 		for (; it != ite; it++)
 			if ((*it).transFrom(s))
 				c++;
@@ -59,40 +84,40 @@ public:
 	}
 
 public:
-	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathVec &paths);
+	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
 
 private:
-	CheckPointVec cpset;
-	int getRepeaterStatus(int count, CheckPointVec &cphooks);
+	CheckPointList cpset;
+	int getRepeaterStatus(int count, CheckPointList &cphooks);
 	void forwardCheckPoint();
 	int getSameRepNumber(CheckPoint &cp);
 	void iterateRepeaters(int count);
 	void findCheckPoints(TSyllable syllable);
-	void labelPath();
+	void labelPath(CheckPointList &cphooks);
 	bool checkNumInPath(TSyllable syllable, int num);
-	bool checkNumInPaths(PathVec paths, TSyllable syllable, int num);
+	bool checkNumInPaths(PathList paths, TSyllable syllable, int num);
 };
 
-typedef std::vector<Path> PathVec;
+typedef std::list<Path> PathList;
 
 struct TrieBranch {
 	Path m_Path;
 	bool newAdded;
 
 public:
-	bool forward(TSyllable s, int num, bool numMet, PathVec &paths) {
+	bool forward(TSyllable s, int num, bool numMet, PathList &paths) {
 		return m_Path.forward(s, num, numMet, paths);
 	}
 	void addPathInfo(Path &path) {
-		PathNodeVec::iterator it = path.getPathNodes().begin();
-		PathNodeVec::iterator ite = path.getPathNodes().end();
+		PathNodeList::iterator it = path.getPathNodes().begin();
+		PathNodeList::iterator ite = path.getPathNodes().end();
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
 	}
 };
 
-typedef std::vector<TrieBranch> BranchVec;
+typedef std::list<TrieBranch> BranchList;
 
 #endif
 

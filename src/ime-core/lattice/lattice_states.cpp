@@ -1,3 +1,5 @@
+#include "lattice_states.h"
+
 void
 TLatticeState::print(std::string prefix) const
 {

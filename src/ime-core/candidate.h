@@ -45,6 +45,7 @@ protected:
  */
 class CCandidate {
     friend class CIMIContext;
+    friend class CLatticeManager;
 public:
     unsigned m_start;
     unsigned m_end;

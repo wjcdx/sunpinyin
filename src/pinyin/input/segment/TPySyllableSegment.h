@@ -12,8 +12,12 @@ struct TPySyllableSegment : TSyllableSegment {
 	{}
 	
 	void forward(unsigned i, unsigned j);
+	
+	void _forwardSingleSyllable(unsigned i,
+							unsigned j,
+							TSyllable syllable,
+							bool fuzzy);
 
-protected:
 	std::vector<unsigned>           m_fuzzy_syllables;
 	bool m_inner_fuzzy;
 };

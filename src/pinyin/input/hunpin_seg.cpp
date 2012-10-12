@@ -71,7 +71,7 @@ CHunpinSegmentor::_encode(const char* buf)
     s.m_len = 2;
     s.m_start = m_pystr.size() - s.m_len;
     s.m_syllables.clear();
-    s.m_type = SYLLABLE;
+    s.m_type = TSegment::SYLLABLE;
     for (; iter != iter_end; iter++) {
         s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
     }
@@ -281,7 +281,7 @@ CHunpinSegmentor::_push(unsigned ch)
 
     TSegment &last_seg = m_segs.back();
     if (m_pGetFuzzySyllablesOp && m_pGetFuzzySyllablesOp->isEnabled())
-        if (m_segs.back().m_type == SYLLABLE)
+        if (m_segs.back().m_type == TSegment::SYLLABLE)
             _addFuzzySyllables(last_seg);
 
     return last_seg.m_start;
@@ -290,7 +290,7 @@ CHunpinSegmentor::_push(unsigned ch)
 void
 CHunpinSegmentor::_addFuzzySyllables(TSegment& seg)
 {
-    assert(seg.m_type == SYLLABLE);
+    assert(seg.m_type == TSegment::SYLLABLE);
 
     TPySyllableSegment &pyseg = *(TPySyllableSegment *)(&seg);
 

@@ -1,10 +1,10 @@
-
 #ifndef SUNPY_XINGHUA_SEG_H
 #define SUNPY_XINGHUA_SEG_H
 
 #include "portability.h"
 #include "segmentor.h"
 #include "segment_types.h"
+#include "xh_data.h"
 
 #include <algorithm>
 #include <climits>
@@ -18,7 +18,7 @@ public:
         return m_segs;
     }
 
-    virtual const wstring& getInputBuffer() { return m_inputBuf; }
+    const wstring& getInputBuffer() { return m_inputBuf; }
 
     virtual const char* getSylSeps() { return "'"; }
 
@@ -39,7 +39,7 @@ private:
                                 unsigned from = UINT_MAX);
     inline void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);
 
-    CXhData &m_trie;
+    CXhData m_trie;
     std::string m_inputstr;
     wstring m_inputBuf;
     TSegmentVec m_segs;

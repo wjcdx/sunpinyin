@@ -25,9 +25,9 @@ TXhLexiconState::print(std::string prefix) const
 {
     printf("%s", prefix.c_str());
     printf("from frame[%d] ", m_start);
-
+/*
     if (m_bPinyin) {
-        printf("%sdict ", m_pPYNode ? "sys" : "usr");
+        printf("%sdict ", m_pNode ? "sys" : "usr");
         if (!m_syls.empty()) {
             printf("pinyin: ");
             CSyllables::const_iterator it = m_syls.begin();
@@ -41,7 +41,9 @@ TXhLexiconState::print(std::string prefix) const
              ++it)
             printf("%d ", *it);
         printf(")");
-    } else {
+    } else
+	*/
+	{
         printf("word id ");
         printf("%d", m_words.front().m_id);
     }
