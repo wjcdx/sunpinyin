@@ -6,6 +6,7 @@
 #include "imi_uiobjects.h"
 
 #include "imi_keys.h"
+#include "CFullCharManager.h"
 
 CIMIClassicView::CIMIClassicView()
     : CIMIView(), m_cursorFrIdx(0), m_candiFrIdx(0),
@@ -33,7 +34,7 @@ CIMIClassicView::clearIC(void)
         m_cursorFrIdx = m_candiFrIdx = m_candiPageFirst = 0;
 
         m_pIC->clear();
-        m_pPySegmentor->clear();
+        m_pSegmentor->clear();
         m_candiList.clear();
         //m_tailSentence.clear ();
         m_sentences.clear();
@@ -217,7 +218,7 @@ CIMIClassicView::onKeyEvent(const CKeyEvent& key)
                 changeMasks |= KEYEVENT_USED;
                 makeSelection(0, changeMasks);
             } else {
-                wstring wstr = (m_pIC->fullPuncOp())(keyvalue);
+                wstring wstr = (CFullCharManager::fullPuncOp())(keyvalue);
                 if (wstr.size()) {
                     _commitString(wstr);
                     changeMasks |= KEYEVENT_USED;
@@ -339,7 +340,7 @@ CIMIClassicView::getPreeditString(IPreeditString& ps)
         charTypes.push_back(
             IPreeditString::HANZI_CHAR | IPreeditString::USER_CHOICE);
 
-    const wstring& pystr = m_pPySegmentor->getInputBuffer();
+    const wstring& pystr = m_pSegmentor->getInputBuffer();
     std::vector<unsigned>& seg_path = m_pIC->getBestSegPath();
 
     if (pystr.empty())
@@ -424,17 +425,17 @@ CIMIClassicView::_insert(unsigned keyvalue, unsigned &changeMasks)
 {
     changeMasks |= KEYEVENT_USED;
 
-    if (m_pPySegmentor->getInputBuffer().size() >= MAX_LATTICE_LENGTH - 1)
+    if (m_pSegmentor->getInputBuffer().size() >= MAX_LATTICE_LENGTH - 1)
         return;
 
     if (m_cursorFrIdx == m_pIC->getLastFrIdx())
-        m_pPySegmentor->push(keyvalue);
+        m_pSegmentor->push(keyvalue);
     else
-        m_pPySegmentor->insertAt(m_cursorFrIdx, keyvalue);
+        m_pSegmentor->insertAt(m_cursorFrIdx, keyvalue);
 
     m_cursorFrIdx++;
 
-    if (m_pIC->buildLattice(m_pPySegmentor))
+    if (m_pIC->buildLattice(m_pSegmentor))
         _getCandidates();
 
     changeMasks |= PREEDIT_MASK | CANDIDATE_MASK;
@@ -452,24 +453,24 @@ CIMIClassicView::_erase(bool backward, unsigned &changeMasks)
             }
         }
         if (m_cursorFrIdx == m_pIC->getLastFrIdx()) {
-            m_pPySegmentor->pop();
+            m_pSegmentor->pop();
         } else if (m_cursorFrIdx > 0) {
-            m_pPySegmentor->deleteAt(m_cursorFrIdx - 1, backward);
+            m_pSegmentor->deleteAt(m_cursorFrIdx - 1, backward);
         } else {
             return;
         }
         _moveLeft(changeMasks, true);
     } else {
         if (m_cursorFrIdx == m_pIC->getLastFrIdx() - 1) {
-            m_pPySegmentor->pop();
+            m_pSegmentor->pop();
         } else if (m_cursorFrIdx < m_pIC->getLastFrIdx() - 1) {
-            m_pPySegmentor->deleteAt(m_cursorFrIdx - 1, backward);
+            m_pSegmentor->deleteAt(m_cursorFrIdx - 1, backward);
         } else {
             return;
         }
     }
 done:
-    if (m_pIC->buildLattice(m_pPySegmentor))
+    if (m_pIC->buildLattice(m_pSegmentor))
         _getCandidates();
 
     changeMasks |= PREEDIT_MASK | CANDIDATE_MASK | KEYEVENT_USED;
@@ -505,7 +506,7 @@ CIMIClassicView::_doCommit(bool bConvert)
         m_pIC->getSelectedSentence(bs);
         handlerCommit(bs.c_str());
     } else {
-        bs += m_pPySegmentor->getInputBuffer();
+        bs += m_pSegmentor->getInputBuffer();
         handlerCommit(bs.c_str());
     }
 }

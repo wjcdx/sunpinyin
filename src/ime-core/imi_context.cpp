@@ -23,7 +23,7 @@ CIMIContext::CIMIContext()
 void
 CIMIContext::setCoreData(CIMIData *pCoreData)
 {
-    //CLatticeManager::m_pModel = pCoreData->getSlm();
+    m_pLatticeMgr->setLangModel(pCoreData->getSlm());
     CInputTrieSource::m_pTrie = pCoreData->getTrie();
 }
 

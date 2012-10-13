@@ -87,7 +87,6 @@ imesource = [
     'src/ime-core/view/imi_view_xh.cpp',
     'src/ime-core/imi_winHandler.cpp',
     'src/ime-core/options/imi_option_event.cpp',
-    'src/ime-core/options/imi_options.cpp',
     'src/ime-core/options/lang_policy_cn.cpp',
     'src/ime-core/options/scheme_policy_hp.cpp',
     'src/ime-core/options/scheme_policy_qp.cpp',

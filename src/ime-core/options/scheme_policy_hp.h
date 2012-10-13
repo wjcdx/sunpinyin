@@ -1,11 +1,17 @@
 #ifndef SUNPY_SCHEME_POLICY_HP_H
 #define SUNPY_SCHEME_POLICY_HP_H
 
+#include "imi_option_event.h"
+#include "segmentor.h"
+#include "pinyin_data.h"
+#include "shuangpin_data.h"
+#include "hunpin_seg.h"
+
 struct  CHunpinSchemePolicy : public IConfigurable {
 public:
     CHunpinSchemePolicy();
 
-    IPySegmentor* createPySegmentor(){
+    ISegmentor* createPySegmentor(){
         CHunpinSegmentor *pseg = new CHunpinSegmentor(m_shuangpinType);
         pseg->setGetFuzzySyllablesOp(&m_getFuzzySyllablesOp);
         return pseg;

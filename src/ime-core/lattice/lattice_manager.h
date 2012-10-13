@@ -51,6 +51,8 @@ public:
     int getHistoryPower()
     { return m_historyPower; }
 
+	void setLangModel(CThreadSlm *pModel) { m_pModel = pModel; }
+
 public:
 	static CLattice m_lattice;
 

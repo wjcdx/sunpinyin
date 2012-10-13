@@ -1,4 +1,13 @@
+#include "utils.h"
+#include "portability.h"
 #include "lang_policy_cn.h"
+#include "CInputTrieSource.h"
+#include "imi_option_keys.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <cassert>
+#include <errno.h>
 
 CSimplifiedChinesePolicy::CSimplifiedChinesePolicy()
     : m_bLoaded(false), m_bTried(false), m_csLevel(3),
@@ -49,11 +58,12 @@ CIMIContext *
 CSimplifiedChinesePolicy::createContext()
 {
     CIMIContext* pic = new CIMIContext();
-    pic->setCoreData(&m_coreData);
-    pic->setHistoryMemory(&m_historyCache);
-    pic->setUserDict(&m_userDict);
-
+    
+	pic->setCoreData(&m_coreData);
     pic->setCharsetLevel(m_csLevel);
+	pic->setHistoryMemory(&m_historyCache);
+	
+	CInputTrieSource::setUserDict(&m_userDict);
 
 	CFullCharManager::setFullSymbolForwarding(m_bEnableFullSymbol);
 	CFullCharManager::setGetFullSymbolOp(&m_getFullSymbolOp);

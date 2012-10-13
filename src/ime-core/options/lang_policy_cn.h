@@ -1,6 +1,13 @@
-
 #ifndef SUNPY_LANG_POLICY_SC_H
 #define SUNPY_LANG_POLICY_SC_H
+
+#include "imi_context.h"
+#include "imi_option_event.h"
+#include <string>
+
+#ifndef SUNPINYIN_USERDATA_DIR_PREFIX
+#define SUNPINYIN_USERDATA_DIR_PREFIX ".sunpinyin"
+#endif
 
 struct CSimplifiedChinesePolicy : public IConfigurable {
     CSimplifiedChinesePolicy ();

@@ -16,7 +16,7 @@ public:
         m_bFullPunctForwarding = value;
     }
     static bool getFullPunctForwarding() { return m_bFullPunctForwarding; }
-    static void setFullPunctOp(CGetFullPunctOp *op) { m_pGetFullPunctOp = op; }
+    static void setGetFullPunctOp(CGetFullPunctOp *op) { m_pGetFullPunctOp = op; }
     static CGetFullPunctOp& fullPuncOp() { return *m_pGetFullPunctOp; }
     static void omitNextPunct() { m_bOmitPunct = true; }
 

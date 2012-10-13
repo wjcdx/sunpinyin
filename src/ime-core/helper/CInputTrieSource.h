@@ -6,8 +6,8 @@
 
 class CInputTrieSource {
 public:
-    void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
-    CUserDict* getUserDict() { return m_pUserDict; }
+    static void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
+    static CUserDict* getUserDict() { return m_pUserDict; }
 	
 	static const TWCHAR * getWstr(unsigned wid);
 

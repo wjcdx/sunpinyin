@@ -1,4 +1,5 @@
 #include "scheme_policy_sp.h"
+#include "imi_option_keys.h"
 
 CShuangpinSchemePolicy::CShuangpinSchemePolicy()
     : m_shuangpinType(MS2003)

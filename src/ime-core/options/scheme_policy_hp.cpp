@@ -1,4 +1,5 @@
 #include "scheme_policy_hp.h"
+#include "imi_option_keys.h"
 
 bool
 CHunpinSchemePolicy::onConfigChanged(const COptionEvent& event)

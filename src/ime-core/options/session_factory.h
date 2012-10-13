@@ -1,6 +1,13 @@
 #ifndef SUNPY_SESSION_FACTORY_H
 #define SUNPY_SESSION_FACTORY_H
 
+#include "utils.h"
+#include "profile_class.h"
+#include "lang_policy_cn.h"
+#include "scheme_policy_qp.h"
+#include "scheme_policy_sp.h"
+#include "style_policy_classic.h"
+
 class CSunpinyinSessionFactory : private CNonCopyable
 {
 public:

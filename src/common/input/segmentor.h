@@ -17,7 +17,7 @@ struct ISegmentor {
     virtual unsigned pop();
     virtual unsigned insertAt(unsigned idx, unsigned ch);
     virtual unsigned deleteAt(unsigned idx, bool backward = true);
-    virtual unsigned clear(unsigned from );
+    virtual unsigned clear(unsigned from = 0);
     virtual void     notify_best_segpath(std::vector<unsigned>& seg_path) {}
 
     virtual unsigned updatedFrom();

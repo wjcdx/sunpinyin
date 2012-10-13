@@ -3,6 +3,7 @@
 
 #include "portability.h"
 
+#include "segmentor.h"
 #include "imi_context.h"
 #include "imi_winHandler.h"
 #include "imi_uiobjects.h"
@@ -126,8 +127,8 @@ public:
     void attachIC(CIMIContext* pIC) { m_pIC = pIC; }
     CIMIContext* getIC(void) const { return m_pIC; }
 
-    void setPySegmentor(IPySegmentor *p) { m_pPySegmentor = p; }
-    IPySegmentor* getPySegmentor() const { return m_pPySegmentor; }
+    void setSegmentor(ISegmentor *p) { m_pSegmentor = p; }
+    ISegmentor* getSegmentor() const { return m_pSegmentor; }
 
     void attachWinHandler(CIMIWinHandler* wh) { m_pWinHandler = wh; }
     CIMIWinHandler* getWinHandler(void) const { return m_pWinHandler; }
@@ -174,7 +175,7 @@ private:
 protected:
     CIMIContext        *m_pIC;
     CIMIWinHandler     *m_pWinHandler;
-    IPySegmentor       *m_pPySegmentor;
+    ISegmentor         *m_pSegmentor;
     CHotkeyProfile     *m_pHotkeyProfile;
 
     unsigned m_candiWindowSize;

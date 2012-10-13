@@ -1,4 +1,5 @@
 #include "scheme_policy_qp.h"
+#include "imi_option_keys.h"
 
 bool
 CQuanpinSchemePolicy::onConfigChanged(const COptionEvent& event)

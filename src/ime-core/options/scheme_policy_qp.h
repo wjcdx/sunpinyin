@@ -1,10 +1,15 @@
 #ifndef SUNPY_SCHEME_POLICY_QP_H
 #define SUNPY_SCHEME_POLICY_QP_H
 
+#include "imi_option_event.h"
+#include "segmentor.h"
+#include "pinyin_data.h"
+#include "pinyin_seg.h"
+
 struct CQuanpinSchemePolicy : IConfigurable {
 public:
 
-    IPySegmentor* createPySegmentor(){
+    ISegmentor* createPySegmentor(){
         CQuanpinSegmentor *pseg = new CQuanpinSegmentor();
         pseg->setGetFuzzySyllablesOp(&m_getFuzzySyllablesOp);
         pseg->setGetCorrectionPairOp(&m_getCorrectionPairOp);
