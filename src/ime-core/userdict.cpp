@@ -38,7 +38,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "userdict.h"
-
+#include "TrieThreadModel.h"
 
 bool
 CUserDict::load(const char  *fname)
@@ -133,7 +133,7 @@ CUserDict::removeWord(unsigned wid)
 
 void
 CUserDict::getWords(CSyllables &syllables,
-                    std::vector<CPinyinTrie::TWordIdInfo> &result)
+                    std::vector<TWordIdInfo> &result)
 {
     assert(m_db != NULL);
 
@@ -182,7 +182,7 @@ CUserDict::getWords(CSyllables &syllables,
     unsigned id = 0;
     TWCHAR cwstr[MAX_USRDEF_WORD_LEN + 1];
     const unsigned char     *utf8str = NULL;
-    CPinyinTrie::TWordIdInfo word;
+    TWordIdInfo word;
 
     while (SQLITE_ROW == sqlite3_step(stmt)) {
         id = sqlite3_column_int(stmt, 0);

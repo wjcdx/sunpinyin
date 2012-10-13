@@ -1,6 +1,7 @@
 #include "string_seg.h"
 #include "lattice_manager.h"
 #include "CFullCharManager.h"
+#include "CInputTrieSource.h"
 #include "lexicon_states.h"
 
 static void
@@ -14,7 +15,7 @@ _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
     if (CFullCharManager::m_pGetFullPunctOp) {
         if (CFullCharManager::m_bFullPunctForwarding && !CFullCharManager::m_bOmitPunct) {
             wstr = (*CFullCharManager::m_pGetFullPunctOp)(ch);
-            wid = CLatticeManager::m_pTrie->getSymbolId(wstr);
+            wid = CInputTrieSource::m_pTrie->getSymbolId(wstr);
         }
     }
 
@@ -38,7 +39,7 @@ _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
 
     if (CFullCharManager::m_pGetFullSymbolOp) {
         wstr = (*CFullCharManager::m_pGetFullSymbolOp)(ch);
-        wid = CLatticeManager::m_pTrie->getSymbolId(wstr);
+        wid = CInputTrieSource::m_pTrie->getSymbolId(wstr);
 
         if (!CFullCharManager::m_bFullSymbolForwarding)
             wstr.clear();

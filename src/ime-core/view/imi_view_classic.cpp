@@ -434,7 +434,7 @@ CIMIClassicView::_insert(unsigned keyvalue, unsigned &changeMasks)
 
     m_cursorFrIdx++;
 
-    if (m_pIC->buildLattice(m_pPySegmentor.getSegments()))
+    if (m_pIC->buildLattice(m_pPySegmentor))
         _getCandidates();
 
     changeMasks |= PREEDIT_MASK | CANDIDATE_MASK;
@@ -694,15 +694,11 @@ CIMIClassicView::deleteCandidate(int candiIdx, unsigned& mask)
         std::vector<unsigned> wids;
         m_pIC->getSelectedSentence(wids, m_candiFrIdx);
         m_pIC->removeFromHistoryCache(wids);
-        m_pIC->buildLattice(m_pSegmentor.getSegments(), m_pSegmentor.updatedFrom());
 
         /* if the sentence wid length is 1, also delete this word */
         if (wids.size() == 1) {
             unsigned wid = wids[0];
-            bool touched = m_pIC->deleteCandidateByWID(wid);
-            if (touched) {
-                m_pIC->buildLattice(m_pSegmentor.getSegments());
-            }
+            m_pIC->deleteCandidateByWID(wid);
         }
     } else if (type == ICandidateList::BEST_WORD
                || type == ICandidateList::NORMAL_WORD) {

@@ -9,6 +9,7 @@
 #include "TCandiRank.h"
 #include "TCandiPair.h"
 #include "TrieThreadModel.h"
+#include "CInputTrieSource.h"
 
 CIMIContext::CIMIContext()
     : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0),
@@ -22,8 +23,8 @@ CIMIContext::CIMIContext()
 void
 CIMIContext::setCoreData(CIMIData *pCoreData)
 {
-    CLatticeManager::m_pModel = pCoreData->getSlm();
-    CLatticeManager::m_pTrie = pCoreData->getTrie();
+    //CLatticeManager::m_pModel = pCoreData->getSlm();
+    CInputTrieSource::m_pTrie = pCoreData->getTrie();
 }
 
 void
@@ -35,7 +36,16 @@ CIMIContext::clear()
 }
 
 bool
-CIMIContext::buildLattice(TSegmentVec &segments,
+CIMIContext::buildLattice(ISegmentor *segmentor, bool doSearch)
+{
+    m_pSegmentor = segmentor;
+    
+    return _buildLattice(segmentor->getSegments(),
+            segmentor->updatedFrom() + 1, doSearch);
+}
+
+bool
+CIMIContext::_buildLattice(TSegmentVec &segments,
                            unsigned rebuildFrom,
                            bool doSearch)
 {
@@ -49,8 +59,8 @@ CIMIContext::searchFrom(unsigned idx)
 {
     bool affectCandidates = (idx <= m_candiEnds);
 
-    bool affect = m_pLatticeMgr->buildLatticeStates(idx, m_csLevel);
-    m_pLatticeMgr->backTracePaths();
+    static GlobalLatticeInfo info(m_csLevel, m_candiStarts, m_candiEnds);
+    bool affect = m_pLatticeMgr->buildLatticeStates(idx, info);
     backTracePaths();
 
     return affect || affectCandidates;
@@ -194,17 +204,6 @@ CIMIContext::getSelectedSentence(std::vector<unsigned>& result,
     return getBestSentence(result, -1, start, end);
 }
 
-const TWCHAR *
-CIMIContext::_getWstr(unsigned wid)
-{
-    if (wid < CLatticeManager::m_pTrie->getWordCount())
-        return (*CLatticeManager::m_pTrie)[wid];
-    else if (CLatticeManager::m_pUserDict)
-        return (*CLatticeManager::m_pUserDict)[wid];
-    else
-        return NULL;
-}
-
 void
 CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
 {
@@ -240,7 +239,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
                     continue;
 
                 TLexiconState & lxst = *(candi.m_pLexiconState);
-                int len = lxst.m_syls.size() - lxst.m_num_of_inner_fuzzies;
+                int len = lxst.getLength();
                 if (len == 0) len = 1;
 
                 cp.m_candi = candi;
@@ -261,7 +260,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
             if (lxst.m_start != m_candiStarts)
                 continue;
 
-            int len = lxst.m_syls.size() - lxst.m_num_of_inner_fuzzies;
+            int len = lxst.getLength();
             if (0 == len) len = 1;
 
             found = true;
@@ -273,7 +272,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
                     continue;
 
                 cp.m_candi.m_wordId = words[i].m_id;
-                cp.m_candi.m_cwstr = _getWstr(cp.m_candi.m_wordId);
+                cp.m_candi.m_cwstr = CInputTrieSource::getWstr(cp.m_candi.m_wordId);
                 cp.m_candi.m_pLexiconState = &lxst;
                 if (!cp.m_candi.m_cwstr)
                     continue;
@@ -308,13 +307,12 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
                     continue;
 
                 cp.m_candi.m_wordId = ltst.m_backTraceWordId;
-                cp.m_candi.m_cwstr = _getWstr(cp.m_candi.m_wordId);
+                cp.m_candi.m_cwstr = CInputTrieSource::getWstr(cp.m_candi.m_wordId);
                 cp.m_candi.m_pLexiconState = ltst.m_pLexiconState;
                 if (!cp.m_candi.m_cwstr)
                     continue;
 
-                int len = cp.m_candi.m_pLexiconState->m_syls.size() -
-                          cp.m_candi.m_pLexiconState->m_num_of_inner_fuzzies;
+                int len = cp.m_candi.m_pLexiconState->getLength();
                 if (0 == len) len = 1;
                 cp.m_Rank = TCandiRank(false,
                                        !st.empty() && st.front() ==
@@ -416,7 +414,7 @@ CIMIContext::memorize()
 void
 CIMIContext::_saveUserDict()
 {
-    if (!CLatticeManager::m_pUserDict)
+    if (!CInputTrieSource::m_pUserDict)
         return;
 
     CSyllables syls;
@@ -455,14 +453,14 @@ CIMIContext::_saveUserDict()
     if (has_user_selected && syls.size() > 1) {
         wstring phrase;
         getSelectedSentence (phrase, 0, e_pos);
-        CLatticeManager::m_pUserDict->addWord (syls, phrase);
+        CInputTrieSource::m_pUserDict->addWord (syls, phrase);
     }
 }
 
 void
 CIMIContext::_saveHistoryCache()
 {
-    if (!CLatticeManager::m_pHistory)
+    if (!m_pHistory)
         return;
 
     std::vector<unsigned> result;
@@ -481,8 +479,8 @@ CIMIContext::_saveHistoryCache()
     }
 
     if (!result.empty()) {
-        CLatticeManager::m_pHistory->memorize(&(result[0]), &(result[0]) + result.size());
-        CLatticeManager::m_pHistory->saveToFile();
+        m_pHistory->memorize(&(result[0]), &(result[0]) + result.size());
+        m_pHistory->saveToFile();
     }
 }
 
@@ -493,22 +491,24 @@ CIMIContext::deleteCandidate(CCandidate &candi)
     deleteCandidateByWID(wid);
 }
 
-bool
+void
 CIMIContext::deleteCandidateByWID(unsigned wid)
 {
     if (wid > INI_USRDEF_WID) {
-        CLatticeManager::m_pHistory->forget(wid);
-        CLatticeManager::m_pUserDict->removeWord(wid);
+        m_pHistory->forget(wid);
+        CInputTrieSource::m_pUserDict->removeWord(wid);
+        _buildLattice(m_pSegmentor->getSegments());
     }
 }
 
 void
 CIMIContext::removeFromHistoryCache(std::vector<unsigned>& wids)
 {
-    if (!CLatticeManager::m_pHistory)
+    if (!m_pHistory)
         return;
 
-    CLatticeManager::m_pHistory->forget(&(wids[0]), &(wids[0]) + wids.size());
+    m_pHistory->forget(&(wids[0]), &(wids[0]) + wids.size());
+    buildLattice(m_pSegmentor);
 }
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

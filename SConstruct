@@ -52,23 +52,46 @@ imesource = [
     'src/portability.cpp',
     'src/slm/slm.cpp',
     'src/common/lexicon/trie.cpp',
-    'src/common/trie/common_data.cpp',
-    'src/common/trie/common_seg.cpp',
-    'src/common/trie/shuangpin_data.cpp',
-    'src/common/trie/shuangpin_seg.cpp',
-    'src/common/trie/hunpin_seg.cpp',
+    'src/common/input/segment/string_seg.cpp',
+    'src/common/input/segment/seperator_seg.cpp',
+    'src/common/input/segment/tail_seg.cpp',
+    'src/ime-core/lattice/lattice.cpp',
+    'src/ime-core/lattice/lexicon_states.cpp',
+    'src/ime-core/lattice/lattice_states.cpp',
+    'src/ime-core/lattice/lattice_manager.cpp',
+    'src/ime-core/helper/CFullCharManager.cpp',
+    'src/ime-core/helper/CInputTrieSource.cpp',
+    'src/pinyin/input/pinyin_data.cpp',
+    'src/pinyin/input/pinyin_seg.cpp',
+    'src/pinyin/input/shuangpin_data.cpp',
+    'src/pinyin/input/shuangpin_seg.cpp',
+    'src/pinyin/input/hunpin_seg.cpp',
+    'src/pinyin/input/segment/TPySyllableSegment.cpp',
+    'src/pinyin/lattice/TPyLexiconState.cpp',
+    'src/pinyin/lattice/CPyLatticeManager.cpp',
+    'src/xh/input/xh_seg.cpp',
+    'src/xh/input/xh_data.cpp',
+    'src/xh/input/segment/TXhSyllableSegment.cpp',
+    'src/xh/input/segment/pathnode.cpp',
+    'src/xh/input/segment/path.cpp',
+    'src/xh/lattice/TXhLexiconState.cpp',
+    'src/xh/lattice/CXhLatticeManager.cpp',
     'src/ime-core/imi_context.cpp',
     'src/ime-core/imi_data.cpp',
-    'src/ime-core/lattice_states.cpp',
-    'src/ime-core/imi_view.cpp',
     'src/ime-core/imi_uiobjects.cpp',
-    'src/ime-core/imi_view_classic.cpp',
-    'src/ime-core/imi_winHandler.cpp',
     'src/ime-core/ic_history.cpp',
-    'src/ime-core/imi_funcobjs.cpp',
-    'src/ime-core/imi_options.cpp',
-    'src/ime-core/imi_option_event.cpp',
     'src/ime-core/userdict.cpp',
+    'src/ime-core/imi_funcobjs.cpp',
+    'src/ime-core/view/imi_view.cpp',
+    'src/ime-core/view/imi_view_classic.cpp',
+    'src/ime-core/view/imi_view_xh.cpp',
+    'src/ime-core/imi_winHandler.cpp',
+    'src/ime-core/options/imi_option_event.cpp',
+    'src/ime-core/options/imi_options.cpp',
+    'src/ime-core/options/lang_policy_cn.cpp',
+    'src/ime-core/options/scheme_policy_hp.cpp',
+    'src/ime-core/options/scheme_policy_qp.cpp',
+    'src/ime-core/options/scheme_policy_sp.cpp',
     ]
 
 headers = [
@@ -440,13 +463,11 @@ libname = '%s.%d' % (libname_soname, abi_minor)
 lib = None
 
 if GetOS() != 'Darwin':
-    #lib = env.SharedLibrary(libname, SHLIBSUFFIX='', source=imesource,
-    #                        parse_flags='-Wl,-soname=%s' % libname_soname)
-    lib = None
+    lib = env.SharedLibrary(libname, SHLIBSUFFIX='', source=imesource,
+                            parse_flags='-Wl,-soname=%s' % libname_soname)
 else:
     # TODO: add install_name on Darwin?
-    #lib = env.SharedLibrary('sunpinyin', source=imesource)
-    lib = None
+    lib = env.SharedLibrary('sunpinyin', source=imesource)
 
 def DoInstall():
     lib_target = None

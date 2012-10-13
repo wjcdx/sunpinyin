@@ -51,6 +51,7 @@ struct TPyLexiconState : TLexiconState {
 	}
 
     void print(std::string prefix) const;
+    int getLength() { return m_syls.size() - m_num_of_inner_fuzzies; }
 };
 
 #endif

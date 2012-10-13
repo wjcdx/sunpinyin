@@ -4,15 +4,17 @@
 
 #include <assert.h>
 #include <algorithm>
-#include "lexicon_states.h"
+#include "TPyLexiconState.h"
+#include "CPyLatticeManager.h"
+#include "CFullCharManager.h"
 
 
 void
-CPyLatticeManager::buildLexiconStates(IPySegmentor::TSegmentVec &segments,
+CPyLatticeManager::buildLexiconStates(TSegmentVec &segments,
                            unsigned rebuildFrom)
 {
-    IPySegmentor::TSegmentVec::const_iterator it = segments.begin();
-    IPySegmentor::TSegmentVec::const_iterator ite = segments.end();
+    TSegmentVec::iterator it = segments.begin();
+    TSegmentVec::iterator ite = segments.end();
 
     unsigned i, j = 0;
     for (; it != ite; ++it) {
@@ -22,13 +24,13 @@ CPyLatticeManager::buildLexiconStates(IPySegmentor::TSegmentVec &segments,
         if (i < rebuildFrom - 1)
             continue;
 
-        if (j >= this.getLatticesCapacity())
+        if (j >= getLatticesCapacity())
             break;
         (*it).forward(i, j); 
         CFullCharManager::m_bOmitPunct = false;
     }
 
-    TTailSegment.forward(j, j + 1);
+    TTailSegment::forward(j, j + 1);
     m_tailIdx = j + 1;
 }
 

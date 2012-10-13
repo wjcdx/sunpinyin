@@ -2,19 +2,23 @@
 #define SUNPY_LATTICE_MANAGER_H
 
 #include "segment.h"
-#include "userdict.h"
 #include "ic_history.h"
+#include "imi_defines.h"
 #include "imi_funcobjs.h"
 #include "lattice.h"
 
 typedef std::vector<unsigned> TPath;
+struct GlobalLatticeInfo;
 
 class CLatticeManager {
 public:
 	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
-	bool buildLatticeStates(unsigned rebuildFrom, unsigned csLevel);
+	bool buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info);
 	bool backTracePaths(const std::vector<TLatticeState>& tail_states,
 								 int rank, TPath& path, TPath& segmentPath);
+	void _transferBetween(unsigned start, unsigned end,
+								  TLexiconState* plxst, unsigned wid,
+								  double ic = 1.0);
 
 	static CLatticeFrame& getLatticeFrame(unsigned i) {
 		if (i >= m_lattice.size())
@@ -27,7 +31,7 @@ public:
 	}
 
 	CLatticeManager ()
-		: m_tailIdx(1), m_historyPower(5)
+		: m_pModel(NULL), m_tailIdx(1), m_historyPower(5)
 	{
 		m_lattice.resize(MAX_LATTICE_LENGTH);
 		m_lattice[0].m_latticeStates.add(TLatticeState(-1.0, 0));
@@ -47,21 +51,11 @@ public:
     int getHistoryPower()
     { return m_historyPower; }
 
-    void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
-    CUserDict* getUserDict() { return m_pUserDict; }
-
-    void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
-    CICHistory * getHistoryMemory() { return m_pHistory; }
-
-
 public:
 	static CLattice m_lattice;
-    static CTrie* m_pTrie;
-    static CUserDict* m_pUserDict;
-    static CThreadSlm* m_pModel;
-    static CICHistory* m_pHistory;
 
 protected:
+    CThreadSlm* m_pModel;
     unsigned m_tailIdx;
     unsigned m_historyPower;
 };

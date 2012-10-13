@@ -23,6 +23,7 @@ public:
     virtual const TWordIdInfo *getWords(unsigned &num);
 	virtual const double getWeight();
     virtual void print(std::string prefix) const;
+    virtual int getLength() { return m_syls.size(); }
 
 	TLexiconState (unsigned start,
                    const TThreadNode *pnode,

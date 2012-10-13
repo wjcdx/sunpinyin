@@ -1,6 +1,8 @@
 #ifndef SUNPY_FULL_CHAR_MANAGER_H
 #define SUNPY_FULL_CHAR_MANAGER_H
 
+#include "imi_funcobjs.h"
+
 class CFullCharManager {
 public:
 	static void setFullSymbolForwarding(bool value = true) {

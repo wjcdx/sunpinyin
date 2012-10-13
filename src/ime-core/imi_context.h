@@ -38,6 +38,20 @@ class CIMIContext;
 
 typedef std::vector<unsigned> TPath;
 
+struct GlobalLatticeInfo {
+    unsigned m_csLevel;
+    unsigned m_candiStarts;
+    unsigned m_candiEnds;
+
+    GlobalLatticeInfo(unsigned csLevel,
+                unsigned candiStart,
+                unsigned candiEnds)
+        : m_csLevel(csLevel),
+         m_candiStarts(candiStart), m_candiEnds(candiEnds)
+    {}
+
+};
+
 class CIMIContext
 {
 public:
@@ -57,8 +71,7 @@ public:
     bool getDynaCandiOrder() { return m_bDynaCandiOrder; }
 
     CLattice& getLattice() { return CLatticeManager::m_lattice; }
-    bool buildLattice(TSegmentVec &segments,
-                       unsigned rebuildFrom = 1, bool doSearch = true);
+    bool buildLattice(ISegmentor *segmentor, bool doSearch = true);
     bool backTracePaths();
     
     bool isEmpty() {
@@ -104,7 +117,7 @@ public:
         // CIMIContext would fail to backTrace the bestPathes when there are
         // no latticeStates on frame e.g., 'yiden' in Quanpin mode, in this
         // case, return the original segs
-        if (m_segPath[0].empty() && m_pSegmentor) {
+        if (m_segPath[0].empty()) {
             // only require the primary segments without the auxiliary ones
             TSegmentVec& segments =
                 m_pSegmentor->getSegments(false);
@@ -141,9 +154,18 @@ public:
 
     void memorize();
     void removeFromHistoryCache(std::vector<unsigned>& wids);
+    
+    void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
+    CICHistory * getHistoryMemory() { return m_pHistory; }
+
+public:
+    static CICHistory* m_pHistory;
 
 protected:
     void _clearFrom(unsigned from);
+    bool _buildLattice(TSegmentVec &segments,
+                           unsigned rebuildFrom = 1,
+                           bool doSearch = true);
 
     void _clearPaths();
 
@@ -154,6 +176,7 @@ protected:
 
 protected:
     size_t m_nBest;
+    size_t m_maxBest;
     size_t m_maxTailCandidateNum;
 
     std::vector<TPath> m_path;
@@ -161,10 +184,13 @@ protected:
 
     unsigned m_csLevel;
 
+    ISegmentor *m_pSegmentor;
+    
     bool m_bDynaCandiOrder;
 
     unsigned m_candiStarts;
     unsigned m_candiEnds;
+
     CLatticeManager* m_pLatticeMgr;
 }; // CIMIContext
 

@@ -2,10 +2,10 @@
 #include "lattice.h"
 #include "lattice_manager.h"
 #include "userdict.h"
+#include "imi_context.h"
+#include "CInputTrieSource.h"
 
 CLattice CLatticeManager::m_lattice;
-CTrie *CLatticeManager::m_pTrie;
-CUserDict* CLatticeManager::m_pUserDict;
 
 void
 CLatticeManager::printLattice()
@@ -51,7 +51,7 @@ static double exp2_tbl[32] = {
 };
 
 bool
-CLatticeManager::buildLatticeStates(unsigned rebuildFrom, unsigned csLevel)
+CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info)
 {
 	bool affectCandidates;
     for (; rebuildFrom <= m_tailIdx; ++rebuildFrom) {
@@ -79,7 +79,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, unsigned csLevel)
             if (!word_num)
                 continue;
 
-            if (lxst.m_start == m_candiStarts && rebuildFrom > m_candiEnds)
+            if (lxst.m_start == info.m_candiStarts && rebuildFrom > info.m_candiEnds)
                 affectCandidates = true;
 
             // only selected the word with higher unigram probablities, and
@@ -93,7 +93,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, unsigned csLevel)
             int i = 0, count = 0;
 
             while (count < sz && i < sz && (words[i].m_bSeen || count < 2)) {
-                if (csLevel >= words[i].m_csLevel) {
+                if (info.m_csLevel >= words[i].m_csLevel) {
                     // printf("cost %d\n", words[i].m_cost);
                     _transferBetween(lxst.m_start, rebuildFrom, &lxst, words[i].m_id,
                                      ic * exp2_tbl[words[i].m_cost]);
@@ -103,10 +103,10 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, unsigned csLevel)
             }
 
             /* try extra words in history cache */
-            if (m_pHistory) {
+            if (CIMIContext::m_pHistory) {
                 while (i < (int) word_num) {
-                    if (csLevel >= words[i].m_csLevel
-                        && m_pHistory->seenBefore(words[i].m_id)) {
+                    if (info.m_csLevel >= words[i].m_csLevel
+                        && CIMIContext::m_pHistory->seenBefore(words[i].m_id)) {
                         // printf("history cost %d\n", words[i].m_cost);
                         _transferBetween(lxst.m_start, rebuildFrom, &lxst,
                                          words[i].m_id,
@@ -162,12 +162,12 @@ CLatticeManager::_transferBetween(unsigned start, unsigned end,
         // save the wid in idx field, so that later we could get it via
         // CThreadSlm::lastWordId, to calculate p_{cache} correctly.
         if (node.m_slmState.getLevel() == 0
-            && m_pHistory && m_pHistory->seenBefore(wid))
+            && CIMIContext::m_pHistory && CIMIContext::m_pHistory->seenBefore(wid))
             node.m_slmState.setIdx(wid);  // an psuedo unigram node state
 
-        if (m_pHistory) {
+        if (CIMIContext::m_pHistory) {
             unsigned history[2] = { m_pModel->lastWordId(it->m_slmState), _wid };
-            double hpr = m_pHistory->pr(history, history + 2);
+            double hpr = CIMIContext::m_pHistory->pr(history, history + 2);
             ts = weight_s * ts + weight_h * hpr;
         }
 
@@ -198,7 +198,7 @@ CLatticeManager::backTracePaths(const std::vector<TLatticeState>& tail_states,
         if (!(end_fr.m_bwType & CLatticeFrame::USER_SELECTED)) {
             const TWCHAR* cwstr = NULL;
             if (end_fr.m_wstr.empty()) {
-                cwstr = _getWstr(bs->m_backTraceWordId);
+                cwstr = CInputTrieSource::getWstr(bs->m_backTraceWordId);
             } else {
                 cwstr = end_fr.m_wstr.c_str();
             }
