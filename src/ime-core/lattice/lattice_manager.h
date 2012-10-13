@@ -7,11 +7,14 @@
 #include "imi_funcobjs.h"
 #include "lattice.h"
 
+typedef std::vector<unsigned> TPath;
+
 class CLatticeManager {
 public:
 	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
 	bool buildLatticeStates(unsigned rebuildFrom, unsigned csLevel);
-	bool backTracePaths();
+	bool backTracePaths(const std::vector<TLatticeState>& tail_states,
+								 int rank, TPath& path, TPath& segmentPath);
 
 	static CLatticeFrame& getLatticeFrame(unsigned i) {
 		if (i >= m_lattice.size())
@@ -44,17 +47,22 @@ public:
     int getHistoryPower()
     { return m_historyPower; }
 
+    void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
+    CUserDict* getUserDict() { return m_pUserDict; }
+
+    void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
+    CICHistory * getHistoryMemory() { return m_pHistory; }
+
 
 public:
 	static CLattice m_lattice;
     static CTrie* m_pTrie;
     static CUserDict* m_pUserDict;
+    static CThreadSlm* m_pModel;
+    static CICHistory* m_pHistory;
 
 protected:
     unsigned m_tailIdx;
-
-    CThreadSlm* m_pModel;
-    CICHistory* m_pHistory;
     unsigned m_historyPower;
 };
 

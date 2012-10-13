@@ -1,4 +1,3 @@
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -7,43 +6,13 @@
 #include <algorithm>
 #include "imi_defines.h"
 #include "imi_context.h"
-
-TCandiRank::TCandiRank(bool user, bool best, unsigned len,
-                       bool fromLattice, TSentenceScore score)
-{
-    anony.m_user = (user) ? 0 : 1;
-    anony.m_best = (best) ? 0 : 1;
-    anony.m_len = (len > 31) ? (0) : (31 - len);
-    anony.m_lattice = (fromLattice) ? 0 : 1;
-
-    double ds = -score.log2();
-
-    //make it 24-bit
-    if (ds > 32767.0)
-        ds = 32767.0;
-    else if (ds < -32768.0)
-        ds = -32768.0;
-    unsigned cost = unsigned((ds + 32768.0) * 256.0);
-    anony.m_cost = cost;
-}
-
-TCandiRank::TCandiRank(bool user, bool best, unsigned len,
-                       bool fromLattice, unsigned rank)
-{
-    anony.m_user = (user) ? 0 : 1;
-    anony.m_best = (best) ? 0 : 1;
-    anony.m_len = (len > 31) ? (0) : (31 - len);
-    anony.m_lattice = (fromLattice) ? 0 : 1;
-    anony.m_cost = rank;
-}
+#include "TCandiRank.h"
+#include "TCandiPair.h"
+#include "TrieThreadModel.h"
 
 CIMIContext::CIMIContext()
     : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0),
-      m_pModel(NULL), m_pPinyinTrie(NULL), m_pUserDict(NULL), m_pHistory(NULL),
-      m_historyPower(5), m_csLevel(0), m_bFullSymbolForwarding(false),
-      m_pGetFullSymbolOp(NULL),
-      m_bFullPunctForwarding(true), m_pGetFullPunctOp(NULL),
-      m_pPySegmentor(NULL), m_bNonCompleteSyllable(true),
+      m_csLevel(0),
       m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0)
 {
     m_pLatticeMgr = new CLatticeManager();
@@ -53,28 +22,20 @@ CIMIContext::CIMIContext()
 void
 CIMIContext::setCoreData(CIMIData *pCoreData)
 {
-    m_pModel = pCoreData->getSlm();
-    m_pPinyinTrie = pCoreData->getTrie();
+    CLatticeManager::m_pModel = pCoreData->getSlm();
+    CLatticeManager::m_pTrie = pCoreData->getTrie();
 }
 
 void
 CIMIContext::clear()
 {
-    this.m_pLatticeMgr->clear();
+    m_pLatticeMgr->clear();
     _clearPaths();
     m_candiStarts = m_candiEnds = 0;
 }
 
 bool
-CIMIContext::buildLattice(IPySegmentor *segmentor, bool doSearch)
-{
-    m_pPySegmentor = segmentor;
-    return _buildLattice(segmentor->getSegments(),
-                         segmentor->updatedFrom() + 1, doSearch);
-}
-
-bool
-CIMIContext::_buildLattice(IPySegmentor::TSegmentVec &segments,
+CIMIContext::buildLattice(TSegmentVec &segments,
                            unsigned rebuildFrom,
                            bool doSearch)
 {
@@ -88,7 +49,7 @@ CIMIContext::searchFrom(unsigned idx)
 {
     bool affectCandidates = (idx <= m_candiEnds);
 
-    bool affect = m_pLatticeMgr->buildLatticeStates(idx);
+    bool affect = m_pLatticeMgr->buildLatticeStates(idx, m_csLevel);
     m_pLatticeMgr->backTracePaths();
     backTracePaths();
 
@@ -102,8 +63,8 @@ CIMIContext::backTracePaths()
     m_nBest = 0;
 
     std::vector<TLatticeState> tail_states =
-        this.m_pLatticeMgr->getLatticeFrame(this
-            .m_pLatticeMgr->getTailIdx())
+        m_pLatticeMgr->getLatticeFrame(
+            m_pLatticeMgr->getTailIdx())
             .m_latticeStates.getFilteredResult();
 
 #ifdef DEBUG
@@ -116,16 +77,16 @@ CIMIContext::backTracePaths()
 
     for (size_t i = 0; i < m_maxBest; i++) {
         TPath path, segpath;
-        if (this.m_pLatticeMgr->backTracePaths(tail_states, m_nBest, path, segpath)) {
+        if (m_pLatticeMgr->backTracePaths(tail_states, m_nBest, path, segpath)) {
             m_path.push_back(path);
             m_segPath.push_back(segpath);
             m_nBest++;
         }
     }
 
-    if (m_pPySegmentor && m_nBest > 0 && !m_segPath[0].empty())
-        m_pPySegmentor->notify_best_segpath(m_segPath[0]);
-
+    if (m_pSegmentor && m_nBest > 0 && !m_segPath[0].empty())
+        m_pSegmentor->notify_best_segpath(m_segPath[0]);
+    return true;
 }
 
 void
@@ -170,15 +131,15 @@ CIMIContext::getBestSentence(CCandidates& result, int rank,
     result.clear();
 
     if (end == UINT_MAX)
-        end = this.getLastFrIdx();
+        end = getLastFrIdx();
 
-    while (end > start && this.m_pLatticeMgr->getLatticeFrame(end)
+    while (end > start && m_pLatticeMgr->getLatticeFrame(end)
             .isNotBestWord())
         end--;
 
     unsigned i = end, nWordConverted = 0;
     while (i > start) {
-        CLatticeFrame& fr = this.m_pLatticeMgr->getLatticeFrame(i);
+        CLatticeFrame& fr = m_pLatticeMgr->getLatticeFrame(i);
         if (rank < 0) {
             result.insert(result.begin(), fr.m_selWord);
             i = fr.m_selWord.m_start;
@@ -233,36 +194,13 @@ CIMIContext::getSelectedSentence(std::vector<unsigned>& result,
     return getBestSentence(result, -1, start, end);
 }
 
-struct TCandiPair {
-    CCandidate m_candi;
-    TCandiRank m_Rank;
-
-    TCandiPair() : m_candi(), m_Rank()
-    {
-    }
-};
-
-struct TCandiPairPtr {
-    TCandiPair*                     m_Ptr;
-
-    TCandiPairPtr(TCandiPair* p = NULL) : m_Ptr(p)
-    {
-    }
-
-    bool
-    operator<(const TCandiPairPtr& b) const
-    {
-        return m_Ptr->m_Rank < b.m_Ptr->m_Rank;
-    }
-};
-
 const TWCHAR *
 CIMIContext::_getWstr(unsigned wid)
 {
-    if (wid < m_pPinyinTrie->getWordCount())
-        return (*m_pPinyinTrie)[wid];
-    else if (m_pUserDict)
-        return (*m_pUserDict)[wid];
+    if (wid < CLatticeManager::m_pTrie->getWordCount())
+        return (*CLatticeManager::m_pTrie)[wid];
+    else if (CLatticeManager::m_pUserDict)
+        return (*CLatticeManager::m_pUserDict)[wid];
     else
         return NULL;
 }
@@ -282,11 +220,11 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
 
     cp.m_candi.m_start = m_candiStarts = frIdx++;
 
-    for (; frIdx <= this.getLastFrIdx(); ++frIdx) {
-        if (this.m_pLatticeMgr->getLatticeFrame(frIdx + 1).isSyllableSepFrame())
+    for (; frIdx <= getLastFrIdx(); ++frIdx) {
+        if (m_pLatticeMgr->getLatticeFrame(frIdx + 1).isSyllableSepFrame())
             continue;
 
-        CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(frIdx);
+        CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(frIdx);
         if (!fr.isSyllableFrame())
             continue;
 
@@ -328,7 +266,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
 
             found = true;
             unsigned word_num;
-            const CPinyinTrie::TWordIdInfo *words = lxst.getWords(word_num);
+            const TWordIdInfo *words = lxst.getWords(word_num);
 
             for (unsigned i = 0; i < word_num; ++i) {
                 if (m_csLevel < words[i].m_csLevel)
@@ -424,10 +362,10 @@ CIMIContext::cancelSelection(unsigned frIdx, bool doSearch)
 {
     unsigned ret = frIdx;
 
-    CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(frIdx);
+    CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(frIdx);
     while (fr.m_bwType & CLatticeFrame::IGNORED) {
         --frIdx;
-        fr = this.m_pLatticeMgr->getLatticeFrame(frIdx);
+        fr = m_pLatticeMgr->getLatticeFrame(frIdx);
     }
 
     if (fr.m_bwType &
@@ -443,7 +381,7 @@ CIMIContext::cancelSelection(unsigned frIdx, bool doSearch)
 void
 CIMIContext::makeSelection(CCandidate &candi, bool doSearch)
 {
-    CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(candi.m_end);
+    CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(candi.m_end);
     fr.m_bwType = fr.m_bwType | CLatticeFrame::USER_SELECTED;
     fr.m_selWord = candi;
     // make best sentence word consistent as well
@@ -457,12 +395,12 @@ CIMIContext::makeSelection(CCandidate &candi, bool doSearch)
 void
 CIMIContext::selectSentence(int idx)
 {
-    unsigned i = this.getLastFrIdx();
-    while (i > 0 && this.m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
+    unsigned i = getLastFrIdx();
+    while (i > 0 && m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
         i--;
 
     while (i > 0) {
-        CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(i);
+        CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(i);
         fr.m_selWord = fr.m_bestWords[idx];
         i = fr.m_selWord.m_start;
     }
@@ -478,19 +416,19 @@ CIMIContext::memorize()
 void
 CIMIContext::_saveUserDict()
 {
-    if (!m_pUserDict)
+    if (!CLatticeManager::m_pUserDict)
         return;
 
     CSyllables syls;
     bool has_user_selected = false;
-    unsigned i = this.getLastFrIdx();
+    unsigned i = getLastFrIdx();
     unsigned e_pos = 0;
 
-    while (i > 0 && this.m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
+    while (i > 0 && m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
         i--;
 
     while (i > 0) {
-        CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(i);
+        CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(i);
         if (!fr.isSyllableFrame()) {
             i = fr.m_selWord.m_start;
             break;
@@ -517,23 +455,23 @@ CIMIContext::_saveUserDict()
     if (has_user_selected && syls.size() > 1) {
         wstring phrase;
         getSelectedSentence (phrase, 0, e_pos);
-        m_pUserDict->addWord (syls, phrase);
+        CLatticeManager::m_pUserDict->addWord (syls, phrase);
     }
 }
 
 void
 CIMIContext::_saveHistoryCache()
 {
-    if (!m_pHistory)
+    if (!CLatticeManager::m_pHistory)
         return;
 
     std::vector<unsigned> result;
-    unsigned i = this.getLastFrIdx();
-    while (i > 0 && this.m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
+    unsigned i = getLastFrIdx();
+    while (i > 0 && m_pLatticeMgr->getLatticeFrame(i).isNotBestWord())
         i--;
 
     while (i > 0) {
-        CLatticeFrame &fr = this.m_pLatticeMgr->getLatticeFrame(i);
+        CLatticeFrame &fr = m_pLatticeMgr->getLatticeFrame(i);
         if (fr.isSyllableFrame()) {
             result.insert(result.begin(), fr.m_selWord.m_wordId);
         } else {
@@ -543,8 +481,8 @@ CIMIContext::_saveHistoryCache()
     }
 
     if (!result.empty()) {
-        m_pHistory->memorize(&(result[0]), &(result[0]) + result.size());
-        m_pHistory->saveToFile();
+        CLatticeManager::m_pHistory->memorize(&(result[0]), &(result[0]) + result.size());
+        CLatticeManager::m_pHistory->saveToFile();
     }
 }
 
@@ -555,24 +493,22 @@ CIMIContext::deleteCandidate(CCandidate &candi)
     deleteCandidateByWID(wid);
 }
 
-void
+bool
 CIMIContext::deleteCandidateByWID(unsigned wid)
 {
     if (wid > INI_USRDEF_WID) {
-        m_pHistory->forget(wid);
-        m_pUserDict->removeWord(wid);
-        _buildLattice(m_pPySegmentor->getSegments());
+        CLatticeManager::m_pHistory->forget(wid);
+        CLatticeManager::m_pUserDict->removeWord(wid);
     }
 }
 
 void
 CIMIContext::removeFromHistoryCache(std::vector<unsigned>& wids)
 {
-    if (!m_pHistory)
+    if (!CLatticeManager::m_pHistory)
         return;
 
-    m_pHistory->forget(&(wids[0]), &(wids[0]) + wids.size());
-    buildLattice(m_pPySegmentor);
+    CLatticeManager::m_pHistory->forget(&(wids[0]), &(wids[0]) + wids.size());
 }
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

@@ -1,4 +1,3 @@
-
 #ifndef SUNPY_IMI_CONTEXT_H
 #define SUNPY_IMI_CONTEXT_H
 
@@ -16,14 +15,16 @@
 #include <map>
 #include <vector>
 
-#include "pinyin_seg.h"
+#include "segment.h"
 #include "imi_data.h"
 #include "ic_history.h"
 #include "userdict.h"
 #include "lattice.h"
 #include "lattice_states.h"
+#include "lattice_manager.h"
 #include "imi_funcobjs.h"
 #include "candidate.h"
+#include "CFullCharManager.h"
 
 /**
  * TSentenceScore is only used for whole sentence score,
@@ -46,10 +47,6 @@ public:
     void clear();
 
     void setCoreData(CIMIData *pCoreData);
-    void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
-
-    void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
-    CICHistory * getHistoryMemory() { return m_pHistory; }
 
     void setCharsetLevel(unsigned l) { m_csLevel = l; }
     unsigned getCharsetLevel() { return m_csLevel; }
@@ -59,30 +56,32 @@ public:
     }
     bool getDynaCandiOrder() { return m_bDynaCandiOrder; }
 
-    CLattice& getLattice() { return m_lattice; }
-    bool buildLattice(IPySegmentor *segmentor, bool doSearch = true);
+    CLattice& getLattice() { return CLatticeManager::m_lattice; }
+    bool buildLattice(TSegmentVec &segments,
+                       unsigned rebuildFrom = 1, bool doSearch = true);
+    bool backTracePaths();
     
     bool isEmpty() {
-        return this.m_pLatticeMgr->getTailIdx() <= 1;
+        return m_pLatticeMgr->getTailIdx() <= 1;
     }
 
     unsigned getLastFrIdx() {
-        return this.m_pLatticeMgr->getTailIdx() - 1;
+        return m_pLatticeMgr->getTailIdx() - 1;
     }
 
     // omit next punctuation if the very next symbol is an punctuation
-    void omitNextPunct() { CFullCharManager::omitNextPunct(true); }
+    void omitNextPunct() { CFullCharManager::omitNextPunct(); }
 
     bool searchFrom(unsigned from = 1);
 
     size_t getMaxBest() const {
-        return this.m_pLatticeMgr->getLatticeFrame(0)
+        return m_pLatticeMgr->getLatticeFrame(0)
                    .m_latticeStates.getMaxBest();
     }
 
     void setMaxBest(size_t maxBest) {
         for (int i = 0; i < MAX_LATTICE_LENGTH; i++) {
-            this.m_pLatticeMgr->getLatticeFrame(i)
+            m_pLatticeMgr->getLatticeFrame(i)
                 .m_latticeStates.setMaxBest(maxBest);
         }
     }
@@ -105,12 +104,12 @@ public:
         // CIMIContext would fail to backTrace the bestPathes when there are
         // no latticeStates on frame e.g., 'yiden' in Quanpin mode, in this
         // case, return the original segs
-        if (m_segPath[0].empty() && m_pPySegmentor) {
+        if (m_segPath[0].empty() && m_pSegmentor) {
             // only require the primary segments without the auxiliary ones
-            IPySegmentor::TSegmentVec& segments =
-                m_pPySegmentor->getSegments(false);
-            IPySegmentor::TSegmentVec::const_iterator it = segments.begin();
-            IPySegmentor::TSegmentVec::const_iterator ite = segments.end();
+            TSegmentVec& segments =
+                m_pSegmentor->getSegments(false);
+            TSegmentVec::const_iterator it = segments.begin();
+            TSegmentVec::const_iterator ite = segments.end();
             m_segPath[0].push_back(0);
             for (; it != ite; ++it)
                 m_segPath[0].push_back(it->m_start + it->m_len);
@@ -143,14 +142,9 @@ public:
     void memorize();
     void removeFromHistoryCache(std::vector<unsigned>& wids);
 
-    CUserDict* getUserDict() { return m_pUserDict; }
-
 protected:
     void _clearFrom(unsigned from);
 
-    bool _buildLattice(IPySegmentor::TSegmentVec &segments,
-                       unsigned rebuildFrom = 1, bool doSearch = true);
-    
     void _clearPaths();
 
     const TWCHAR *_getWstr(unsigned wid);
@@ -166,8 +160,6 @@ protected:
     std::vector<TPath> m_segPath;
 
     unsigned m_csLevel;
-
-    IPySegmentor *m_pPySegmentor;
 
     bool m_bDynaCandiOrder;
 
