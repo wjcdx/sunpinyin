@@ -1,10 +1,10 @@
 #ifndef SUNPY_LATTICE_MANAGER_H
 #define SUNPY_LATTICE_MANAGER_H
 
-#include "segment.h"
-#include "ic_history.h"
-#include "imi_defines.h"
-#include "imi_funcobjs.h"
+#include "common/input/segment/segment.h"
+#include "ime-core/ic_history.h"
+#include "ime-core/imi_defines.h"
+#include "ime-core/imi_funcobjs.h"
 #include "lattice.h"
 
 typedef std::vector<unsigned> TPath;

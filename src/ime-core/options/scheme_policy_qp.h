@@ -9,7 +9,7 @@
 struct CQuanpinSchemePolicy : IConfigurable {
 public:
 
-    ISegmentor* createPySegmentor(){
+    ISegmentor* createSegmentor(){
         CQuanpinSegmentor *pseg = new CQuanpinSegmentor();
         pseg->setGetFuzzySyllablesOp(&m_getFuzzySyllablesOp);
         pseg->setGetCorrectionPairOp(&m_getCorrectionPairOp);

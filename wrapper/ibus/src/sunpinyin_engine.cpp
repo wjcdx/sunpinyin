@@ -25,8 +25,9 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
 {
     CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
-    CSunpinyinSessionFactory::EPyScheme pinyin_scheme =
-        m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
+    CSunpinyinSessionFactory::EScheme pinyin_scheme =
+    //    m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
+        CSunpinyinSessionFactory::XINGHUA;
     factory.setPinyinScheme(pinyin_scheme);
     if (pinyin_scheme == CSunpinyinSessionFactory::QUANPIN) {
         update_fuzzy_pinyins();
@@ -38,7 +39,7 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
     update_user_data_dir();
     update_punct_mappings();
 
-    factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 10));
+    factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 5));
 
     m_pv = factory.createSession();
     if (!m_pv)

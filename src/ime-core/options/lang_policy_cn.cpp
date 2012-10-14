@@ -3,6 +3,7 @@
 #include "lang_policy_cn.h"
 #include "CInputTrieSource.h"
 #include "imi_option_keys.h"
+#include "CPyLatticeManager.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -57,7 +58,8 @@ CSimplifiedChinesePolicy::loadResources()
 CIMIContext *
 CSimplifiedChinesePolicy::createContext()
 {
-    CIMIContext* pic = new CIMIContext();
+	CLatticeManager *pLatticeMgr = new CPyLatticeManager();
+    CIMIContext* pic = new CIMIContext(pLatticeMgr);
     
 	pic->setCoreData(&m_coreData);
     pic->setCharsetLevel(m_csLevel);

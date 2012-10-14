@@ -88,9 +88,12 @@ imesource = [
     'src/ime-core/imi_winHandler.cpp',
     'src/ime-core/options/imi_option_event.cpp',
     'src/ime-core/options/lang_policy_cn.cpp',
+    'src/ime-core/options/lang_policy_cn_xh.cpp',
     'src/ime-core/options/scheme_policy_hp.cpp',
     'src/ime-core/options/scheme_policy_qp.cpp',
     'src/ime-core/options/scheme_policy_sp.cpp',
+    'src/ime-core/options/scheme_policy_xh.cpp',
+#    'src/ime-core/options/a.cpp',
     ]
 
 headers = [
@@ -108,37 +111,48 @@ headers = [
     'src/slm/sim_slmbuilder.h',
     'src/slm/tslmendian/slm_file.h',
     'src/slm/tslmendian/writer.h',
-    'src/pinyin/lexicon/pytrie_gen.h',
-    'src/pinyin/lexicon/trie_writer.h',
-    'src/pinyin/lexicon/pytrie.h',
-    'src/ime-core/imi_view_classic.h',
+    'src/common/lexicon/trie_maker.h',
+    'src/common/lexicon/trie_writer.h',
+    'src/common/lexicon/trie.h',
+    'src/ime-core/view/imi_view.h',
+    'src/ime-core/view/imi_view_classic.h',
+    'src/ime-core/view/imi_view_xh.h',
     'src/ime-core/imi_uiobjects.h',
-    'src/ime-core/lattice_states.h',
+    'src/ime-core/lattice/lattice_states.h',
     'src/ime-core/ic_history.h',
     'src/ime-core/imi_funcobjs.h',
     'src/ime-core/imi_context.h',
     'src/ime-core/imi_winHandler.h',
     'src/ime-core/imi_glibHandler.h',
     'src/ime-core/userdict.h',
-    'src/ime-core/imi_option_event.h',
+    'src/ime-core/options/imi_option_event.h',
+    'src/ime-core/options/imi_option_keys.h',
+    'src/ime-core/options/lang_policy_cn.h',
+    'src/ime-core/options/lang_policy_cn_xh.h',
+    'src/ime-core/options/profile_class.h',
+    'src/ime-core/options/profile_interface.h',
+    'src/ime-core/options/scheme_policy_hp.h',
+    'src/ime-core/options/scheme_policy_qp.h',
+    'src/ime-core/options/scheme_policy_sp.h',
+    'src/ime-core/options/scheme_policy_xh.h',
+    'src/ime-core/options/style_policy_classic.h',
+    'src/ime-core/options/style_policy_xh.h',
+    'src/ime-core/options/session_factory.h',
     'src/ime-core/imi_data.h',
     'src/ime-core/utils.h',
     'src/ime-core/imi_keys.h',
-    'src/ime-core/imi_option_keys.h',
-    'src/ime-core/imi_options.h',
     'src/ime-core/imi_defines.h',
-    'src/ime-core/imi_view.h',
     'src/portability.h',
-    'src/pinyin/trie/segmentor.h',
-    'src/pinyin/trie/shuangpin_seg.h',
-    'src/pinyin/trie/datrie.h',
+    'src/common/input/segmentor.h',
+    'src/pinyin/input/shuangpin_seg.h',
+    'src/pinyin/input/datrie.h',
     'src/pinyin/trie/quanpin_trie.h',
-    'src/pinyin/trie/pinyin_seg.h',
-    'src/pinyin/trie/pinyin_data.h',
-    'src/pinyin/trie/syllable.h',
-    'src/pinyin/trie/shuangpin_data.h',
-    'src/pinyin/trie/hunpin_seg.h',
-    'src/pinyin/trie/datrie_impl.h',
+    'src/pinyin/input/pinyin_seg.h',
+    'src/pinyin/input/pinyin_data.h',
+    'src/pinyin/input/syllable.h',
+    'src/pinyin/input/shuangpin_data.h',
+    'src/pinyin/input/hunpin_seg.h',
+    'src/pinyin/input/datrie_impl.h',
     'src/sunpinyin.h',
     ]
 
@@ -222,10 +236,12 @@ opts.Add('ENABLE_PLUGINS', default=False)
 #
 #
 def allinc():
-    inc=[]
-    for root, dirs, files in os.walk('src'):
-        inc.append(root)
-    return inc
+    if 0:
+        inc=[]
+        for root, dirs, files in os.walk('src'):
+            inc.append(root)
+        return inc
+    return ['src']
 
 def GetOS():
     return platform.uname()[0]
@@ -469,37 +485,40 @@ else:
     lib = env.SharedLibrary('sunpinyin', source=imesource)
 
 def DoInstall():
-    lib_target = None
-    if GetOS() == 'Darwin':
-        lib_target = env.Install(libdir, lib)
-    else:
-        lib_target_bin = env.Install(libdir, lib)
-        # where does it goes
-        install_path = os.path.dirname(str(lib_target_bin[0]))
-        lib_target = [
-            lib_target_bin,
-            env.InstallAsSymlink(os.path.join(install_path, libname_soname),
-                                 lib_target_bin),
-            env.InstallAsSymlink(os.path.join(install_path, libname_link),
-                                 lib_target_bin),
-            ]
+    if 0:
+        lib_target = None
+        if GetOS() == 'Darwin':
+            lib_target = env.Install(libdir, lib)
+        else:
+            lib_target_bin = env.Install(libdir, lib)
+            # where does it goes
+            install_path = os.path.dirname(str(lib_target_bin[0]))
+            lib_target = [
+                lib_target_bin,
+                env.InstallAsSymlink(os.path.join(install_path, libname_soname),
+                                     lib_target_bin),
+                env.InstallAsSymlink(os.path.join(install_path, libname_link),
+                                     lib_target_bin),
+                ]
 
-    lib_pkgconfig_target = env.Install(os.path.join(libdir, 'pkgconfig'),
-                                       ['sunpinyin-2.0.pc'])
-    bin_target = env.Install(bindir, bins)
-    man1_target = env.Install(man1dir, man1s)
-    doc_target = env.Install(docdir, docs)
+        lib_pkgconfig_target = env.Install(os.path.join(libdir, 'pkgconfig'),
+                                           ['sunpinyin-2.0.pc'])
+        bin_target = env.Install(bindir, bins)
+        man1_target = env.Install(man1dir, man1s)
+        doc_target = env.Install(docdir, docs)
+
     header_targets = []
     for header in headers:
         header_targets.append(env.InstallAs(headersdir + header[3:], header))
-    env.Alias('install-bin', bin_target)
-    env.Alias('install-man1', man1_target)
-    env.Alias('install-doc', doc_target)
     env.Alias('install-headers', header_targets)
-    env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
-    Mkdir(datadir)
+    if 0:
+        env.Alias('install-bin', bin_target)
+        env.Alias('install-man1', man1_target)
+        env.Alias('install-doc', doc_target)
+        env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
+        Mkdir(datadir)
 
-#DoInstall()
+DoInstall()
 env.Alias('install', [
     'install-bin', 'install-man1', 'install-doc', 'install-headers', 'install-lib'
 ])

@@ -11,7 +11,7 @@ struct CShuangpinSchemePolicy : public IConfigurable {
 public:
     CShuangpinSchemePolicy();
 
-    ISegmentor* createPySegmentor(){
+    ISegmentor* createSegmentor(){
         CShuangpinSegmentor *pseg = new CShuangpinSegmentor(m_shuangpinType);
         pseg->setGetFuzzySyllablesOp(&m_getFuzzySyllablesOp);
         return pseg;

@@ -4,7 +4,7 @@
 #include "segment.h"
 #include "lattice_manager.h"
 
-class CPyLatticeManager : CLatticeManager {
+class CPyLatticeManager : public CLatticeManager {
 public:
 	void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
 };

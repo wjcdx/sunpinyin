@@ -64,6 +64,7 @@ SunPinyinConfig::SunPinyinConfig()
 {
     m_scheme_names["QuanPin"]    = CSunpinyinSessionFactory::QUANPIN;
     m_scheme_names["ShuangPin"]  = CSunpinyinSessionFactory::SHUANGPIN;
+    m_scheme_names["XingHua"]  = CSunpinyinSessionFactory::XINGHUA;
 }
 
 SunPinyinConfig::~SunPinyinConfig()

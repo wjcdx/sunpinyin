@@ -9,7 +9,7 @@
 #include <map>
 
 #include "portability.h"
-#include "TrieThreadModel.h"
+#include "thread/TrieThreadModel.h"
 
 using namespace TrieThreadModel;
 

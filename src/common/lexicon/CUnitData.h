@@ -1,11 +1,8 @@
 #ifndef SUNPY_UNIT_DATA_H
 #define SUNPY_UNIT_DATA_H
 
-#include "stdio.h"
-#include "TUnit.h"
+#include <stdio.h>
 #include "trie.h"
-
-using namespace TrieThreadModel;
 
 class CUnitData {
 public:

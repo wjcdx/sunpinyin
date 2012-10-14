@@ -55,7 +55,7 @@ struct GlobalLatticeInfo {
 class CIMIContext
 {
 public:
-    CIMIContext ();
+    CIMIContext (CLatticeManager *pLatticeMgr);
     ~CIMIContext () {
         delete m_pLatticeMgr;
         clear();

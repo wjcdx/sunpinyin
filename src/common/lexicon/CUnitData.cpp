@@ -3,6 +3,8 @@
 #include "pinyin_data.h"
 #include "xh_data.h"
 
+using namespace TrieThreadModel;
+
 CTrie::TrieType CUnitData::m_type = CTrie::XINGHUA;
 
 void

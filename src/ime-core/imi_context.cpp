@@ -11,12 +11,11 @@
 #include "TrieThreadModel.h"
 #include "CInputTrieSource.h"
 
-CIMIContext::CIMIContext()
-    : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0),
-      m_csLevel(0),
-      m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0)
+CIMIContext::CIMIContext(CLatticeManager *pLatticeMgr)
+    : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0), m_csLevel(0),
+      m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0),
+      m_pLatticeMgr(pLatticeMgr)
 {
-    m_pLatticeMgr = new CLatticeManager();
     setMaxBest(m_maxBest);
 }
 

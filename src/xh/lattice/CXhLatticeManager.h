@@ -4,7 +4,7 @@
 #include "segment.h"
 #include "lattice_manager.h"
 
-class CXhLatticeManager : CLatticeManager {
+class CXhLatticeManager : public CLatticeManager {
 public:
 	void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
 };

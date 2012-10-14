@@ -19,7 +19,7 @@ public:
         if (!m_langPolicy.loadResources())
             return NULL;
 
-        ISegmentor* pseg = m_SchemePolicy.createPySegmentor();
+        ISegmentor* pseg = m_SchemePolicy.createSegmentor();
         if (pseg == NULL)
             return NULL;
 

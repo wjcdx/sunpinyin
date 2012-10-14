@@ -4,9 +4,12 @@
 #include "utils.h"
 #include "profile_class.h"
 #include "lang_policy_cn.h"
+#include "lang_policy_cn_xh.h"
 #include "scheme_policy_qp.h"
 #include "scheme_policy_sp.h"
+#include "scheme_policy_xh.h"
 #include "style_policy_classic.h"
+#include "style_policy_xh.h"
 
 class CSunpinyinSessionFactory : private CNonCopyable
 {
@@ -17,15 +20,18 @@ public:
         YUEPIN,
         ZHUYIN,
         HUNPIN,
-    } EPyScheme;
+        XINGHUA,
+    } EScheme;
 
     typedef enum {
         MSPY_STYLE,
         CLASSIC_STYLE,
+        XH_STYLE,
     } EInputStyle;
 
     typedef enum {
-        SIMPLIFIED_CHINESE,
+        SIMPLIFIED_CHINESE_PY,
+        SIMPLIFIED_CHINESE_XH,
         TRADITIONAL_CHINESE,
     } ELanguage;
 
@@ -37,11 +43,11 @@ public:
 
     void setLanguage(ELanguage lang) { m_lang = lang; }
     void setInputStyle(EInputStyle inputStyle) { m_inputStyle = inputStyle; }
-    void setPinyinScheme(EPyScheme pyScheme) { m_pyScheme = pyScheme; }
+    void setPinyinScheme(EScheme scheme) { m_Scheme = scheme; }
     void setCandiWindowSize(unsigned size) { m_candiWindowSize = size; }
 
     CIMIView* createSession(){
-        unsigned key = _policiesToKey(m_lang, m_pyScheme, m_inputStyle);
+        unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
         ISunpinyinProfile *profile = _getProfile(key);
         if (!profile)
             return NULL;
@@ -56,7 +62,7 @@ public:
     }
 
     void destroySession(CIMIView* pview){
-        unsigned key = _policiesToKey(m_lang, m_pyScheme, m_inputStyle);
+        unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
         ISunpinyinProfile *profile = _getProfile(key);
         if (!profile)
             return;
@@ -65,18 +71,22 @@ public:
 
 private:
     CSunpinyinSessionFactory ()
-        : m_pyScheme(QUANPIN), m_inputStyle(CLASSIC_STYLE),
-          m_lang(SIMPLIFIED_CHINESE),
+        : m_Scheme(QUANPIN), m_inputStyle(CLASSIC_STYLE),
+          m_lang(SIMPLIFIED_CHINESE_PY),
           m_candiWindowSize(10){
-        m_profiles [_policiesToKey(SIMPLIFIED_CHINESE, QUANPIN,
+        m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_PY, QUANPIN,
                                    CLASSIC_STYLE)] =
-            new CSunpinyinProfile <ASimplifiedChinesePolicy,
+            new CSunpinyinProfile <APySimplifiedChinesePolicy,
                                    AQuanpinSchemePolicy, AClassicStylePolicy> ();
 
-        m_profiles [_policiesToKey(SIMPLIFIED_CHINESE, SHUANGPIN,
+        m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_PY, SHUANGPIN,
                                    CLASSIC_STYLE)] =
-            new CSunpinyinProfile <ASimplifiedChinesePolicy,
+            new CSunpinyinProfile <APySimplifiedChinesePolicy,
                                    AShuangpinSchemePolicy, AClassicStylePolicy> ();
+        m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_XH, XINGHUA,
+                                   XH_STYLE)] =
+            new CSunpinyinProfile <AXhSimplifiedChinesePolicy,
+                                   AXhSchemePolicy, AXhStylePolicy> ();
     }
 
     ~CSunpinyinSessionFactory (){
@@ -98,13 +108,13 @@ private:
     }
 
     unsigned _policiesToKey(ELanguage lang,
-                            EPyScheme pyScheme,
+                            EScheme scheme,
                             EInputStyle inputStyle)
-    { return (lang << 16) + (pyScheme << 8) + inputStyle; }
+    { return (lang << 16) + (scheme << 8) + inputStyle; }
 
     std::map <unsigned, ISunpinyinProfile*> m_profiles;
 
-    EPyScheme m_pyScheme;
+    EScheme m_Scheme;
     EInputStyle m_inputStyle;
     ELanguage m_lang;
     unsigned m_candiWindowSize;

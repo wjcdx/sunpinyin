@@ -12,9 +12,9 @@
 struct CSimplifiedChinesePolicy : public IConfigurable {
     CSimplifiedChinesePolicy ();
 
-    bool loadResources();
+    virtual bool loadResources();
 
-    CIMIContext* createContext();
+    virtual CIMIContext* createContext();
     void destroyContext(CIMIContext *context);
 
     void setPunctMapping(string_pairs punc_map)
@@ -55,7 +55,7 @@ public:
     CUserDict m_userDict;
 };
 
-typedef SingletonHolder<CSimplifiedChinesePolicy> ASimplifiedChinesePolicy;
+typedef SingletonHolder<CSimplifiedChinesePolicy> APySimplifiedChinesePolicy;
 
 #endif
 
