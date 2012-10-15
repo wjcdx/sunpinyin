@@ -1,4 +1,4 @@
-#include "trie.h"
+#include "common/lexicon/trie.h"
 #include "TXhLexiconState.h"
 #include <algorithm>
 

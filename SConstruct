@@ -52,6 +52,7 @@ imesource = [
     'src/portability.cpp',
     'src/slm/slm.cpp',
     'src/common/lexicon/trie.cpp',
+    'src/common/lexicon/CUnitData.cpp',
     'src/common/input/segment/string_seg.cpp',
     'src/common/input/segment/seperator_seg.cpp',
     'src/common/input/segment/tail_seg.cpp',
@@ -76,6 +77,7 @@ imesource = [
     'src/xh/input/segment/path.cpp',
     'src/xh/lattice/TXhLexiconState.cpp',
     'src/xh/lattice/CXhLatticeManager.cpp',
+    'src/ime-core/TCandiRank.cpp',
     'src/ime-core/imi_context.cpp',
     'src/ime-core/imi_data.cpp',
     'src/ime-core/imi_uiobjects.cpp',
@@ -93,7 +95,7 @@ imesource = [
     'src/ime-core/options/scheme_policy_qp.cpp',
     'src/ime-core/options/scheme_policy_sp.cpp',
     'src/ime-core/options/scheme_policy_xh.cpp',
-#    'src/ime-core/options/a.cpp',
+    'src/ime-core/options/a.cpp',
     ]
 
 headers = [
@@ -114,14 +116,33 @@ headers = [
     'src/common/lexicon/trie_maker.h',
     'src/common/lexicon/trie_writer.h',
     'src/common/lexicon/trie.h',
+    'src/common/lexicon/thread/TrieThreadModel.h',
+    'src/common/lexicon/thread/TThreadNode.h',
+    'src/common/lexicon/thread/TTransUnit.h',
+    'src/common/lexicon/thread/TUnit.h',
+    'src/common/lexicon/thread/TUnitInfo.h',
+    'src/common/lexicon/thread/TWordIdInfo.h',
+    'src/common/lexicon/tree/TrieTreeModel.h',
+    'src/common/lexicon/tree/CTreeNode.h',
+    'src/common/lexicon/tree/PNodeSet.h',
+    'src/common/lexicon/tree/TTreeWordId.h',
+    'src/common/lexicon/tree/TWordInfo.h',
     'src/ime-core/view/imi_view.h',
     'src/ime-core/view/imi_view_classic.h',
     'src/ime-core/view/imi_view_xh.h',
     'src/ime-core/imi_uiobjects.h',
     'src/ime-core/lattice/lattice_states.h',
+    'src/ime-core/lattice/lattice.h',
+    'src/ime-core/lattice/lexicon_states.h',
+    'src/ime-core/lattice/lattice_manager.h',
+    'src/ime-core/helper/CFullCharManager.h',
+    'src/ime-core/helper/CInputTrieSource.h',
     'src/ime-core/ic_history.h',
     'src/ime-core/imi_funcobjs.h',
     'src/ime-core/imi_context.h',
+    'src/ime-core/candidate.h',
+    'src/ime-core/TCandiPair.h',
+    'src/ime-core/TCandiRank.h',
     'src/ime-core/imi_winHandler.h',
     'src/ime-core/imi_glibHandler.h',
     'src/ime-core/userdict.h',
@@ -144,15 +165,30 @@ headers = [
     'src/ime-core/imi_defines.h',
     'src/portability.h',
     'src/common/input/segmentor.h',
+    'src/common/input/segment/segment.h',
+    'src/common/input/segment/invalid_seg.h',
+    'src/common/input/segment/segment_types.h',
+    'src/common/input/segment/seperator_seg.h',
+    'src/common/input/segment/string_seg.h',
+    'src/common/input/segment/syllable_seg.h',
+    'src/common/input/segment/tail_seg.h',
     'src/pinyin/input/shuangpin_seg.h',
     'src/pinyin/input/datrie.h',
-    'src/pinyin/trie/quanpin_trie.h',
+    'src/pinyin/input/quanpin_trie.h',
+    'src/pinyin/input/pinyin_info.h',
     'src/pinyin/input/pinyin_seg.h',
     'src/pinyin/input/pinyin_data.h',
     'src/pinyin/input/syllable.h',
     'src/pinyin/input/shuangpin_data.h',
     'src/pinyin/input/hunpin_seg.h',
     'src/pinyin/input/datrie_impl.h',
+    'src/pinyin/input/segment/TPySyllableSegment.h',
+    'src/xh/input/xh_data.h',
+    'src/xh/input/xh_seg.h',
+    'src/xh/input/segment/pathnode.h',
+    'src/xh/input/segment/path.h',
+    'src/xh/input/segment/checkpoint.h',
+    'src/xh/input/segment/TXhSyllableSegment.h',
     'src/sunpinyin.h',
     ]
 
@@ -454,10 +490,10 @@ def DoConfigure():
 #==============================compile==============================
 #
 env.Object(slmsource)
-env.Command('src/pinyin/trie/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/trie/quanpin_trie.h')
-env.Command('src/pinyin/trie/pinyin_info.h', 'python/pinyin_info_gen.py',
-            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/trie/pinyin_info.h')
+env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
+env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
+            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
 
 SConscript(['src/SConscript', 'man/SConscript', 'doc/SConscript'], exports='env')
 
@@ -485,38 +521,36 @@ else:
     lib = env.SharedLibrary('sunpinyin', source=imesource)
 
 def DoInstall():
-    if 0:
-        lib_target = None
-        if GetOS() == 'Darwin':
-            lib_target = env.Install(libdir, lib)
-        else:
-            lib_target_bin = env.Install(libdir, lib)
-            # where does it goes
-            install_path = os.path.dirname(str(lib_target_bin[0]))
-            lib_target = [
-                lib_target_bin,
-                env.InstallAsSymlink(os.path.join(install_path, libname_soname),
-                                     lib_target_bin),
-                env.InstallAsSymlink(os.path.join(install_path, libname_link),
-                                     lib_target_bin),
-                ]
+    lib_target = None
+    if GetOS() == 'Darwin':
+        lib_target = env.Install(libdir, lib)
+    else:
+        lib_target_bin = env.Install(libdir, lib)
+        # where does it goes
+        install_path = os.path.dirname(str(lib_target_bin[0]))
+        lib_target = [
+            lib_target_bin,
+            env.InstallAsSymlink(os.path.join(install_path, libname_soname),
+                                 lib_target_bin),
+            env.InstallAsSymlink(os.path.join(install_path, libname_link),
+                                 lib_target_bin),
+            ]
 
-        lib_pkgconfig_target = env.Install(os.path.join(libdir, 'pkgconfig'),
-                                           ['sunpinyin-2.0.pc'])
-        bin_target = env.Install(bindir, bins)
-        man1_target = env.Install(man1dir, man1s)
-        doc_target = env.Install(docdir, docs)
+    lib_pkgconfig_target = env.Install(os.path.join(libdir, 'pkgconfig'),
+                                       ['sunpinyin-2.0.pc'])
+    bin_target = env.Install(bindir, bins)
+    man1_target = env.Install(man1dir, man1s)
+    doc_target = env.Install(docdir, docs)
 
     header_targets = []
     for header in headers:
         header_targets.append(env.InstallAs(headersdir + header[3:], header))
     env.Alias('install-headers', header_targets)
-    if 0:
-        env.Alias('install-bin', bin_target)
-        env.Alias('install-man1', man1_target)
-        env.Alias('install-doc', doc_target)
-        env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
-        Mkdir(datadir)
+    env.Alias('install-bin', bin_target)
+    env.Alias('install-man1', man1_target)
+    env.Alias('install-doc', doc_target)
+    env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
+    Mkdir(datadir)
 
 DoInstall()
 env.Alias('install', [

@@ -1,7 +1,7 @@
 #ifndef SUNPY_CANDIDATE_H
 #define SUNPY_CANDIDATE_H
 
-#include "lattice_states.h"
+#include "lattice/lattice_states.h"
 
 /**
  * CCandidate represent basic information about a single candidate.

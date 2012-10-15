@@ -1,9 +1,9 @@
-#include "trie.h"
+#include "common/lexicon/trie.h"
 #include "lattice.h"
 #include "lattice_manager.h"
-#include "userdict.h"
-#include "imi_context.h"
-#include "CInputTrieSource.h"
+#include "ime-core/userdict.h"
+#include "ime-core/imi_context.h"
+#include "ime-core/helper/CInputTrieSource.h"
 
 CLattice CLatticeManager::m_lattice;
 

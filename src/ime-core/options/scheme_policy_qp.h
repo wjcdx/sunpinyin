@@ -2,9 +2,9 @@
 #define SUNPY_SCHEME_POLICY_QP_H
 
 #include "imi_option_event.h"
-#include "segmentor.h"
-#include "pinyin_data.h"
-#include "pinyin_seg.h"
+#include "common/input/segmentor.h"
+#include "pinyin/input/pinyin_data.h"
+#include "pinyin/input/pinyin_seg.h"
 
 struct CQuanpinSchemePolicy : IConfigurable {
 public:

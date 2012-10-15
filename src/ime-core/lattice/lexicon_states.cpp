@@ -1,5 +1,5 @@
 #include "lexicon_states.h"
-#include "TrieThreadModel.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
 
 const TrieThreadModel::TWordIdInfo*
 TLexiconState::getWords(unsigned &num)

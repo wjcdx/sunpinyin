@@ -1,7 +1,7 @@
 #ifndef SUNPY_FULL_CHAR_MANAGER_H
 #define SUNPY_FULL_CHAR_MANAGER_H
 
-#include "imi_funcobjs.h"
+#include "ime-core/imi_funcobjs.h"
 
 class CFullCharManager {
 public:

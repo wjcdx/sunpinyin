@@ -1,7 +1,8 @@
 #ifndef SUNPY_PYSYLLABLE_SEGMENT_H
 #define SUNPY_PYSYLLABLE_SEGMENT_H
 
-#include "syllable_seg.h"
+#include "common/input/segment/syllable_seg.h"
+#include "../syllable.h"
 
 struct TPySyllableSegment : TSyllableSegment {
 

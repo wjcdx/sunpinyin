@@ -1,7 +1,7 @@
 #ifndef SUNPY_XH_DATA_H
 #define SUNPY_XH_DATA_H
 
-#include "TUnit.h"
+#include "common/lexicon/thread/TUnit.h"
 
 using namespace TrieThreadModel;
 

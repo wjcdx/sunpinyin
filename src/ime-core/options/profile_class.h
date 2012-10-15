@@ -2,7 +2,7 @@
 #define SUNPY_CSUNPINYIN_PROFILE_H
 
 #include "profile_interface.h"
-#include "segmentor.h"
+#include "common/input/segmentor.h"
 
 template <class LanguagePolicy, class SchemePolicy,
           class InputStylePolicy>

@@ -41,7 +41,7 @@
 
 #include <glib.h>
 #include "imi_winHandler.h"
-#include "imi_view.h"
+#include "view/imi_view.h"
 
 static inline gboolean
 UpdateCallback(gpointer ptr)

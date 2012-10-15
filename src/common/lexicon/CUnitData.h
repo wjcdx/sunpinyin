@@ -7,8 +7,8 @@
 class CUnitData {
 public:
 	static void initialize(CTrie::TrieType t);
-    static TUnit encode(const char *str);
-    static const char *decode(TUnit u, const char **i = NULL,
+    static TrieThreadModel::TUnit encode(const char *str);
+    static const char *decode(TrieThreadModel::TUnit u, const char **i = NULL,
 			const char **f = NULL);
 private:
 	static CTrie::TrieType m_type;

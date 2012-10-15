@@ -12,10 +12,10 @@
 
 #include <algorithm>
 
-#include "trie_maker.h"
+#include "common/lexicon/trie_maker.h"
+#include "common/lexicon/tree/TTreeWordId.h"
+#include "common/lexicon/trie_writer.h"
 #include "CXhTrieMaker.h"
-#include "TTreeWordId.h"
-#include "trie_writer.h"
 
 CXhTrieMaker::CXhTrieMaker()
 {

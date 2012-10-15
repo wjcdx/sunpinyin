@@ -3,11 +3,9 @@
 #endif
 
 #include "imi_view_xh.h"
-#include "imi_uiobjects.h"
-
-#include "imi_keys.h"
-#include "CFullCharManager.h"
-
+#include "ime-core/imi_uiobjects.h"
+#include "ime-core/imi_keys.h"
+#include "ime-core/helper/CFullCharManager.h"
 
 bool
 CIMIXhView::onKeyEvent(const CKeyEvent& key)

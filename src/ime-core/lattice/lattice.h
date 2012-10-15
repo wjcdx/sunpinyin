@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-#include "candidate.h"
+#include "ime-core/candidate.h"
 #include "lexicon_states.h"
 #include "lattice_states.h"
 

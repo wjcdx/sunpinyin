@@ -41,8 +41,8 @@
 
 #include <sqlite3.h>
 #include "portability.h"
-#include "syllable.h"
-#include "trie.h"
+#include "pinyin/input/syllable.h"
+#include "common/lexicon/trie.h"
 #include "imi_defines.h"
 
 class CUserDict

@@ -13,9 +13,8 @@
 #include <algorithm>
 
 #include "pytrie_maker.h"
-#include "CUnitData.h"
-#include "trie_writer.h"
-#include "syllable.h"
+#include "common/lexicon/trie_writer.h"
+#include "pinyin/input/syllable.h"
 
 using namespace TrieTreeModel;
 

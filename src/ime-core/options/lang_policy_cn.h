@@ -1,7 +1,7 @@
 #ifndef SUNPY_LANG_POLICY_SC_H
 #define SUNPY_LANG_POLICY_SC_H
 
-#include "imi_context.h"
+#include "ime-core/imi_context.h"
 #include "imi_option_event.h"
 #include <string>
 
@@ -55,6 +55,7 @@ public:
     CUserDict m_userDict;
 };
 
+typedef SingletonHolder<CSimplifiedChinesePolicy> ASimplifiedChinesePolicy;
 typedef SingletonHolder<CSimplifiedChinesePolicy> APySimplifiedChinesePolicy;
 
 #endif

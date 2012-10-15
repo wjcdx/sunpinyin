@@ -3,12 +3,12 @@
 
 #include "portability.h"
 
-#include "segmentor.h"
-#include "imi_context.h"
-#include "imi_winHandler.h"
-#include "imi_uiobjects.h"
-#include "imi_keys.h"
-#include "utils.h"
+#include "common/input/segmentor.h"
+#include "ime-core/imi_context.h"
+#include "ime-core/imi_winHandler.h"
+#include "ime-core/imi_uiobjects.h"
+#include "ime-core/imi_keys.h"
+#include "ime-core/utils.h"
 #include <set>
 
 class CHotkeyProfile : private CNonCopyable

@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "TPyLexiconState.h"
 #include "CPyLatticeManager.h"
-#include "CFullCharManager.h"
+#include "ime-core/helper/CFullCharManager.h"
 
 
 void

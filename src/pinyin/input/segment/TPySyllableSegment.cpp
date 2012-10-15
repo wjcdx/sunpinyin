@@ -1,9 +1,9 @@
-#include "syllable_seg.h"
-#include "lattice.h"
-#include "TPyLexiconState.h"
-#include "TrieThreadModel.h"
-#include "lattice_manager.h"
-#include "CInputTrieSource.h"
+#include "ime-core/lattice/lattice.h"
+#include "ime-core/lattice/lattice_manager.h"
+#include "ime-core/helper/CInputTrieSource.h"
+#include "common/input/segment/syllable_seg.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
+#include "pinyin/lattice/TPyLexiconState.h"
 
 using namespace TrieThreadModel;
 

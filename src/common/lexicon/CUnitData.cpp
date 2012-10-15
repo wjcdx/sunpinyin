@@ -1,7 +1,7 @@
 #include "trie.h"
 #include "CUnitData.h"
-#include "pinyin_data.h"
-#include "xh_data.h"
+#include "pinyin/input/pinyin_data.h"
+#include "xh/input/xh_data.h"
 
 using namespace TrieThreadModel;
 
@@ -13,7 +13,7 @@ CUnitData::initialize(CTrie::TrieType t)
 	m_type = t;
 }
 
-TUnit
+TrieThreadModel::TUnit
 CUnitData::encode(const char *str)
 {
 	switch(m_type) {
@@ -27,7 +27,7 @@ CUnitData::encode(const char *str)
 }
 
 const char *
-CUnitData::decode(TUnit u, const char **i,
+CUnitData::decode(TrieThreadModel::TUnit u, const char **i,
 		const char **f)
 {
 	switch(m_type) {

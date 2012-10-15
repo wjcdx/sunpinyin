@@ -2,25 +2,25 @@
 #define SUNPY_SEGMENTOR_H
 
 #include "portability.h"
-#include "syllable.h"
-#include "segment.h"
+#include "pinyin/input/syllable.h"
+#include "segment/segment.h"
 #include <vector>
 
 struct ISegmentor {
 
     virtual ~ISegmentor () {}
-    virtual TSegmentVec& getSegments(bool req_aux_segs = true);
-    virtual const wstring& getInputBuffer();
-    virtual const char* getSylSeps();
+    virtual TSegmentVec& getSegments(bool req_aux_segs = true) = 0;
+    virtual const wstring& getInputBuffer() = 0;
+    virtual const char* getSylSeps() = 0;
 
-    virtual unsigned push(unsigned ch);
-    virtual unsigned pop();
-    virtual unsigned insertAt(unsigned idx, unsigned ch);
-    virtual unsigned deleteAt(unsigned idx, bool backward = true);
-    virtual unsigned clear(unsigned from = 0);
+    virtual unsigned push(unsigned ch) = 0;
+    virtual unsigned pop() = 0;
+    virtual unsigned insertAt(unsigned idx, unsigned ch) = 0;
+    virtual unsigned deleteAt(unsigned idx, bool backward = true) = 0;
+    virtual unsigned clear(unsigned from = 0) = 0;
     virtual void     notify_best_segpath(std::vector<unsigned>& seg_path) {}
 
-    virtual unsigned updatedFrom();
+    virtual unsigned updatedFrom() = 0;
 };
 
 #endif

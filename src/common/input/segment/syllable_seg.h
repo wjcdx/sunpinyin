@@ -11,7 +11,7 @@ struct TSyllableSegment : TSegment {
 		m_type = TSegment::SYLLABLE;
 	}
 
-	virtual void forward(unsigned i, unsigned j);
+	virtual void forward(unsigned i, unsigned j) {};
 };
 
 #endif

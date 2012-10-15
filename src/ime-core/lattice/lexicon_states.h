@@ -5,9 +5,9 @@
 #include <vector>
 #include <map>
 #include "portability.h"
-#include "trie.h"
-#include "TrieThreadModel.h"
-#include "syllable.h"
+#include "common/lexicon/trie.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
+#include "pinyin/input/syllable.h"
 
 using namespace TrieThreadModel;
 
@@ -21,7 +21,7 @@ struct TLexiconState {
 	typedef std::vector<TWordIdInfo> TWordIdInfoVec;
 public:
     virtual const TWordIdInfo *getWords(unsigned &num);
-	virtual const double getWeight();
+	virtual const double getWeight() { return 1; }
     virtual void print(std::string prefix) const;
     virtual int getLength() { return m_syls.size(); }
 

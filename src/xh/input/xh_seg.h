@@ -2,8 +2,8 @@
 #define SUNPY_XINGHUA_SEG_H
 
 #include "portability.h"
-#include "segmentor.h"
-#include "segment_types.h"
+#include "common/input/segmentor.h"
+#include "common/input/segment/segment_types.h"
 #include "xh_data.h"
 
 #include <algorithm>

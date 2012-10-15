@@ -2,7 +2,7 @@
 #define SUNPY_CUNIGRAMSORTER_H
 
 #include "CWordEvaluator.h"
-#include "slm.h"
+#include "slm/slm.h"
 
 class CUnigramSorter : public CWordEvaluator {
 public:

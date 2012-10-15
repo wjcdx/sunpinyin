@@ -1,7 +1,7 @@
 #ifndef SUNPY_TREE_PYTNODE_H
 #define SUNPY_TREE_PYTNODE_H
 
-#include "CTreeNode.h"
+#include "common/lexicon/tree/CTreeNode.h"
 
 namespace TrieTreeModel {
 	class CPyTreeNode : public CTreeNode {

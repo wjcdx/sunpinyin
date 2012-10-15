@@ -2,14 +2,14 @@
 #define SUNPY_SCHEME_POLICY_XH_H
 
 #include "imi_option_event.h"
-#include "segmentor.h"
-#include "xh_seg.h"
+#include "common/input/segmentor.h"
+#include "xh/input/xh_seg.h"
 
 struct CXhSchemePolicy : IConfigurable {
 public:
 
     ISegmentor* createSegmentor(){
-        CXhSegmentor *pseg = new CXhSegmentor();
+		CXhSegmentor *pseg = new CXhSegmentor();
         return pseg;
     }
 

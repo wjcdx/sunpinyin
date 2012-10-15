@@ -2,8 +2,8 @@
 #define SUNPY_MAKER_FACTORY_H
 
 #include "trie.h"
-#include "pytrie_maker.h"
-#include "CXhTrieMaker.h"
+#include "pinyin/lexicon/pytrie_maker.h"
+#include "xh/lexicon/CXhTrieMaker.h"
 
 class MakerFactory {
 public:

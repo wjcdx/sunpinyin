@@ -12,7 +12,7 @@ struct GlobalLatticeInfo;
 
 class CLatticeManager {
 public:
-	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
+	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom) {}
 	bool buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info);
 	bool backTracePaths(const std::vector<TLatticeState>& tail_states,
 								 int rank, TPath& path, TPath& segmentPath);

@@ -4,12 +4,14 @@
 
 #include <assert.h>
 #include <algorithm>
+#include "common/lexicon/thread/TrieThreadModel.h"
 #include "imi_defines.h"
 #include "imi_context.h"
 #include "TCandiRank.h"
 #include "TCandiPair.h"
-#include "TrieThreadModel.h"
-#include "CInputTrieSource.h"
+#include "helper/CInputTrieSource.h"
+
+CICHistory* CIMIContext::m_pHistory;
 
 CIMIContext::CIMIContext(CLatticeManager *pLatticeMgr)
     : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0), m_csLevel(0),
@@ -48,7 +50,7 @@ CIMIContext::_buildLattice(TSegmentVec &segments,
                            unsigned rebuildFrom,
                            bool doSearch)
 {
-    _clearFrom(rebuildFrom);
+    m_pLatticeMgr->_clearFrom(rebuildFrom);
     m_pLatticeMgr->buildLexiconStates(segments, rebuildFrom);
     return doSearch && searchFrom(rebuildFrom);
 }

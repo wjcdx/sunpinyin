@@ -2,10 +2,10 @@
 #define SUNPY_SCHEME_POLICY_HP_H
 
 #include "imi_option_event.h"
-#include "segmentor.h"
-#include "pinyin_data.h"
-#include "shuangpin_data.h"
-#include "hunpin_seg.h"
+#include "common/input/segmentor.h"
+#include "pinyin/input/pinyin_data.h"
+#include "pinyin/input/shuangpin_data.h"
+#include "pinyin/input/hunpin_seg.h"
 
 struct  CHunpinSchemePolicy : public IConfigurable {
 public:

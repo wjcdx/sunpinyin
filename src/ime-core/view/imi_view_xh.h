@@ -3,13 +3,13 @@
 
 #include "portability.h"
 
-#include "imi_view_classic.h"
+#include "ime-core/view/imi_view_classic.h"
 
 class CIMIXhView : public CIMIClassicView
 {
 public:
-    CIMIXhView();
-    virtual ~CIMIXhView();
+    CIMIXhView() {}
+    virtual ~CIMIXhView() {}
 
     virtual bool onKeyEvent(const CKeyEvent&);
 };

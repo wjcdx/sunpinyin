@@ -10,11 +10,11 @@
 #include <set>
 #include <list>
 
-#include "trie.h"
-#include "trie_maker.h"
-#include "TrieTreeModel.h"
-#include "CWordEvaluator.h"
-#include "CPyTreeNode.h"
+#include "common/lexicon/trie.h"
+#include "common/lexicon/trie_maker.h"
+#include "common/lexicon/tree/TrieTreeModel.h"
+#include "common/lexicon/CWordEvaluator.h"
+#include "tree/CPyTreeNode.h"
 
 class CPyTrieMaker : public CTrieMaker {
 public:

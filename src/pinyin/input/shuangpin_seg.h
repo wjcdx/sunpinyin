@@ -3,7 +3,7 @@
 
 #include "portability.h"
 #include "shuangpin_data.h"
-#include "segmentor.h"
+#include "common/input/segmentor.h"
 #include "pinyin_data.h"
 #include <vector>
 

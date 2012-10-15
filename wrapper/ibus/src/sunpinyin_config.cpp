@@ -78,8 +78,8 @@ SunPinyinConfig::set_config(IBusConfig* config)
     listen_on_changed();
 }
 
-CSunpinyinSessionFactory::EPyScheme
-SunPinyinConfig::get_py_scheme(CSunpinyinSessionFactory::EPyScheme scheme)
+CSunpinyinSessionFactory::EScheme
+SunPinyinConfig::get_py_scheme(CSunpinyinSessionFactory::EScheme scheme)
 {
     string default_name =
         get_scheme_name(scheme);
@@ -120,7 +120,7 @@ SunPinyinConfig::listen_on_changed()
 }
 
 std::string
-SunPinyinConfig::get_scheme_name(CSunpinyinSessionFactory::EPyScheme scheme)
+SunPinyinConfig::get_scheme_name(CSunpinyinSessionFactory::EScheme scheme)
 {
     string val = "ShuangPin";
     for (SchemeNames::iterator it = m_scheme_names.begin();
@@ -131,10 +131,10 @@ SunPinyinConfig::get_scheme_name(CSunpinyinSessionFactory::EPyScheme scheme)
     return val;
 }
 
-CSunpinyinSessionFactory::EPyScheme
+CSunpinyinSessionFactory::EScheme
 SunPinyinConfig::get_scheme(const std::string& name)
 {
-    CSunpinyinSessionFactory::EPyScheme val = CSunpinyinSessionFactory::SHUANGPIN;
+    CSunpinyinSessionFactory::EScheme val = CSunpinyinSessionFactory::SHUANGPIN;
     SchemeNames::iterator it = m_scheme_names.find(name);
     if (it != m_scheme_names.end()) {
         val = it->second;

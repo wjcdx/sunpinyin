@@ -31,7 +31,7 @@ struct TSegment {
 	unsigned m_type         : 7;
 
 public:
-	virtual void forward(unsigned i, unsigned j);
+	virtual void forward(unsigned i, unsigned j) {};
 };
 
 // it requires the segments are sorted by its m_start field

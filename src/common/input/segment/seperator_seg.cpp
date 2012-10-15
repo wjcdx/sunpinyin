@@ -1,6 +1,6 @@
-#include "lattice.h"
+#include "ime-core/lattice/lattice.h"
+#include "ime-core/lattice/lattice_manager.h"
 #include "seperator_seg.h"
-#include "lattice_manager.h"
 
 void
 TSeperatorSegment::forward(unsigned i, unsigned j)

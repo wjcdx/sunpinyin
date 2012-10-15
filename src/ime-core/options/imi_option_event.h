@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "utils.h"
+#include "ime-core/utils.h"
 
 class COptionEventBus;
 

@@ -12,9 +12,9 @@
 
 #include "trie.h"
 #include "CUnitData.h"
-#include "TrieTreeModel.h"
+#include "tree/TrieTreeModel.h"
 #include "CWordEvaluator.h"
-#include "TUnitInfo.h"
+#include "thread/TUnitInfo.h"
 
 using namespace TrieTreeModel;
 

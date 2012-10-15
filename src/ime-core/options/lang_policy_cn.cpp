@@ -1,9 +1,9 @@
-#include "utils.h"
 #include "portability.h"
+#include "ime-core/utils.h"
+#include "ime-core/helper/CInputTrieSource.h"
+#include "pinyin/lattice/CPyLatticeManager.h"
 #include "lang_policy_cn.h"
-#include "CInputTrieSource.h"
 #include "imi_option_keys.h"
-#include "CPyLatticeManager.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>

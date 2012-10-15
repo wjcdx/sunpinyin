@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 #include "slm/slm.h"
-#include "trie.h"
+#include "common/lexicon/trie.h"
 
 void print_wide(const TWCHAR* wstr);
 

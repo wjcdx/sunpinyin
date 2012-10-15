@@ -1,9 +1,9 @@
-#include "utils.h"
 #include "portability.h"
+#include "ime-core/utils.h"
+#include "ime-core/helper/CInputTrieSource.h"
+#include "xh/lattice/CXhLatticeManager.h"
 #include "lang_policy_cn_xh.h"
-#include "CInputTrieSource.h"
 #include "imi_option_keys.h"
-#include "CXhLatticeManager.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>

@@ -7,6 +7,18 @@ CXhData::xhDataMaps[] = {
 	{ 0, "" },
 };
 
+bool
+CXhData::isPattern(unsigned ch)
+{
+	return true;
+}
+
+bool
+CXhData::isStroke(unsigned ch)
+{
+	return true;
+}
+
 XhKeyMapPair &
 CXhData::findPair(std::string name)
 {

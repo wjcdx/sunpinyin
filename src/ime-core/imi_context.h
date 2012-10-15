@@ -15,22 +15,16 @@
 #include <map>
 #include <vector>
 
-#include "segment.h"
+#include "common/input/segment/segment.h"
 #include "imi_data.h"
 #include "ic_history.h"
 #include "userdict.h"
-#include "lattice.h"
-#include "lattice_states.h"
-#include "lattice_manager.h"
+#include "lattice/lattice.h"
+#include "lattice/lattice_states.h"
+#include "lattice/lattice_manager.h"
 #include "imi_funcobjs.h"
 #include "candidate.h"
-#include "CFullCharManager.h"
-
-/**
- * TSentenceScore is only used for whole sentence score,
- * the score from language model still using double.
- */
-typedef TLongExpFloat TSentenceScore;
+#include "helper/CFullCharManager.h"
 
 class CLatticeFrame;
 class CCandidate;
@@ -83,6 +77,10 @@ public:
 
     unsigned getLastFrIdx() {
         return m_pLatticeMgr->getTailIdx() - 1;
+    }
+    
+    void setHistoryPower(unsigned power) {
+        m_pLatticeMgr->setHistoryPower(power);
     }
 
     // omit next punctuation if the very next symbol is an punctuation
@@ -165,7 +163,6 @@ public:
     static CICHistory* m_pHistory;
 
 protected:
-    void _clearFrom(unsigned from);
     bool _buildLattice(TSegmentVec &segments,
                            unsigned rebuildFrom = 1,
                            bool doSearch = true);

@@ -12,8 +12,8 @@
 
 #include <algorithm>
 
-#include "TrieThreadModel.h"
-#include "TrieTreeModel.h"
+#include "thread/TrieThreadModel.h"
+#include "tree/TrieTreeModel.h"
 #include "trie.h"
 #include "trie_maker.h"
 #include "trie_writer.h"

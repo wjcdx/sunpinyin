@@ -1,6 +1,14 @@
 #ifndef SUNPY_TCANDI_RANK_H
 #define SUNPY_TCANDI_RANK_H
 
+#include "portability.h"
+
+/**
+ * TSentenceScore is only used for whole sentence score,
+ * the score from language model still using double.
+ */
+typedef TLongExpFloat TSentenceScore;
+
 union TCandiRank {
 public:
     bool operator<(const TCandiRank& b) const

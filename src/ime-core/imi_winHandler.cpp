@@ -40,7 +40,7 @@
 #endif
 
 #include "imi_winHandler.h"
-#include "imi_view.h"
+#include "view/imi_view.h"
 
 void
 CIMIWinHandler::commit(const TWCHAR* wstr)

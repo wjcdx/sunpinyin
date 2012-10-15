@@ -1,7 +1,7 @@
 #ifndef SUNPY_SESSION_FACTORY_H
 #define SUNPY_SESSION_FACTORY_H
 
-#include "utils.h"
+#include "ime-core/utils.h"
 #include "profile_class.h"
 #include "lang_policy_cn.h"
 #include "lang_policy_cn_xh.h"

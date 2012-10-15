@@ -4,9 +4,9 @@
 
 #include <assert.h>
 #include <algorithm>
+#include "ime-core/helper/CFullCharManager.h"
 #include "TXhLexiconState.h"
 #include "CXhLatticeManager.h"
-#include "CFullCharManager.h"
 
 void
 CXhLatticeManager::buildLexiconStates(TSegmentVec &segments,

@@ -3,10 +3,9 @@
 #endif
 
 #include "imi_view_classic.h"
-#include "imi_uiobjects.h"
-
-#include "imi_keys.h"
-#include "CFullCharManager.h"
+#include "ime-core/imi_uiobjects.h"
+#include "ime-core/imi_keys.h"
+#include "ime-core/helper/CFullCharManager.h"
 
 CIMIClassicView::CIMIClassicView()
     : CIMIView(), m_cursorFrIdx(0), m_candiFrIdx(0),

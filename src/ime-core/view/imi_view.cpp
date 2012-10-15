@@ -4,7 +4,7 @@
 
 #include "imi_view.h"
 #include "imi_view_classic.h"
-#include "CFullCharManager.h"
+#include "../helper/CFullCharManager.h"
 
 #ifdef ENABLE_PLUGINS
 #include "imi_plugin.h"

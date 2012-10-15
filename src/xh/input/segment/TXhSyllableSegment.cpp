@@ -1,8 +1,8 @@
-#include "syllable_seg.h"
-#include "TXhLexiconState.h"
+#include "common/input/segment/syllable_seg.h"
+#include "xh/lattice/TXhLexiconState.h"
+#include "ime-core/lattice/lattice.h"
+#include "ime-core/lattice/lattice_manager.h"
 #include "TXhSyllableSegment.h"
-#include "lattice.h"
-#include "lattice_manager.h"
 
 void
 TXhSyllableSegment::forward(unsigned i, unsigned j)

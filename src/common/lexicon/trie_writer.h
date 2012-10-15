@@ -2,7 +2,7 @@
 #ifndef __SUNPINYIN_TRIE_WRITER_H__
 #define __SUNPINYIN_TRIE_WRITER_H__
 
-#include "writer.h"
+#include "slm/tslmendian/writer.h"
 #include "trie.h"
 
 template <>

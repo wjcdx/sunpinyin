@@ -1,7 +1,7 @@
 #include <cassert>
 #include <climits>
 #include "shuangpin_seg.h"
-#include "segment_types.h"
+#include "common/input/segment/segment_types.h"
 
 CShuangpinData CShuangpinSegmentor::s_shpData;
 

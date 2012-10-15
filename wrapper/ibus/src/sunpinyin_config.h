@@ -54,7 +54,7 @@ enum CharsetLevel
 class SunPinyinConfig
 {
     typedef std::map<std::string,
-        CSunpinyinSessionFactory::EPyScheme> SchemeNames;
+        CSunpinyinSessionFactory::EScheme> SchemeNames;
     typedef std::map<std::string,
         EShuangpinType> TypeNames;
 
@@ -82,8 +82,8 @@ public:
 
     std::vector<std::string> get(const char *key, const std::vector<std::string>& val);
 
-    CSunpinyinSessionFactory::EPyScheme get_py_scheme(CSunpinyinSessionFactory::EPyScheme);
-    void set_py_scheme(CSunpinyinSessionFactory::EPyScheme);
+    CSunpinyinSessionFactory::EScheme get_py_scheme(CSunpinyinSessionFactory::EScheme);
+    void set_py_scheme(CSunpinyinSessionFactory::EScheme);
 
     bool is_initial_mode_cn();
     bool is_initial_punct_full();
@@ -113,8 +113,8 @@ private:
                                         SunPinyinConfig *user_data);
 #endif
 
-    std::string get_scheme_name(CSunpinyinSessionFactory::EPyScheme scheme);
-    CSunpinyinSessionFactory::EPyScheme get_scheme(const std::string& name);
+    std::string get_scheme_name(CSunpinyinSessionFactory::EScheme scheme);
+    CSunpinyinSessionFactory::EScheme get_scheme(const std::string& name);
 };
 
 #endif // SUNPINYIN_CONFIG_H

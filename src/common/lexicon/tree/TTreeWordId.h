@@ -4,7 +4,7 @@
 #include <set>
 
 //for WORD_ID_WIDTH
-#include <TThreadNode.h>
+#include "../thread/TThreadNode.h"
 
 namespace TrieTreeModel {
     union TTreeWordId {

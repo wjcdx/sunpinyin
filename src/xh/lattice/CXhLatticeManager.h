@@ -1,8 +1,8 @@
 #ifndef SUNPY_XHLATTICE_MANAGER_H
 #define SUNPY_XHLATTICE_MANAGER_H
 
-#include "segment.h"
-#include "lattice_manager.h"
+#include "common/input/segment/segment.h"
+#include "ime-core/lattice/lattice_manager.h"
 
 class CXhLatticeManager : public CLatticeManager {
 public:

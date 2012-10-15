@@ -1,8 +1,8 @@
 #ifndef SUNPY_PATH_NODE_H
 #define SUNPY_PATH_NODE_H
 
-#include "TrieThreadModel.h"
-#include "syllable.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
+#include "pinyin/input/syllable.h"
 #include <list>
 
 struct PathNode;

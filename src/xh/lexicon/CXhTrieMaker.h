@@ -10,9 +10,9 @@
 #include <set>
 #include <list>
 
-#include "TrieThreadModel.h"
-#include "TrieTreeModel.h"
-#include "CWordEvaluator.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
+#include "common/lexicon/tree/TrieTreeModel.h"
+#include "common/lexicon/CWordEvaluator.h"
 
 class CXhTrieMaker : public CTrieMaker {
 public:

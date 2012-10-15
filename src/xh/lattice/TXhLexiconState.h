@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include "portability.h"
-#include "lexicon_states.h"
+#include "ime-core/lattice/lexicon_states.h"
 
 struct TXhLexiconState : TLexiconState {
 

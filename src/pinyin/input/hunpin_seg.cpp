@@ -7,12 +7,11 @@
  *
  */
 
-#include "hunpin_seg.h"
 #include <cassert>
 #include <functional>
 #include <algorithm>
-#include "pinyin_seg.h"
-#include "segment_types.h"
+#include "common/input/segment/segment_types.h"
+#include "hunpin_seg.h"
 #include "quanpin_trie.h"
 
 

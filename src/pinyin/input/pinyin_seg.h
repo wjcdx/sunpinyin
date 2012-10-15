@@ -2,9 +2,9 @@
 #define SUNPY_PINYIN_SEG_H
 
 #include "portability.h"
-#include "segmentor.h"
+#include "common/input/segmentor.h"
 #include "pinyin_data.h"
-#include "segment_types.h"
+#include "common/input/segment/segment_types.h"
 #include "datrie.h"
 #include "ime-core/utils.h"
 

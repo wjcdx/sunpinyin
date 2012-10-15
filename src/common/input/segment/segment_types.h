@@ -6,7 +6,7 @@
 #include "string_seg.h"
 #include "tail_seg.h"
 #include "syllable_seg.h"
-#include "TPySyllableSegment.h"
-#include "TXhSyllableSegment.h"
+#include "pinyin/input/segment/TPySyllableSegment.h"
+#include "xh/input/segment/TXhSyllableSegment.h"
 
 #endif

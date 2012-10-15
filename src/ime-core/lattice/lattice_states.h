@@ -4,9 +4,9 @@
 #include <vector>
 #include <map>
 #include "portability.h"
-#include "imi_data.h"
-#include "pinyin_seg.h"
-#include "trie.h"
+#include "ime-core/imi_data.h"
+#include "pinyin/input/pinyin_seg.h"
+#include "common/lexicon/trie.h"
 #include "lexicon_states.h"
 
 typedef TLongExpFloat TSentenceScore;

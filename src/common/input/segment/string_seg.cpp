@@ -2,7 +2,7 @@
 #include "ime-core/lattice/lattice_manager.h"
 #include "ime-core/helper/CFullCharManager.h"
 #include "ime-core/helper/CInputTrieSource.h"
-#include "imi-core/lattice/lexicon_states.h"
+#include "ime-core/lattice/lexicon_states.h"
 
 static void
 _forwardPunctChar(unsigned i, unsigned j, unsigned ch)

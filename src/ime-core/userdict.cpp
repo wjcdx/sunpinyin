@@ -38,7 +38,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "userdict.h"
-#include "TrieThreadModel.h"
+#include "common/lexicon/thread/TrieThreadModel.h"
 
 bool
 CUserDict::load(const char  *fname)

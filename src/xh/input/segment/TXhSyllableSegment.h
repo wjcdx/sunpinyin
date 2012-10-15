@@ -1,8 +1,8 @@
 #ifndef SUNPY_XHSYLLABLE_SEGMENT_H
 #define SUNPY_XHSYLLABLE_SEGMENT_H
 
-#include "syllable.h"
-#include "syllable_seg.h"
+#include "pinyin/input/syllable.h"
+#include "common/input/segment/syllable_seg.h"
 #include "path.h"
 
 struct TXhSyllableSegment : TSyllableSegment {

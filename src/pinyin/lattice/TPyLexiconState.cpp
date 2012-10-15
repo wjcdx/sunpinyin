@@ -1,6 +1,6 @@
-#include "pinyin_data.h"
 #include "TPyLexiconState.h"
-#include "lattice_states.h"
+#include "pinyin/input/pinyin_data.h"
+#include "ime-core/lattice/lattice_states.h"
 #include <algorithm>
 
 const TrieThreadModel::TWordIdInfo*

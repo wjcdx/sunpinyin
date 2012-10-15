@@ -1,8 +1,8 @@
 #ifndef SUNPY_INPUT_TRIE_SOURCE_H
 #define SUNPY_INPUT_TRIE_SOURCE_H
 
-#include "userdict.h"
-#include "trie.h"
+#include "ime-core/userdict.h"
+#include "common/lexicon/trie.h"
 
 class CInputTrieSource {
 public:

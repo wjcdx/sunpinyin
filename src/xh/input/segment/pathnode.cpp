@@ -3,7 +3,7 @@
 #include "checkpoint.h" 
 
 PathNodeList
-getChildren(TSyllable syllable)
+PathNode::getChildren(TSyllable syllable)
 {
 	PathNodeList nodes;
 	return nodes;

@@ -1,5 +1,5 @@
+#include "ime-core/lattice/lattice_manager.h"
 #include "tail_seg.h"
-#include "lattice_manager.h"
 
 void
 TTailSegment::forward(unsigned i, unsigned j)

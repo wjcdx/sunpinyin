@@ -1,8 +1,8 @@
 #ifndef SUNPY_PYLATTICE_MANAGER_H
 #define SUNPY_PYLATTICE_MANAGER_H
 
-#include "segment.h"
-#include "lattice_manager.h"
+#include "common/input/segment/segment.h"
+#include "ime-core/lattice/lattice_manager.h"
 
 class CPyLatticeManager : public CLatticeManager {
 public:
