@@ -3,7 +3,8 @@
 
 #include "pathnode.h"
 
-struct CheckPoint {
+class CheckPoint {
+public:
 	PathNode *m_Start;
 	PathNode *m_PNode;
 	CheckPoint(PathNode *node) {

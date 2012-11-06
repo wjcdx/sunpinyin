@@ -3,8 +3,8 @@
 
 XhKeyMapPair
 CXhData::xhDataMaps[] = {
-	{ 'a', "P01" },
-	{ 0, "" },
+	XhKeyMapPair('a', "P01"),
+	XhKeyMapPair(0, ""),
 };
 
 bool

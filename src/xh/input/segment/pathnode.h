@@ -5,14 +5,15 @@
 #include "pinyin/input/syllable.h"
 #include <list>
 
-struct PathNode;
+class PathNode;
 typedef std::list<PathNode> PathNodeList;
 
-struct Path;
+class Path;
 typedef std::list<Path> PathList;
 
-struct PathNode {
+class PathNode {
 
+public:
 	enum PathNodeFlag {
 		JUMPED,
 		HISTORY,
@@ -26,9 +27,14 @@ struct PathNode {
 	TrieThreadModel::TThreadNode *m_TNode;
 	unsigned flag;
 	
-public:
 	PathNode() {}
 	PathNode(PathNodeFlag f) : flag(f)
+	{}
+	
+	PathNode(TrieThreadModel::TTransUnit *trans,
+			TrieThreadModel::TThreadNode *node,
+			unsigned f = FUTURE)
+	: m_Trans(trans), m_TNode(node), flag(f)
 	{}
 
 	bool operator==(PathNode &node) {

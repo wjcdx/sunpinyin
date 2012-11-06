@@ -7,7 +7,7 @@ using namespace TrieThreadModel;
 
 struct XhKeyMapPair {
 public:
-	XhKeyMapPair() : key(0), name() {}
+	XhKeyMapPair() : key(0) {}
 	XhKeyMapPair(int key, std::string name): key(key), name(name) {}
 	int getKey() {return key;}
 	std::string getName() {return name;}

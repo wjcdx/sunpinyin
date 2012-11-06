@@ -1,11 +1,27 @@
 #include "pathnode.h" 
 #include "path.h" 
 #include "checkpoint.h" 
+#include "ime-core/helper/CInputTrieSource.h" 
+#include "common/lexicon/trie.h" 
+
+using namespace TrieThreadModel;
 
 PathNodeList
 PathNode::getChildren(TSyllable syllable)
 {
 	PathNodeList nodes;
+
+	unsigned int sz = m_TNode->m_nTransfer;
+
+	if (sz == 0)
+		return nodes;
+
+    TTransUnit* ptrans = (TTransUnit *)m_TNode->getTrans();
+    for (unsigned int i = 0; i < sz; ++i) {
+        unsigned u = ptrans[i].m_Unit; 
+        TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
+		nodes.push_back(PathNode(&ptrans[i], pch));
+    }
 	return nodes;
 }
 

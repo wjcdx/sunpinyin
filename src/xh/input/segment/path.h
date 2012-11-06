@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <list>
 
-struct Path {
+class Path {
 private:
 	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
@@ -100,11 +100,11 @@ private:
 
 typedef std::list<Path> PathList;
 
-struct TrieBranch {
+class TrieBranch {
+public:
 	Path m_Path;
 	bool newAdded;
 
-public:
 	bool forward(TSyllable s, int num, bool numMet, PathList &paths) {
 		return m_Path.forward(s, num, numMet, paths);
 	}
