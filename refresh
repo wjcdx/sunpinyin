@@ -1,0 +1,2 @@
+sudo scons -c install-headers
+sudo scons --prefix=/usr install-headers
