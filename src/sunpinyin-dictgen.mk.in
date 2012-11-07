@@ -35,10 +35,17 @@ lm_sc.t3g: lm_sc.t3g.orig
 	tslmendian -e ${ENDIANNESS} -i $^ -o $@
 
 pydict3_sc.bin: dict.utf8 lm_sc.t3g
-	genpyt -e ${ENDIANNESS} -i dict.utf8 -s lm_sc.t3g \
-		-l lm_sc.t3g.log -t py -o $@
+	genpyt -e ${ENDIANNESS} -i dict.utf8.py -s lm_sc.t3g \
+		-l lm_sc.t3g.py.log -t py -o $@
 
-install: lm_sc.t3g pydict3_sc.bin
+xhdict3_sc.bin: dict.utf8 lm_sc.t3g
+	genpyt -e ${ENDIANNESS} -i dict.utf8.xh -s lm_sc.t3g \
+		-l lm_sc.t3g.xh.log -t xh -o $@
+
+bin_data: lm_sc.t3g pydict3_sc.bin xhdict3_sc.bin
+	
+
+install: bin_data
 	install -d ${DATA_DIR}
 	install -Dm644 $^ ${DATA_DIR}
 

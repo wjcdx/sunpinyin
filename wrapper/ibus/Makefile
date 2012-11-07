@@ -25,5 +25,6 @@ check:
 
 kill:
 	killall -9 ibus-engine-sunpinyin
+	ps axu | grep sun
 	
 

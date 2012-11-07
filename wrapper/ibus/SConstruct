@@ -13,7 +13,8 @@ sources = ['src/debug.cpp',
 
 locales = ['zh_CN']
 
-cflags = '-O2 -g -pipe '
+#cflags = '-O2 -g -pipe '
+cflags = '-g -pipe '
 version = '2.0.3'
 
 AddOption('--prefix', dest='prefix', metavar='DIR',

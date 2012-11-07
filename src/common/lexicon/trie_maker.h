@@ -45,7 +45,7 @@ public:
     unsigned
     getPureGBEncoding(const char* utf8str);
 
-    bool
+    virtual bool
     parseLine(char* buf,
               char* word_buf,
               unsigned& id,
@@ -58,6 +58,15 @@ public:
     write(FILE *fp, CWordEvaluator* psrt, bool revert_endian);
 
 protected:
+    const char*
+    skipSpace(const char* p);
+
+    const char*
+    skipNonSpace(const char* p);
+
+    void
+    insertWordId(CTreeWordSet& idset, TTreeWordId id);
+
     virtual CTreeNode*
     insertTransfer(CTreeNode* pnode, unsigned s);
 };

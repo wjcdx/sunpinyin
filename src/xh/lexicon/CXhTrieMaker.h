@@ -21,6 +21,12 @@ public:
     ~CXhTrieMaker(); //forget this
 
     bool
+    parseLine(char* buf,
+              char* word_buf,
+              unsigned& id,
+              std::set<TUnitInfo>& unitset);
+
+    bool
     constructFromLexicon(const char* fileName);
 
     bool

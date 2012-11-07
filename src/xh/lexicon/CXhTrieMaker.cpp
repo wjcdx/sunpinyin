@@ -26,6 +26,52 @@ CXhTrieMaker::~CXhTrieMaker()
 {
     delete m_pRootNode;
 }
+
+
+bool
+CXhTrieMaker::parseLine(char* buf,
+          char* word_buf,
+          unsigned& id,
+          std::set<TUnitInfo>& unitset)
+{
+    unitset.clear();
+
+    /* ignore the empty lines and comment lines */
+    if (*buf == '\n' || *buf == '#')
+        return 0;
+
+    char* p = (char*)skipSpace(buf);
+    char* t = (char*)skipNonSpace(p);
+    while (p < t) *word_buf++ = *p++;
+    *word_buf = 0;
+
+    p = (char*)skipSpace(p);
+    t = (char*)skipNonSpace(p);
+    if (*t)
+        *t++ = 0;
+    id = atoi(p);
+    p = (char*)skipSpace(t);
+    while (*p) {
+        const char* s = p;
+        t = (char*)skipNonSpace(p);
+        if (*t)
+            *t++ = 0;
+        while ((*p >= '0' && *p <= '9') || (*p == '\'') 
+                || (*p == 'P') || (*p == 'S'))
+            ++p;
+        if ((p > s) && ((*p == 0) || (*p == ':'))) {
+            int cost = 0;
+            if (*p == ':') {
+                *p++ = 0;
+                cost = -log2(atof(p)/100);
+            }
+            unitset.insert(TUnitInfo(s, cost));
+        }
+        p = (char*)skipSpace(t);
+    }
+    return unitset.size() > 0;
+}
+
 /**********************************************************
     lexicon文件格式：
         以行为单位的文本文件。行中是空格或TAB(1个或多个)分
@@ -45,7 +91,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     std::set<TUnitInfo> unitset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
-    printf("CXhTrieMaker..."); fflush(stdout);
+    printf("CXhTrieMaker...\n"); fflush(stdout);
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, unitset)) {
@@ -70,7 +116,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     }
     fclose(fp);
 
-    printf("\n    %zd primitive nodes", CTreeNode::m_AllNodes.size());  fflush(stdout);
+    printf("\n    %zd primitive nodes\n", CTreeNode::m_AllNodes.size());  fflush(stdout);
     return suc;
 }
 

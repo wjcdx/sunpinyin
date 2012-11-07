@@ -25,10 +25,12 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
 {
     CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
-    CSunpinyinSessionFactory::EScheme pinyin_scheme =
+    CSunpinyinSessionFactory::EScheme pinyin_scheme = CSunpinyinSessionFactory::XINGHUA;
     //    m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
-        CSunpinyinSessionFactory::XINGHUA;
+    
     factory.setPinyinScheme(pinyin_scheme);
+    factory.setInputStyle(CSunpinyinSessionFactory::XH_STYLE);
+    factory.setLanguage(CSunpinyinSessionFactory::SIMPLIFIED_CHINESE_XH);
     if (pinyin_scheme == CSunpinyinSessionFactory::QUANPIN) {
         update_fuzzy_pinyins();
         update_correction_pinyins();

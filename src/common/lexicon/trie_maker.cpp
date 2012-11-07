@@ -21,24 +21,24 @@
 using namespace TrieTreeModel;
 using namespace TrieThreadModel;
 
-static const char*
-skipSpace(const char* p)
+const char*
+CTrieMaker::skipSpace(const char* p)
 {
     while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
         ++p;
     return p;
 }
 
-static const char*
-skipNonSpace(const char* p)
+const char*
+CTrieMaker::skipNonSpace(const char* p)
 {
     while (*p != '\0' && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r')
         ++p;
     return p;
 }
 
-static void
-insertWordId(CTreeWordSet& idset, TTreeWordId id)
+void
+CTrieMaker::insertWordId(CTreeWordSet& idset, TTreeWordId id)
 {
     CTreeWordSet::const_iterator it = idset.find(id);
     if (it == idset.end())
