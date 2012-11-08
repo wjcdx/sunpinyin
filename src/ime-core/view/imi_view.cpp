@@ -7,7 +7,7 @@
 #include "../helper/CFullCharManager.h"
 
 #ifdef ENABLE_PLUGINS
-#include "imi_plugin.h"
+#include "../imi_plugin.h"
 #endif
 
 // #pragma setlocale("zh_CN.UTF-8")

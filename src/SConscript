@@ -1,38 +1,38 @@
 import os
 Import('env')
 
-env.Program('mmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
+env.Program('dict/mmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
                       'slm/mmseg/mmseg.o'])
 
-env.Program('slmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
+env.Program('dict/slmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
                       'slm/slm.o', 'slm/slmseg/slmseg.o'])
 
-env.Program('ids2ngram', ['portability.o', 'slm/ids2ngram/ids2ngram.o'])
+env.Program('dict/ids2ngram', ['portability.o', 'slm/ids2ngram/ids2ngram.o'])
 
-env.Program('idngram_merge', ['portability.o', 'slm/ids2ngram/idngram_merge.o'])
+env.Program('dict/idngram_merge', ['portability.o', 'slm/ids2ngram/idngram_merge.o'])
 
-env.Program('slmbuild', ['portability.o', 'slm/sim_slmbuilder.o',
+env.Program('dict/slmbuild', ['portability.o', 'slm/sim_slmbuilder.o',
                          'slm/slmbuild/slmbuild.o'])
 
-env.Program('slmprune', ['portability.o', 'slm/sim_slm.o',
+env.Program('dict/slmprune', ['portability.o', 'slm/sim_slm.o',
                          'slm/slmprune/slmprune.o'])
 
-env.Program('slminfo', ['portability.o', 'slm/slminfo/slminfo.o'])
+env.Program('dict/slminfo', ['portability.o', 'slm/slminfo/slminfo.o'])
 
-env.Program('slmthread', ['portability.o', 'slm/sim_slm.o',
+env.Program('dict/slmthread', ['portability.o', 'slm/sim_slm.o',
                           'slm/thread/ValueCompress.o', 'slm/thread/slmthread.o'])
 
-env.Program('tslmendian', ['slm/tslmendian/slm_file.o',
+env.Program('dict/tslmendian', ['slm/tslmendian/slm_file.o',
                            'slm/tslmendian/slm_endian.o',
                            'slm/tslmendian/writer.o'])
 
-env.Program('tslminfo', ['portability.o', 'slm/slm.o', 'slm/tslminfo/tslminfo.o'])
+env.Program('dict/tslminfo', ['portability.o', 'slm/slm.o', 'slm/tslminfo/tslminfo.o'])
 
-env.Program('tslmpack', ['portability.o', 'slm/slm.o',
+env.Program('dict/tslmpack', ['portability.o', 'slm/slm.o',
                      	 'slm/thread/ValueCompress.o', 'slm/tslmpack/slmpack.o',
                      	 'slm/tslmpack/arpa_conv.o', 'slm/tslmpack/arpa_slm.o'])
 
-env.Program('genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer.o',
+env.Program('dict/genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer.o',
                    	   'common/lexicon/trie_writer.o', 'common/lexicon/gentrie.o',
                    	   'common/lexicon/trie_factory.o', 'common/lexicon/maker_factory.o',
                    	   'common/lexicon/trie.o', 'common/lexicon/trie_maker.o',
@@ -44,10 +44,10 @@ env.Program('genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer.o',
                        'pinyin/lexicon/pytrie_maker.o',
                    	   'pinyin/input/pinyin_data.o'])
 
-env.Program('getwordfreq', ['portability.o', 'slm/slm.o',
+env.Program('dict/getwordfreq', ['portability.o', 'slm/slm.o',
                             'slm/getwordfreq/getwordfreq.o'])
 
-env.Program('testvc', ['slm/thread/ValueCompress.o', 'slm/thread/test_vc.o'])
+env.Program('dict/testvc', ['slm/thread/ValueCompress.o', 'slm/thread/test_vc.o'])
 
 env.Substfile('sunpinyin-dictgen.mk.in', SUBST_DICT = {
     '@MAKE@': env['MAKE'],
@@ -56,7 +56,7 @@ env.Substfile('sunpinyin-dictgen.mk.in', SUBST_DICT = {
     '@DATADIR@': env['DATADIR'],
     '@ENDIANNESS@': env['ENDIANNESS'],
     })
-env.Command('sunpinyin-dictgen', 'sunpinyin-dictgen.mk', [
+env.Command('dict/sunpinyin-dictgen', 'sunpinyin-dictgen.mk', [
         Copy("$TARGET", "$SOURCE"),
         Chmod("$TARGET", 0755),
     ])

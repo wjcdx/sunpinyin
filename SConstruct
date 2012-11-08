@@ -203,20 +203,20 @@ headers_plugin = [
     ]
 
 bins = [
-    'src/mmseg',
-    'src/slmseg',
-    'src/ids2ngram',
-    'src/idngram_merge',
-    'src/slmbuild',
-    'src/slmprune',
-    'src/slminfo',
-    'src/slmthread',
-    'src/tslmendian',
-    'src/tslminfo',
-    'src/tslmpack',
-    'src/genpyt',
-    'src/getwordfreq',
-    'src/sunpinyin-dictgen',
+    'src/dict/mmseg',
+    'src/dict/slmseg',
+    'src/dict/ids2ngram',
+    'src/dict/idngram_merge',
+    'src/dict/slmbuild',
+    'src/dict/slmprune',
+    'src/dict/slminfo',
+    'src/dict/slmthread',
+    'src/dict/tslmendian',
+    'src/dict/tslminfo',
+    'src/dict/tslmpack',
+    'src/dict/genpyt',
+    'src/dict/getwordfreq',
+    'src/dict/sunpinyin-dictgen',
     ]
 
 man1s = [
@@ -483,8 +483,8 @@ def DoConfigure():
     if GetOS() != 'Darwin':
         env.ParseConfig('pkg-config sqlite3 --libs --cflags')
 
-#if not GetOption('clean') and not GetOption('help'):
-#    DoConfigure()
+if not GetOption('clean') and not GetOption('help'):
+    DoConfigure()
 
 #
 #==============================compile==============================

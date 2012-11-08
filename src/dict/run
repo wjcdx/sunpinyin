@@ -1,0 +1,3 @@
+#!/bin/bash
+PATH=${PATH}:. sunpinyin-dictgen 
+#PATH=${PATH}:../src sunpinyin-dictgen pydict3_sc.bin
