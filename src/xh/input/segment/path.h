@@ -13,7 +13,19 @@ private:
 	PathNode *m_Now;
 
 public:
+	Path(){};
+
+	Path(PathNode &node)
+	{
+		add_first_node(node);
+	}
+
 	void add(PathNode &node) {
+		if (m_Nodes.empty()) {
+			add_first_node(node);
+			return;
+		}
+
 		PathNode *priv = &m_Nodes.back();
 		m_Nodes.push_back(node);
 
@@ -27,6 +39,10 @@ public:
 	}
 	
 	void push_front(PathNode &node) {
+		if (m_Nodes.empty()) {
+			add_first_node(node);
+			return;
+		}
 		PathNode *next = &m_Nodes.front();
 		m_Nodes.push_front(node);
 
@@ -87,6 +103,13 @@ public:
 	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
 
 private:
+
+	void add_first_node(PathNode &node)
+	{
+		m_Nodes.push_back(node);
+		m_Now = &m_Nodes.back();
+	}
+
 	CheckPointList cpset;
 	int getRepeaterStatus(int count, CheckPointList &cphooks);
 	void forwardCheckPoint();

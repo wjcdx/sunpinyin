@@ -4,6 +4,8 @@
 #include "pinyin/input/syllable.h"
 #include "common/input/segment/syllable_seg.h"
 #include "path.h"
+#include "ime-core/helper/CInputTrieSource.h"
+#include "common/lexicon/trie.h"
 
 struct TXhSyllableSegment : TSyllableSegment {
 
@@ -13,6 +15,14 @@ struct TXhSyllableSegment : TSyllableSegment {
         : TSyllableSegment(syllable, start, length),
 		m_FwdStrokeNum(1), m_NumMet(false)
     {
+		TrieBranch branch;
+		PathNode node(NULL,
+				(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
+				PathNode::JUSTNOW);
+		Path path(node);
+		branch.m_Path = path;
+		branch.newAdded = false;
+		m_TrieBranches.push_back(branch);
 	}
 	
 	void

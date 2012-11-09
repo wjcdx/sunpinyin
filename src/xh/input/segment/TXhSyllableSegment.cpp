@@ -36,11 +36,11 @@ TXhSyllableSegment::_forwardNumber(unsigned n)
 void
 TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 {
-    std::list<TrieBranch>::iterator itn, it = m_TrieBranches.begin();
+    std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
-	for (itn = it++; it != ite; it = itn, itn++) {
-		if(!it->newAdded && _forwardBranch(*it, syllable)) {
+	for (it = itn, itn++; it != ite; it = itn, itn++) {
+		if(!it->newAdded && !_forwardBranch(*it, syllable)) {
 			m_TrieBranches.erase(it);
 		}
 	}
