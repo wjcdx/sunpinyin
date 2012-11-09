@@ -4,6 +4,35 @@
 #include "pinyin_seg.h"
 #include "quanpin_trie.h"
 
+void
+erase_segs(TSegmentVec& segs,
+    TSegmentVec::iterator itb,
+    TSegmentVec::iterator ite)
+{
+    TSegmentVec::iterator it = itb;
+    //[itb, ite)
+    for (; it < ite; it++) {
+        delete (*it);
+    }
+
+    segs.erase(itb, ite);
+}
+
+void
+erase_seg(TSegmentVec& segs, TSegmentVec::iterator it)
+{
+    TSegmentVec::iterator ite = segs.end();
+    if (it < ite) {
+        erase_segs(segs, it, it+1);
+    }
+}
+
+void
+erase_segs(TSegmentVec& segs)
+{
+    erase_segs(segs, segs.begin(), segs.end());
+}
+
 const char *
 CGetCorrectionPairOp::operator ()(std::string& pystr, unsigned& matched_len)
 {
@@ -59,7 +88,7 @@ CGetFuzzySegmentsOp::_initMaps()
 
 unsigned
 CGetFuzzySegmentsOp::_invalidateSegments(TSegmentVec& fuzzy_segs,
-                                         TSegment& seg)
+                                         TSegment *seg)
 {
     unsigned invalidatedFrom = UINT_MAX;
 
@@ -67,14 +96,14 @@ CGetFuzzySegmentsOp::_invalidateSegments(TSegmentVec& fuzzy_segs,
     TSegmentVec::reverse_iterator ite = fuzzy_segs.rend();
 
     for (; it != ite; it += 2) {
-        TSegment& seg1 = *(it + 1);
-        TSegment& seg2 = *it;
+        TSegment *seg1 = *(it + 1);
+        TSegment *seg2 = *it;
 
-        unsigned r = seg2.m_start + seg2.m_len;
-        if (r <= seg.m_start)
+        unsigned r = seg2->m_start + seg2->m_len;
+        if (r <= seg->m_start)
             break;
 
-        invalidatedFrom = seg1.m_start;
+        invalidatedFrom = seg1->m_start;
     }
 
     fuzzy_segs.erase(it.base(), fuzzy_segs.end());
@@ -87,11 +116,11 @@ CGetFuzzySegmentsOp::operator ()(TSegmentVec& segs,
                                  TSegmentVec& fuzzy_segs,
                                  wstring& input)
 {
-    TSegment&  seg = segs.back();
+    TSegment *seg = segs.back();
     unsigned invalidatedFrom = _invalidateSegments(fuzzy_segs, seg);
 
     unsigned updatedFrom = UINT_MAX;
-    TSyllable syl = (TSyllable)seg.m_syllables[0];
+    TSyllable syl = (TSyllable)seg->m_syllables[0];
 
     if (m_bInnerFuzzyEnabled) { // xian -> xian, xi'an
         CInnerFuzzyFinalMap::iterator it = m_fuzzyFinalMap.find(syl.final);
@@ -100,8 +129,8 @@ CGetFuzzySegmentsOp::operator ()(TSegmentVec& segs,
             unsigned an_syl = it->second.first;
             unsigned an_len = it->second.second;
 
-            unsigned xi_len = seg.m_len - an_len;
-            wstring wstr = input.substr(seg.m_start, xi_len);
+            unsigned xi_len = seg->m_len - an_len;
+            wstring wstr = input.substr(seg->m_start, xi_len);
 
 #ifndef _RW_STD_STL
             std::string xi_str(wstr.begin(), wstr.end());
@@ -116,46 +145,46 @@ CGetFuzzySegmentsOp::operator ()(TSegmentVec& segs,
             if (0 == xi_syl)
                 goto RETURN;
 
-            TPySyllableSegment xi = *(TPySyllableSegment *)(&segs.back());
-            xi.m_len = xi_len;
-            xi.m_syllables[0] = xi_syl;
+            TPySyllableSegment *xi = (TPySyllableSegment *)(segs.back());
+            xi->m_len = xi_len;
+            xi->m_syllables[0] = xi_syl;
 
-            TPySyllableSegment an = *(TPySyllableSegment *)(&segs.back());
-            an.m_len = an_len;
-            an.m_start += xi_len;
-            an.m_syllables[0] = an_syl;
-            an.m_inner_fuzzy = true;
+            TPySyllableSegment *an = (TPySyllableSegment *)(segs.back());
+            an->m_len = an_len;
+            an->m_start += xi_len;
+            an->m_syllables[0] = an_syl;
+            an->m_inner_fuzzy = true;
 
             fuzzy_segs.push_back(xi);
             fuzzy_segs.push_back(an);
 
-            updatedFrom = xi.m_start;
+            updatedFrom = xi->m_start;
             goto RETURN;
         }
     }
 
     if (segs.size() >= 2) { // fangan -> fang'an, fan'gan
-        TSegment& pre_seg = *(segs.end() - 2);
+        TSegment *pre_seg = *(segs.end() - 2);
 
         CFuzzySyllableMap::iterator pre_it = m_fuzzyPreMap.find(
-            pre_seg.m_syllables[0]);
+            pre_seg->m_syllables[0]);
         CFuzzySyllableMap::iterator it = m_fuzzyProMap.find(syl);
 
         if (pre_it != m_fuzzyPreMap.end() && it != m_fuzzyProMap.end() &&
             pre_it->second.first == it->second.first) {
-            TSegment fang = segs[segs.size() - 2];
-            fang.m_len++;
-            fang.m_syllables[0] = pre_it->second.second;
+            TSegment *fang = segs[segs.size() - 2];
+            fang->m_len++;
+            fang->m_syllables[0] = pre_it->second.second;
 
-            TSegment an = segs.back();
-            an.m_start++;
-            an.m_len--;
-            an.m_syllables[0] = it->second.second;
+            TSegment *an = segs.back();
+            an->m_start++;
+            an->m_len--;
+            an->m_syllables[0] = it->second.second;
 
             fuzzy_segs.push_back(fang);
             fuzzy_segs.push_back(an);
 
-            updatedFrom = fang.m_start;
+            updatedFrom = fang->m_start;
             goto RETURN;
         }
     }
@@ -174,6 +203,11 @@ CQuanpinSegmentor::CQuanpinSegmentor ()
       m_updatedFrom(0)
 {
     m_segs.reserve(32);
+}
+
+CQuanpinSegmentor::~CQuanpinSegmentor ()
+{
+    erase_segs(m_segs);
 }
 
 bool
@@ -220,7 +254,7 @@ CQuanpinSegmentor::push(unsigned ch)
             } else {
                 if (l != strlen(v)) {
                     // e.g. uen -> un
-                    m_segs.back().m_len += l - strlen(v);
+                    m_segs.back()->m_len += l - strlen(v);
                     m_pystr.resize(m_inputBuf.length());
                 }
                 std::copy(m_inputBuf.end() - l, m_inputBuf.end(),
@@ -245,8 +279,9 @@ CQuanpinSegmentor::pop()
     m_inputBuf.resize(size - 1);
     m_pystr.resize(size - 1);
 
-    unsigned l = m_segs.back().m_len;
-    m_segs.pop_back();
+    unsigned l = m_segs.back()->m_len;
+    //m_segs.pop_back();
+    erase_seg(m_segs, m_segs.end()-1);
 
     if (l == 1)
         return m_updatedFrom = size - 1;
@@ -270,7 +305,7 @@ CQuanpinSegmentor::insertAt(unsigned idx, unsigned ch)
 
     std::string new_pystr = m_pystr.substr(i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr);
 
@@ -289,7 +324,7 @@ CQuanpinSegmentor::deleteAt(unsigned idx, bool backward)
 
     std::string new_pystr = m_pystr.substr(i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr);
 
@@ -312,7 +347,7 @@ CQuanpinSegmentor::_clear(unsigned from)
 
     std::string new_pystr = m_pystr.substr(i, from - i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr, from);
 
@@ -330,10 +365,10 @@ CQuanpinSegmentor::_locateSegment(unsigned idx,
     TSegmentVec::iterator ite = m_segs.end();
 
     for (; it != ite; ++it) {
-        if (strIdx + (*it).m_len > idx)
+        if (strIdx + (*it)->m_len > idx)
             break;
 
-        strIdx += (*it).m_len;
+        strIdx += (*it)->m_len;
         segIdx += 1;
     }
 }
@@ -357,7 +392,7 @@ CQuanpinSegmentor::_push(unsigned ch)
         } else {
             new_seg = new TStringSegment(ch, ret, 1);
         }
-        m_segs.push_back(*new_seg);
+        m_segs.push_back(new_seg);
 
     } else if (l == 1) { // possible a new segment
         int last_idx = m_pystr.size() - 2;
@@ -368,10 +403,10 @@ CQuanpinSegmentor::_push(unsigned ch)
             unsigned l;
             int v = m_pytrie.match_longest(m_pystr.rbegin(), m_pystr.rend(), l);
 
-            TSegment &last_seg = m_segs.back();
-            if (l == (unsigned) last_seg.m_len + 1) {
-                last_seg.m_len += 1;
-                last_seg.m_syllables[0] = v;
+            TSegment *last_seg = m_segs.back();
+            if (l == (unsigned) last_seg->m_len + 1) {
+                last_seg->m_len += 1;
+                last_seg->m_syllables[0] = v;
                 ret = m_pystr.size() - l;
                 goto RETURN;
             }
@@ -382,17 +417,17 @@ CQuanpinSegmentor::_push(unsigned ch)
 
         // push the new 1-length segment
         ret = m_pystr.size() - 1;
-        m_segs.push_back(TPySyllableSegment(v, ret, 1));
-    } else if (l == (unsigned) m_segs.back().m_len + 1) {
+        m_segs.push_back(new TPySyllableSegment(v, ret, 1));
+    } else if (l == (unsigned) m_segs.back()->m_len + 1) {
         // current segment is extensible, e.g., [xia] + n -> [xian]
-        TSegment &last_seg = m_segs.back();
-        last_seg.m_len += 1;
-        last_seg.m_syllables[0] = v;
+        TSegment *last_seg = m_segs.back();
+        last_seg->m_len += 1;
+        last_seg->m_syllables[0] = v;
         ret = m_pystr.size() - l;
     } else {  // other cases
-        TSegment &last_seg = m_segs.back();
-        int i = 0, isum = last_seg.m_len + 1, lsum = l;
-        TSegmentVec new_segs(1, TPySyllableSegment(v, m_pystr.size() - l, l));
+        TSegment *last_seg = m_segs.back();
+        int i = 0, isum = last_seg->m_len + 1, lsum = l;
+        TSegmentVec new_segs(1, new TPySyllableSegment(v, m_pystr.size() - l, l));
 
         // e.g., [zh] [o] [n] + g -> [zhonG],
         if (isum < lsum) {
@@ -404,17 +439,17 @@ CQuanpinSegmentor::_push(unsigned ch)
             if (lsum < isum) { // e.g., [die] + r -> [di] [er]
                 v = m_pytrie.match_longest(
                     m_pystr.rbegin() + lsum, m_pystr.rend(), l);
-                TSegment &last_seg = new_segs.back();
-                new_segs.push_back(TPySyllableSegment(v, last_seg.m_start - l, l));
+                TSegment *last_seg = new_segs.back();
+                new_segs.push_back(new TPySyllableSegment(v, last_seg->m_start - l, l));
                 _addFuzzySyllables(new_segs.back());
                 lsum += l;
             } else {
                 i += 1;
-                isum += (m_segs.rbegin() + i)->m_len;
+                isum += (*(m_segs.rbegin() + i))->m_len;
             }
         }
 
-        m_segs.erase(m_segs.end() - (i + 1), m_segs.end());
+        erase_segs(m_segs, m_segs.end() - (i + 1), m_segs.end());
         std::copy(new_segs.rbegin(), new_segs.rend(), back_inserter(m_segs));
         ret = m_pystr.size() - lsum;
     }
@@ -427,7 +462,7 @@ RETURN:;
                      (*m_pGetFuzzySegmentsOp)(m_segs, m_fuzzy_segs, m_inputBuf));
 
     if (m_pGetFuzzySyllablesOp && m_pGetFuzzySyllablesOp->isEnabled()) {
-        if (m_segs.back().m_type == TSegment::SYLLABLE)
+        if (m_segs.back()->m_type == TSegment::SYLLABLE)
             _addFuzzySyllables(m_segs.back());
 
         if (m_fuzzy_segs.size()) {
@@ -440,20 +475,20 @@ RETURN:;
 }
 
 void
-CQuanpinSegmentor::_addFuzzySyllables(TSegment& seg)
+CQuanpinSegmentor::_addFuzzySyllables(TSegment *seg)
 {
-    assert(seg.m_type == TSegment::SYLLABLE);
+    assert(seg->m_type == TSegment::SYLLABLE);
 
-    TPySyllableSegment &pyseg = *(TPySyllableSegment *)(&seg);
+    TPySyllableSegment *pyseg = (TPySyllableSegment *)(seg);
 
-    pyseg.m_fuzzy_syllables.clear();
+    pyseg->m_fuzzy_syllables.clear();
 
-    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(pyseg.m_syllables.front());
+    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(pyseg->m_syllables.front());
     CSyllables::const_iterator it = fuzzy_set.begin();
     CSyllables::const_iterator ite = fuzzy_set.end();
 
     for (; it != ite; ++it)
-        pyseg.m_fuzzy_syllables.push_back(*it);
+        pyseg->m_fuzzy_syllables.push_back(*it);
 }
 
 unsigned

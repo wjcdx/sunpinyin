@@ -52,7 +52,7 @@ public:
 private:
     void        _initMaps();
     unsigned    _invalidateSegments(TSegmentVec&,
-                                    TSegment&);
+                                    TSegment*);
 
     bool m_bEnabled;
     bool m_bInnerFuzzyEnabled;
@@ -65,6 +65,7 @@ class CQuanpinSegmentor : public ISegmentor
 {
 public:
     CQuanpinSegmentor ();
+    ~CQuanpinSegmentor ();
 
     virtual TSegmentVec& getSegments(bool req_aux_segs){
         if (req_aux_segs && m_pGetFuzzySegmentsOp &&
@@ -103,7 +104,7 @@ public:
 private:
     inline unsigned _push(unsigned ch);
     inline unsigned _clear(unsigned from);
-    inline void _addFuzzySyllables(TSegment &seg);
+    inline void _addFuzzySyllables(TSegment *seg);
     inline unsigned _updateWith(const std::string& new_pystr,
                                 unsigned from = UINT_MAX);
     inline void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);

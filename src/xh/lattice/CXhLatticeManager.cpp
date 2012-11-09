@@ -17,8 +17,8 @@ CXhLatticeManager::buildLexiconStates(TSegmentVec &segments,
 
     unsigned i, j = 0;
     for (; it != ite; ++it) {
-        i = it->m_start;
-        j = i + it->m_len;
+        i = (*it)->m_start;
+        j = i + (*it)->m_len;
 
         if (i < rebuildFrom - 1)
             continue;
@@ -26,7 +26,7 @@ CXhLatticeManager::buildLexiconStates(TSegmentVec &segments,
         if (j >= getLatticesCapacity())
             break;
 
-		(*it).forward(i, j);
+		(*it)->forward(i, j);
 		CFullCharManager::m_bOmitPunct = false;
     }
 

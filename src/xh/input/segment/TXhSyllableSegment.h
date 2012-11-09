@@ -12,7 +12,8 @@ struct TXhSyllableSegment : TSyllableSegment {
               unsigned length)
         : TSyllableSegment(syllable, start, length),
 		m_FwdStrokeNum(1), m_NumMet(false)
-    {}
+    {
+	}
 	
 	void
 	forward(unsigned i, unsigned j);

@@ -35,7 +35,7 @@ public:
 };
 
 // it requires the segments are sorted by its m_start field
-typedef std::vector<TSegment>  TSegmentVec;
+typedef std::vector<TSegment *>  TSegmentVec;
 
 #endif
 

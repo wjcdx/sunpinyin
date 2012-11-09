@@ -3,7 +3,7 @@ all:
 	scons --prefix=/usr --enable-plugins
 
 install:
-	scons --prefix=/usr install
+	scons --prefix=/usr --enable-plugins install
 
 clean:
 	scons --prefix=/usr --enable-plugins -c

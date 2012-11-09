@@ -126,7 +126,7 @@ public:
             TSegmentVec::const_iterator ite = segments.end();
             m_segPath[0].push_back(0);
             for (; it != ite; ++it)
-                m_segPath[0].push_back(it->m_start + it->m_len);
+                m_segPath[0].push_back((*it)->m_start + (*it)->m_len);
         }
         return m_segPath[0];
     }

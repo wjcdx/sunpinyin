@@ -13,6 +13,7 @@ class CXhSegmentor : public ISegmentor
 {
 public:
     CXhSegmentor ();
+    ~CXhSegmentor();
 
     virtual TSegmentVec& getSegments(bool req_aux_segs){
         return m_segs;

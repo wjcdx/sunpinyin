@@ -1,0 +1,4 @@
+dict/*
+pinyin/input/pinyin_info.h
+pinyin/input/quanpin_trie.h
+sunpinyin-dictgen.mk

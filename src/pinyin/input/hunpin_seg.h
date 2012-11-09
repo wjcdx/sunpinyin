@@ -27,6 +27,7 @@ class CHunpinSegmentor : public ISegmentor
 {
 public:
     CHunpinSegmentor (EShuangpinType shpType);
+    ~CHunpinSegmentor ();
 
     virtual TSegmentVec& getSegments(bool) { return m_segs; }
 
@@ -54,7 +55,7 @@ public:
 private:
     inline unsigned _push(unsigned ch);
     inline unsigned _clear(unsigned from);
-    inline void _addFuzzySyllables(TSegment &seg);
+    inline void _addFuzzySyllables(TSegment *seg);
     inline unsigned _updateWith(const std::string& new_pystr,
                                 unsigned from = UINT_MAX);
     inline void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);

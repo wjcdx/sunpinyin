@@ -3,10 +3,18 @@
 #include <algorithm>
 #include "xh_seg.h"
 
+extern void
+erase_segs(TSegmentVec& segs);
+
 CXhSegmentor::CXhSegmentor ()
     : m_updatedFrom(0)
 {
     m_segs.reserve(32);
+}
+
+CXhSegmentor::~CXhSegmentor ()
+{
+    erase_segs(m_segs);
 }
 
 bool
@@ -46,7 +54,7 @@ CXhSegmentor::pop()
     m_inputBuf.resize(size - 1);
     m_inputstr.resize(size - 1);
 
-    unsigned l = m_segs.back().m_len;
+    unsigned l = m_segs.back()->m_len;
     m_segs.pop_back();
 
     if (l == 1)
@@ -131,10 +139,10 @@ CXhSegmentor::_locateSegment(unsigned idx,
     TSegmentVec::iterator ite = m_segs.end();
 
     for (; it != ite; ++it) {
-        if (strIdx + (*it).m_len > idx)
+        if (strIdx + (*it)->m_len > idx)
             break;
 
-        strIdx += (*it).m_len;
+        strIdx += (*it)->m_len;
         segIdx += 1;
     }
 }
@@ -146,17 +154,17 @@ CXhSegmentor::_push(unsigned ch)
     m_inputstr.push_back(ch);
 
     if (m_trie.isStroke(ch)) {
-        TSegment &last_seg = m_segs.back();
+        TSegment *last_seg = m_segs.back();
 
-        last_seg.m_len += 1;
-        last_seg.m_syllables.push_back(ch);
+        last_seg->m_len += 1;
+        last_seg->m_syllables.push_back(ch);
 
         ret = m_inputstr.size() - 1;
 
     } else if (m_trie.isPattern(ch)) {
 
         ret = m_inputstr.size() - 1;
-        m_segs.push_back(TXhSyllableSegment(ch, ret, 1));
+        m_segs.push_back(new TXhSyllableSegment(ch, ret, 1));
 
     } else {
 
@@ -167,8 +175,7 @@ CXhSegmentor::_push(unsigned ch)
         } else {
             new_seg = new TStringSegment(ch, ret, 1);
         }
-        m_segs.push_back(*new_seg);
-        delete new_seg;
+        m_segs.push_back(new_seg);
     }
 
     return ret;

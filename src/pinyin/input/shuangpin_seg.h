@@ -11,6 +11,7 @@ class CShuangpinSegmentor : public ISegmentor
 {
 public:
     CShuangpinSegmentor (EShuangpinType shpType);
+    ~CShuangpinSegmentor ();
 
     virtual TSegmentVec& getSegments(bool) { return m_segs; }
     virtual const wstring& getInputBuffer() { return m_inputBuf; }
@@ -34,7 +35,7 @@ private:
     int _encode(const char* buf, char ch, bool isComplete);
     void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);
 
-    inline void _addFuzzySyllables(TSegment &seg);
+    inline void _addFuzzySyllables(TSegment *seg);
 
     static CShuangpinData s_shpData;
     std::string m_pystr;

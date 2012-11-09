@@ -17,6 +17,17 @@
 
 CShuangpinData CHunpinSegmentor::s_shpData;
 
+extern void
+erase_segs(TSegmentVec& segs,
+    TSegmentVec::iterator itb,
+    TSegmentVec::iterator ite);
+
+extern void
+erase_seg(TSegmentVec& segs, TSegmentVec::iterator it);
+
+extern void
+erase_segs(TSegmentVec& segs);
+
 CHunpinSegmentor::CHunpinSegmentor (EShuangpinType shpType)
     : m_pGetFuzzySyllablesOp(NULL),
       m_pytrie(base, check, value, sizeof(base) / sizeof(*base)),
@@ -26,6 +37,10 @@ CHunpinSegmentor::CHunpinSegmentor (EShuangpinType shpType)
     s_shpData.setShuangpinType(shpType);
 }
 
+CHunpinSegmentor::~CHunpinSegmentor ()
+{
+    erase_segs(m_segs);
+}
 
 int
 CHunpinSegmentor::_encode(const char* buf, int ret)
@@ -40,18 +55,18 @@ CHunpinSegmentor::_encode(const char* buf, int ret)
     CMappedYin::const_iterator iter = syls.begin();
     CMappedYin::const_iterator iter_end = syls.end();
 
-    m_segs.push_back(TPySyllableSegment(0, 0, 1));
+    m_segs.push_back(new TPySyllableSegment(0, 0, 1));
     
-    TSegment &s = m_segs.back();
-    s.m_len = 2;
-    s.m_start = ret;
-    s.m_syllables.clear();
+    TSegment *s = m_segs.back();
+    s->m_len = 2;
+    s->m_start = ret;
+    s->m_syllables.clear();
 
     for (; iter != iter_end; iter++) {
-        s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
+        s->m_syllables.push_back(s_shpData.encode(iter->c_str()));
     }
 
-    return s.m_start;
+    return s->m_start;
 }
 
 int
@@ -66,16 +81,16 @@ CHunpinSegmentor::_encode(const char* buf)
     CMappedYin::const_iterator iter = syls.begin();
     CMappedYin::const_iterator iter_end = syls.end();
 
-    TSegment &s = m_segs.back();
-    s.m_len = 2;
-    s.m_start = m_pystr.size() - s.m_len;
-    s.m_syllables.clear();
-    s.m_type = TSegment::SYLLABLE;
+    TSegment *s = m_segs.back();
+    s->m_len = 2;
+    s->m_start = m_pystr.size() - s->m_len;
+    s->m_syllables.clear();
+    s->m_type = TSegment::SYLLABLE;
     for (; iter != iter_end; iter++) {
-        s.m_syllables.push_back(s_shpData.encode(iter->c_str()));
+        s->m_syllables.push_back(s_shpData.encode(iter->c_str()));
     }
 
-    return s.m_start;
+    return s->m_start;
 }
 
 bool
@@ -118,8 +133,9 @@ CHunpinSegmentor::pop()
     m_inputBuf.resize(size - 1);
     m_pystr.resize(size - 1);
 
-    unsigned l = m_segs.back().m_len;
-    m_segs.pop_back();
+    unsigned l = m_segs.back()->m_len;
+    //m_segs.pop_back();
+    erase_seg(m_segs, m_segs.end() - 1);
 
     if (l == 1)
         return m_updatedFrom = size - 1;
@@ -143,7 +159,7 @@ CHunpinSegmentor::insertAt(unsigned idx, unsigned ch)
 
     std::string new_pystr = m_pystr.substr(i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr);
 
@@ -162,7 +178,7 @@ CHunpinSegmentor::deleteAt(unsigned idx, bool backward)
 
     std::string new_pystr = m_pystr.substr(i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr);
 
@@ -185,7 +201,7 @@ CHunpinSegmentor::_clear(unsigned from)
 
     std::string new_pystr = m_pystr.substr(i, from - i);
     m_pystr.resize(i);
-    m_segs.erase(m_segs.begin() + j, m_segs.end());
+    erase_segs(m_segs, m_segs.begin() + j, m_segs.end());
 
     m_updatedFrom = _updateWith(new_pystr, from);
 
@@ -203,10 +219,10 @@ CHunpinSegmentor::_locateSegment(unsigned idx,
     TSegmentVec::iterator ite = m_segs.end();
 
     for (; it != ite; ++it) {
-        if (strIdx + (*it).m_len > idx)
+        if (strIdx + (*it)->m_len > idx)
             break;
 
-        strIdx += (*it).m_len;
+        strIdx += (*it)->m_len;
         segIdx += 1;
     }
 }
@@ -223,7 +239,7 @@ CHunpinSegmentor::_push(unsigned ch)
     unsigned syllableCount = 0;
     unsigned stringCount = 0;
     for (; ite != m_segs.begin() - 1; ite--) {
-        stringCount += (*ite).m_len;
+        stringCount += (*ite)->m_len;
         syllableCount++;
         if (stringCount > maxStringCount) {
             syllableCount--;
@@ -239,21 +255,21 @@ CHunpinSegmentor::_push(unsigned ch)
         unsigned tmpl;
         unsigned v;
         if (index != 0) {
-            if ((strlen - (*it).m_start) == 2) {
+            if ((strlen - (*it)->m_start) == 2) {
                 char buf[4];
-                sprintf(buf, "%c%c", m_pystr[(*it).m_start],
-                        m_pystr[(*it).m_start + 1]);
+                sprintf(buf, "%c%c", m_pystr[(*it)->m_start],
+                        m_pystr[(*it)->m_start + 1]);
                 int startFrom = _encode(buf);
                 if (startFrom >= 0) break;
             }
 
             v = m_pytrie.match_longest(m_pystr.rbegin(),
                                        m_pystr.rbegin() + strlen -
-                                       (*it).m_start, tmpl);
+                                       (*it)->m_start, tmpl);
 
-            if (tmpl == (strlen - (*it).m_start)) {
-                TSegmentVec new_segs(1, TPySyllableSegment(v, (*it).m_start, tmpl));
-                m_segs.erase(m_segs.end() - index, m_segs.end());
+            if (tmpl == (strlen - (*it)->m_start)) {
+                TSegmentVec new_segs(1, new TPySyllableSegment(v, (*it)->m_start, tmpl));
+                erase_segs(m_segs, m_segs.end() - index, m_segs.end());
                 std::copy(new_segs.rbegin(), new_segs.rend(),
                           back_inserter(m_segs));
 
@@ -265,42 +281,42 @@ CHunpinSegmentor::_push(unsigned ch)
             if (tmpl == 0) {
                 ret = m_pystr.size() - 1;
                 if (ch == '\'' && m_inputBuf.size() > 1) {
-                    m_segs.push_back(TSeperatorSegment(ch, ret, 1));
+                    m_segs.push_back(new TSeperatorSegment(ch, ret, 1));
                 } else if (islower(ch)) {
-                    m_segs.push_back(TInvalidSegment(ch, ret, 1));
+                    m_segs.push_back(new TInvalidSegment(ch, ret, 1));
                 } else {
-                    m_segs.push_back(TStringSegment(ch, ret, 1));
+                    m_segs.push_back(new TStringSegment(ch, ret, 1));
                 }
             } else {
                 ret = m_pystr.size() - 1;
-                m_segs.push_back(TPySyllableSegment(v, ret, 1));
+                m_segs.push_back(new TPySyllableSegment(v, ret, 1));
             }
         }
     }
 
-    TSegment &last_seg = m_segs.back();
+    TSegment *last_seg = m_segs.back();
     if (m_pGetFuzzySyllablesOp && m_pGetFuzzySyllablesOp->isEnabled())
-        if (m_segs.back().m_type == TSegment::SYLLABLE)
+        if (m_segs.back()->m_type == TSegment::SYLLABLE)
             _addFuzzySyllables(last_seg);
 
-    return last_seg.m_start;
+    return last_seg->m_start;
 }
 
 void
-CHunpinSegmentor::_addFuzzySyllables(TSegment& seg)
+CHunpinSegmentor::_addFuzzySyllables(TSegment *seg)
 {
-    assert(seg.m_type == TSegment::SYLLABLE);
+    assert(seg->m_type == TSegment::SYLLABLE);
 
-    TPySyllableSegment &pyseg = *(TPySyllableSegment *)(&seg);
+    TPySyllableSegment *pyseg = (TPySyllableSegment *)(seg);
 
-    pyseg.m_fuzzy_syllables.clear();
+    pyseg->m_fuzzy_syllables.clear();
 
-    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(pyseg.m_syllables.front());
+    CSyllables fuzzy_set = (*m_pGetFuzzySyllablesOp)(pyseg->m_syllables.front());
     CSyllables::const_iterator it = fuzzy_set.begin();
     CSyllables::const_iterator ite = fuzzy_set.end();
 
     for (; it != ite; ++it)
-        pyseg.m_fuzzy_syllables.push_back(*it);
+        pyseg->m_fuzzy_syllables.push_back(*it);
 }
 
 unsigned
