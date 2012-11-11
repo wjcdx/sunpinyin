@@ -60,13 +60,14 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 		//newAdded maybe not needed
 		//because newAdded is behind
 		//ite, which is not changed
-		//if (!it->newAdded) {
+		if (!it->newAdded) {
 			if (!_forwardBranch(*it, syllable)) {
-				m_TrieBranches.erase(it);
+				//m_TrieBranches.erase(it);
+				it->newAdded = true;
 			}
 		//} else {
 		//	it->newAdded = false;
-		//}
+		}
 	}
 }
 
@@ -98,7 +99,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 
 		b.addPathInfo(branch.getPath());
 		b.addPathInfo(*it);
-		//b.newAdded = true;
+		b.newAdded = false;
 		//
 		b.getPath().printNodes();
 		b.getPath().printNextMap();
