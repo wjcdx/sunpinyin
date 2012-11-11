@@ -5,11 +5,11 @@
 #include "checkpoint.h"
 
 void
-Path::printNodes(std::string prefix)
+Path::printNodes()
 {
 	PathNodeList::iterator nit = m_Nodes.begin();
 	PathNodeList::iterator nite = m_Nodes.end();
-	std::cout << prefix << "\tNodes:\t";
+	std::cout << "\tNodes:\t";
 	fflush(stdout);
 	for (; nit != nite; nit++) {
 		if ((*nit).m_Trans) {
@@ -22,9 +22,9 @@ Path::printNodes(std::string prefix)
 }
 
 void
-Path::printNextMap(std::string prefix)
+Path::printNextMap()
 {
-	std::cout << prefix << "\tNextMap:\t";
+	std::cout << "\tNextMap:\t";
 	fflush(stdout);
 	PathNode *nxt = m_Now;
 	while (nxt) {
@@ -55,8 +55,8 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 			std::cout << (char)nxt->m_Trans->m_Unit << std::endl;
 		}
 		fflush(stdout);
-		printNodes("Path::forward");
-		printNextMap("Path::forward");
+		printNodes();
+		printNextMap();
 
 		PathNode *cp = next(syllable);
 		if (cp == NULL || cp->isEnd()) {

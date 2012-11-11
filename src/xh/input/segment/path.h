@@ -112,10 +112,10 @@ public:
 	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
 
 	void
-	printNodes(std::string prefix);
+	printNodes();
 	
 	void
-	printNextMap(std::string prefix);
+	printNextMap();
 private:
 
 	void add_first_node(PathNode &node)

@@ -77,8 +77,8 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	bool suc = false;
 	PathList fwdPaths;
 	
-	branch.getPath().printNodes("Preforward");
-	branch.getPath().printNextMap("Preforward");
+	branch.getPath().printNodes();
+	branch.getPath().printNextMap();
 
 	suc = branch.forward(syllable, m_FwdStrokeNum, m_NumMet, fwdPaths);
 	
@@ -100,15 +100,15 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		b.addPathInfo(*it);
 		//b.newAdded = true;
 		//
-		b.getPath().printNodes("AfterInsert");
-		b.getPath().printNextMap("AfterInsert");
+		b.getPath().printNodes();
+		b.getPath().printNextMap();
 
 		m_TrieBranches.push_back(b);
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
-	branch.getPath().printNodes("AfterInsert");
-	branch.getPath().printNextMap("AfterInsert");
+	branch.getPath().printNodes();
+	branch.getPath().printNextMap();
 	return true;
 }
 
