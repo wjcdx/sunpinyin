@@ -72,18 +72,24 @@ public:
 	}
 
 	PathNode *next(PathNode *node) {
-		return m_NextMap[node];
+		if (m_NextMap.find(node) != m_NextMap.end())
+			return m_NextMap[node];
+		return NULL;
 	}
 
 	PathNode *next(TSyllable s) {
-		PathNode *nxt = m_NextMap[m_Now];
-		if (nxt && nxt->transFrom(s)) {
-			return nxt;
+		if (m_NextMap.find(m_Now) != m_NextMap.end()) {
+			PathNode *nxt = m_NextMap[m_Now];
+			if (nxt->transFrom(s)) {
+				return nxt;
+			}
 		}
 		return NULL;
 	}
 
 	void forward() {
+		if (m_NextMap.find(m_Now) == m_NextMap.end())
+			return;
 		PathNode *nxt = m_NextMap[m_Now];
 		m_Now->flag = PathNode::HISTORY;
 		nxt->flag = PathNode::JUSTNOW;
@@ -116,6 +122,9 @@ public:
 	
 	void
 	printNextMap();
+	
+	void
+	rebuildNextMap();
 private:
 
 	void add_first_node(PathNode &node)

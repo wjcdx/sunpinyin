@@ -37,13 +37,33 @@ Path::printNextMap()
 		}
 	}
 	std::cout << std::endl;
+	std::cout << std::endl;
 	fflush(stdout);
+}
+
+void
+Path::rebuildNextMap()
+{
+	m_NextMap.clear();
+	
+	PathNodeList::iterator it, itn = m_Nodes.begin();
+	PathNodeList::iterator ite = m_Nodes.end();
+	
+	for (it = itn, itn++; itn != ite; it = itn, itn++) {
+		if ((*it).flag == PathNode::JUSTNOW) {
+			m_Now = &(*it);
+		}
+
+		m_NextMap[&(*it)] = &(*itn);
+	}
 }
 
 bool
 Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
+
+	rebuildNextMap();
 
 	if (pathInfoFull) {
 		std::cout << "Find " << (char)syllable << " in:" << std::endl;
@@ -52,8 +72,9 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 		std::cout << "next is: ";
 		PathNode *nxt = next(m_Now);
 		if (nxt) {
-			std::cout << (char)nxt->m_Trans->m_Unit << std::endl;
+			std::cout << (char)nxt->m_Trans->m_Unit;
 		}
+		std::cout << std::endl;
 		fflush(stdout);
 		printNodes();
 		printNextMap();

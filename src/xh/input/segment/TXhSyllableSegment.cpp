@@ -56,6 +56,12 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
+	for (it = itn; it != ite; it++) {
+		(*it).getPath().printNodes();
+		(*it).getPath().rebuildNextMap();
+		(*it).getPath().printNextMap();
+	}
+
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
 		//newAdded maybe not needed
 		//because newAdded is behind
@@ -77,8 +83,9 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	bool suc = false;
 	PathList fwdPaths;
 	
-	branch.getPath().printNodes();
-	branch.getPath().printNextMap();
+	//branch.getPath().rebuildNextMap();
+	//branch.getPath().printNodes();
+	//branch.getPath().printNextMap();
 
 	suc = branch.forward(syllable, m_FwdStrokeNum, m_NumMet, fwdPaths);
 	
@@ -88,6 +95,8 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	//if (!m_NumMet && m_FwdStrokeNum > 1) {
 	if (!m_NumMet) {
 		m_NumMet = true;
+	} else {
+		return true;
 	}
 
 	PathList::iterator it = fwdPaths.begin();
@@ -100,10 +109,13 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		b.addPathInfo(*it);
 		//b.newAdded = true;
 		//
-		b.getPath().printNodes();
-		b.getPath().printNextMap();
+		//b.getPath().printNodes();
+		//b.getPath().printNextMap();
 
 		m_TrieBranches.push_back(b);
+		TrieBranch &b2 = m_TrieBranches.back();
+		b2.getPath().printNodes();
+		b2.getPath().printNextMap();
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
