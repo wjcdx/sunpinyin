@@ -159,7 +159,8 @@ CXhSegmentor::_push(unsigned ch)
         last_seg->m_len += 1;
         last_seg->m_syllables.push_back(ch);
 
-        ret = m_inputstr.size() - 1;
+        //ret = m_inputstr.size() - 1;
+        ret = last_seg->m_start;
 
     } else if (m_trie.isPattern(ch)) {
 

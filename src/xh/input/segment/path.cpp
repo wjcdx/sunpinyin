@@ -16,15 +16,15 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 		return true;
 	}
 
-	if (num == 1) {
-		suc = m_Now->findNextSubNode(syllable, paths);
-	} else {
+	//if (num == 1) {
+	//	suc = m_Now->findNextSubNode(syllable, paths);
+	//} else {
 		suc = m_Now->findAllSubNode(syllable, num, paths);
 		if (!suc)
 			return false;
 		//add into or remove from paths;
-		suc = checkNumInPaths(paths, syllable, num);
-	}
+		suc = checkNumInPaths(syllable, num, paths);
+	//}
 
 	return suc;
 }
@@ -45,11 +45,14 @@ Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 		return -1;
 	}
 
-	if (len == 1 && count == 1)
-		return 1;
-
 	CheckPointList::iterator it = cpset.begin();
 	CheckPointList::iterator ite = cpset.end();
+
+	if (len == 1 && count == 1) {
+		cphooks.push_back(*it);
+		return 1;
+	}
+
 	CheckPoint &cp = *it;
 	for (cp = *it, it++; it != ite; cp = *it, it++) {
 		if (next(cp.m_PNode) == (*it).m_Start) {
@@ -102,13 +105,11 @@ Path::iterateRepeaters(int count)
 	
 	forwardCheckPoint();
 
-	CheckPointList::iterator itn, it = cpset.begin();
+	CheckPointList::iterator it, itn = cpset.begin();
 	CheckPointList::iterator ite = cpset.end();
-	for (itn = it; it != ite; it = itn, itn++) {
+	for (it = itn, itn++; it != ite; it = itn, itn++) {
 		int c = getSameRepNumber(*it);
-		if (c+1 >= count) {
-			it++;
-		} else {
+		if (c+1 < count) {
 			cpset.erase(it);
 		}
 	}
@@ -118,7 +119,7 @@ void
 Path::findCheckPoints(TSyllable syllable)
 {
 	PathNodeList::iterator it = m_Nodes.begin();
-	PathNodeList::iterator ite = m_Nodes.begin();
+	PathNodeList::iterator ite = m_Nodes.end();
 	for (; it != ite; it++) {
 		if ((*it).flag == PathNode::CHECKPOINT) {
 			CheckPoint cp(&(*it));
@@ -130,6 +131,9 @@ Path::findCheckPoints(TSyllable syllable)
 void
 Path::labelPath(CheckPointList &cphooks)
 {
+	if (cphooks.empty())
+		return;
+
 	CheckPointList::iterator it = cphooks.begin();
 	CheckPointList::iterator ite = cphooks.end();
 
@@ -173,11 +177,12 @@ Path::checkNumInPath(TSyllable syllable, int num)
 }
 
 bool
-Path::checkNumInPaths(PathList paths, TSyllable syllable, int num)
+Path::checkNumInPaths(TSyllable syllable, int num, PathList &paths)
 {
-	PathList::iterator it = paths.begin();
+	PathList::iterator it, itn = paths.begin();
 	PathList::iterator ite = paths.end();
-	for (; it != ite; it++) {
+	for (it = itn, itn++; it != ite; it = itn, itn++) {
+		(*it).initNodeNow();
 		if (!(*it).checkNumInPath(syllable, num)) {
 			paths.erase(it);
 		}

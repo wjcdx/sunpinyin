@@ -9,5 +9,5 @@ clean:
 	scons --prefix=/usr --enable-plugins -c
 
 uninstall:
-	scons --prefix=/usr install
+	scons --prefix=/usr --enable-plugins -c install
 

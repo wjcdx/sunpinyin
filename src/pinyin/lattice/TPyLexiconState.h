@@ -14,18 +14,21 @@
  */
 struct TPyLexiconState : TLexiconState {
     //unsigned m_start                 : 16;
-    unsigned m_num_of_inner_fuzzies  : 14;
-    bool m_bFuzzy                : 1;
-    bool m_bPinyin               : 1;
+    //unsigned m_num_of_inner_fuzzies  : 14;
+    //bool m_bFuzzy                : 1;
+    //bool m_bPinyin               : 1;
 
     TPyLexiconState (unsigned start,
                    const TThreadNode *pnode,
                    CSyllables& syls,
                    std::vector<unsigned>& seg_path,
                    bool fuzzy = false)
-		: TLexiconState(start, pnode, syls, seg_path),
-			m_num_of_inner_fuzzies(0), m_bFuzzy(fuzzy), m_bPinyin(true) 
+		: TLexiconState(start, pnode, syls, seg_path)/*,
+			m_num_of_inner_fuzzies(0), m_bFuzzy(fuzzy), m_bPinyin(true)*/
 	{
+		m_num_of_inner_fuzzies = 0;
+		m_bFuzzy = fuzzy;
+		m_bPinyin = true;
 	}
 
     TPyLexiconState (unsigned start,
@@ -33,16 +36,21 @@ struct TPyLexiconState : TLexiconState {
                    CSyllables &syls,
                    std::vector<unsigned>& seg_path,
                    bool fuzzy = false)
-		: TLexiconState(start, NULL, syls, seg_path),
+		: TLexiconState(start, NULL, syls, seg_path)/*,
 			m_num_of_inner_fuzzies(0),
-			m_bFuzzy(fuzzy), m_bPinyin(true)
+			m_bFuzzy(fuzzy), m_bPinyin(true)*/
 	{
 		m_words = words;
+		m_num_of_inner_fuzzies = 0;
+		m_bFuzzy = fuzzy;
+		m_bPinyin = true;
 	}
 
     TPyLexiconState (unsigned start, unsigned wid)
-    	: TLexiconState(start, wid), m_bPinyin(false)
-	{}
+    	: TLexiconState(start, wid)/*, m_bPinyin(false)*/
+	{
+		m_bPinyin = false;;
+	}
 
     const TWordIdInfo *getWords(unsigned &num);
 

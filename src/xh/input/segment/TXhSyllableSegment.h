@@ -15,20 +15,15 @@ struct TXhSyllableSegment : TSyllableSegment {
         : TSyllableSegment(syllable, start, length),
 		m_FwdStrokeNum(1), m_NumMet(false)
     {
-		TrieBranch branch;
-		PathNode node(NULL,
-				(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
-				PathNode::JUSTNOW);
-		Path path(node);
-		branch.m_Path = path;
-		branch.newAdded = false;
-		m_TrieBranches.push_back(branch);
 	}
 	
 	void
 	forward(unsigned i, unsigned j);
 
 private:
+	void
+	prepare();
+
 	void
 	_forwardSingleSyllable(TSyllable syllable);
 	

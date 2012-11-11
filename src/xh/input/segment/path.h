@@ -11,6 +11,7 @@ private:
 	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
+	PathNode m_NodeWithWord;
 
 public:
 	Path(){};
@@ -58,25 +59,24 @@ public:
 	PathNode *getNow() {
 		return m_Now;
 	}
+
+	void initNodeNow() {
+		if (m_Nodes.empty())
+			return;
+		m_Now = &m_Nodes.front();
+	}
 	
 	PathNodeList &getPathNodes() {
 		return m_Nodes;
 	}
 
 	PathNode *next(PathNode *node) {
-		PathNodeList::iterator it = m_Nodes.begin();
-		PathNodeList::iterator ite = m_Nodes.end();
-		for (; it != ite; it++) {
-			if (*it == *node) {
-				return m_NextMap[&(*it)];
-			}
-		}
-		return NULL;
+		return m_NextMap[node];
 	}
 
 	PathNode *next(TSyllable s) {
 		PathNode *nxt = m_NextMap[m_Now];
-		if (nxt->transFrom(s)) {
+		if (nxt && nxt->transFrom(s)) {
 			return nxt;
 		}
 		return NULL;
@@ -99,6 +99,14 @@ public:
 		return c;
 	}
 
+	void setWordNode(PathNode &node) {
+		m_NodeWithWord = node;
+	}
+	
+	PathNode &getWordNode() {
+		return m_NodeWithWord;
+	}
+
 public:
 	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
 
@@ -118,7 +126,7 @@ private:
 	void findCheckPoints(TSyllable syllable);
 	void labelPath(CheckPointList &cphooks);
 	bool checkNumInPath(TSyllable syllable, int num);
-	bool checkNumInPaths(PathList paths, TSyllable syllable, int num);
+	bool checkNumInPaths(TSyllable syllable, int num, PathList &paths);
 };
 
 typedef std::list<Path> PathList;
@@ -127,6 +135,10 @@ class TrieBranch {
 public:
 	Path m_Path;
 	bool newAdded;
+
+	Path &getPath() {
+		return m_Path;
+	}
 
 	bool forward(TSyllable s, int num, bool numMet, PathList &paths) {
 		return m_Path.forward(s, num, numMet, paths);
@@ -137,6 +149,7 @@ public:
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
+		m_Path.setWordNode(path.getWordNode());
 	}
 };
 

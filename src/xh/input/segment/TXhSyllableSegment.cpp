@@ -4,9 +4,26 @@
 #include "ime-core/lattice/lattice_manager.h"
 #include "TXhSyllableSegment.h"
 
+
+void
+TXhSyllableSegment::prepare()
+{
+	m_TrieBranches.clear();
+	TrieBranch branch;
+	PathNode node(NULL,
+			(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
+			PathNode::JUSTNOW);
+	Path path(node);
+	branch.m_Path = path;
+	//branch.newAdded = false;
+	m_TrieBranches.push_back(branch);
+	m_NumMet = false;
+}
+
 void
 TXhSyllableSegment::forward(unsigned i, unsigned j)
 {
+	prepare();
     std::vector<unsigned>::const_iterator it = m_syllables.begin();
     std::vector<unsigned>::const_iterator ite = m_syllables.end();
 
@@ -40,9 +57,16 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		if(!it->newAdded && !_forwardBranch(*it, syllable)) {
-			m_TrieBranches.erase(it);
-		}
+		//newAdded maybe not needed
+		//because newAdded is behind
+		//ite, which is not changed
+		//if (!it->newAdded) {
+			if (!_forwardBranch(*it, syllable)) {
+				m_TrieBranches.erase(it);
+			}
+		//} else {
+		//	it->newAdded = false;
+		//}
 	}
 }
 
@@ -58,7 +82,8 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	if (!suc)
 		return false;
 
-	if (!m_NumMet && m_FwdStrokeNum > 1) {
+	//if (!m_NumMet && m_FwdStrokeNum > 1) {
+	if (!m_NumMet) {
 		m_NumMet = true;
 	}
 
@@ -69,7 +94,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		TrieBranch b(branch);
 
 		b.addPathInfo(*it);
-		b.newAdded = true;
+		//b.newAdded = true;
 		m_TrieBranches.push_back(b);
 	}
 	Path &p = fwdPaths.front();
@@ -97,14 +122,23 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
     BranchList::iterator it = m_TrieBranches.begin();
     BranchList::iterator ite = m_TrieBranches.end();
 	for (; it != ite; it++) {
+		TXhLexiconState new_lxst = TXhLexiconState(i,
+			(*it).getPath().getWordNode().getTNode(),
+			syls, seg_path);
+		fr.m_lexiconStates.push_back(new_lxst);
+	/*
 		PathNodeList &nodes = (*it).m_Path.getPathNodes();
 
 		PathNodeList::iterator nit = nodes.begin();
 		PathNodeList::iterator nite = nodes.end();
         for (; nit != nite; nit++) {
+			if ((*nit).getTNode()->m_nWordId <= 0) {
+				continue;
+			}
 			TXhLexiconState new_lxst = TXhLexiconState(i, (*nit).getTNode(), syls, seg_path);
 			fr.m_lexiconStates.push_back(new_lxst);
 		}
+	*/
 	}
 }
 

@@ -21,7 +21,9 @@ struct TLexiconState {
 	typedef std::vector<TWordIdInfo> TWordIdInfoVec;
 public:
     virtual const TWordIdInfo *getWords(unsigned &num);
-	virtual const double getWeight() { return 1; }
+	virtual const double getWeight() {
+		return (m_bFuzzy ? 0.5 : 1);
+	}
     virtual void print(std::string prefix) const;
     virtual int getLength() { return m_syls.size(); }
 
@@ -47,7 +49,12 @@ public:
     }
 	
 public:
-	unsigned m_start;
+	//unsigned m_start;
+	unsigned m_start                 : 16;
+    unsigned m_num_of_inner_fuzzies  : 14; 
+    bool m_bFuzzy                : 1;
+    bool m_bPinyin               : 1;
+
 	const TThreadNode *m_pNode;
 
 	CSyllables m_syls;
