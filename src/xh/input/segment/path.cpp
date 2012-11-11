@@ -1,13 +1,63 @@
+#include <iostream>
+#include <stdio.h>
 #include "pathnode.h"
 #include "path.h"
 #include "checkpoint.h"
-	
+
+void
+Path::printNodes(std::string prefix)
+{
+	PathNodeList::iterator nit = m_Nodes.begin();
+	PathNodeList::iterator nite = m_Nodes.end();
+	std::cout << prefix << "\tNodes:\t";
+	fflush(stdout);
+	for (; nit != nite; nit++) {
+		if ((*nit).m_Trans) {
+			std::cout << (char)(*nit).m_Trans->m_Unit << " ";
+			fflush(stdout);
+		}
+	}
+	std::cout << std::endl;
+	fflush(stdout);
+}
+
+void
+Path::printNextMap(std::string prefix)
+{
+	std::cout << prefix << "\tNextMap:\t";
+	fflush(stdout);
+	PathNode *nxt = m_Now;
+	while (nxt) {
+		if (nxt && nxt->m_Trans) {
+			std::cout << (char)nxt->m_Trans->m_Unit << " ";
+			fflush(stdout);
+			nxt = next(nxt);
+		} else {
+			break;
+		}
+	}
+	std::cout << std::endl;
+	fflush(stdout);
+}
+
 bool
 Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
 
 	if (pathInfoFull) {
+		std::cout << "Find " << (char)syllable << " in:" << std::endl;
+		fflush(stdout);
+
+		std::cout << "next is: ";
+		PathNode *nxt = next(m_Now);
+		if (nxt) {
+			std::cout << (char)nxt->m_Trans->m_Unit << std::endl;
+		}
+		fflush(stdout);
+		printNodes("Path::forward");
+		printNextMap("Path::forward");
+
 		PathNode *cp = next(syllable);
 		if (cp == NULL || cp->isEnd()) {
 			return false;
@@ -19,7 +69,18 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 	//if (num == 1) {
 	//	suc = m_Now->findNextSubNode(syllable, paths);
 	//} else {
+		//m_Now will be unconsciously changed by c++
+		PathNode node = *m_Now;
 		suc = m_Now->findAllSubNode(syllable, num, paths);
+
+		PathNodeList::iterator it = m_Nodes.begin();
+		PathNodeList::iterator ite = m_Nodes.end();
+		for (; it != ite; it++) {
+			if ((*it) == node) {
+				m_Now = &(*it);
+			}
+		}
+
 		if (!suc)
 			return false;
 		//add into or remove from paths;

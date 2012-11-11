@@ -9,11 +9,11 @@ void
 TXhSyllableSegment::prepare()
 {
 	m_TrieBranches.clear();
-	TrieBranch branch;
 	PathNode node(NULL,
 			(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
 			PathNode::JUSTNOW);
 	Path path(node);
+	TrieBranch branch;
 	branch.m_Path = path;
 	//branch.newAdded = false;
 	m_TrieBranches.push_back(branch);
@@ -76,6 +76,9 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 {
 	bool suc = false;
 	PathList fwdPaths;
+	
+	branch.getPath().printNodes("Preforward");
+	branch.getPath().printNextMap("Preforward");
 
 	suc = branch.forward(syllable, m_FwdStrokeNum, m_NumMet, fwdPaths);
 	
@@ -91,14 +94,21 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	PathList::iterator ite = fwdPaths.end();
 
 	for (it++; it != ite; it++) {
-		TrieBranch b(branch);
+		TrieBranch b;
 
+		b.addPathInfo(branch.getPath());
 		b.addPathInfo(*it);
 		//b.newAdded = true;
+		//
+		b.getPath().printNodes("AfterInsert");
+		b.getPath().printNextMap("AfterInsert");
+
 		m_TrieBranches.push_back(b);
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
+	branch.getPath().printNodes("AfterInsert");
+	branch.getPath().printNextMap("AfterInsert");
 	return true;
 }
 

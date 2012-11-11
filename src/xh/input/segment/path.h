@@ -1,6 +1,7 @@
 #ifndef SUNPY_BRANCH_PATH_H
 #define SUNPY_BRANCH_PATH_H
 
+#include "portability.h"
 #include "pathnode.h"
 #include "checkpoint.h"
 #include <algorithm>
@@ -110,6 +111,11 @@ public:
 public:
 	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
 
+	void
+	printNodes(std::string prefix);
+	
+	void
+	printNextMap(std::string prefix);
 private:
 
 	void add_first_node(PathNode &node)
@@ -135,6 +141,10 @@ class TrieBranch {
 public:
 	Path m_Path;
 	bool newAdded;
+
+	TrieBranch()
+	 : newAdded(false)
+	{}
 
 	Path &getPath() {
 		return m_Path;
