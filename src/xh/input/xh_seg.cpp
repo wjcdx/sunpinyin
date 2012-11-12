@@ -153,7 +153,7 @@ CXhSegmentor::_push(unsigned ch)
     unsigned ret;
     m_inputstr.push_back(ch);
 
-    if (m_trie.isStroke(ch)) {
+    if (isdigit(ch) || m_trie.isStroke(ch)) {
         TSegment *last_seg = m_segs.back();
 
         last_seg->m_len += 1;

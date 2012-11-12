@@ -94,7 +94,6 @@ CIMIXhView::onKeyEvent(const CKeyEvent& key)
         }
 
         if (keyvalue >= '1' && keyvalue <= '5') {
-            /* islower(keyvalue) */
             changeMasks |= KEYEVENT_USED;
             _insert(keyvalue, changeMasks);
         } else if (keyvalue > 0x60 && keyvalue < 0x7b) {

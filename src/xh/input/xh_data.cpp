@@ -60,9 +60,10 @@ CXhData::xhDataMaps[] = {
 bool
 CXhData::isPattern(unsigned ch)
 {
-	assert(ch >= 'a' && ch <= 'z');
+	//assert(ch >= 'a' && ch <= 'z');
 	XhKeyMapPair p = findPair(ch);
-	if (p.getName()[0] == 'P') {
+	if (!p.getName().empty()
+		&& p.getName().at(0) == 'P') {
 		return true;
 	}
 	return false;
@@ -71,7 +72,12 @@ CXhData::isPattern(unsigned ch)
 bool
 CXhData::isStroke(unsigned ch)
 {
-	return !isPattern(ch);
+	XhKeyMapPair p = findPair(ch);
+	if (!p.getName().empty()
+		&& p.getName().at(0) == 'S') {
+		return true;
+	}
+	return false;
 }
 
 XhKeyMapPair &

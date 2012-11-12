@@ -18,6 +18,7 @@ TXhSyllableSegment::prepare()
 	//branch.newAdded = false;
 	m_TrieBranches.push_back(branch);
 	m_NumMet = false;
+	m_FwdStrokeNum = 1;
 }
 
 void
@@ -38,7 +39,7 @@ TXhSyllableSegment::_forwardSingleSyllable(TSyllable syllable)
 {
 	if (isdigit(syllable)) {
 		_forwardNumber(syllable);
-		m_FwdStrokeNum = syllable;
+		m_FwdStrokeNum = syllable - '0';
 	} else {
 		_forwardStroke(syllable);
 		m_FwdStrokeNum = 1;

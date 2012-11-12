@@ -91,9 +91,9 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 	//	suc = m_Now->findNextSubNode(syllable, paths);
 	//} else {
 		//m_Now will be unconsciously changed by c++
-		PathNode node = *m_Now;
+		//PathNode node = *m_Now;
 		suc = m_Now->findAllSubNode(syllable, num, paths);
-
+		/*
 		PathNodeList::iterator it = m_Nodes.begin();
 		PathNodeList::iterator ite = m_Nodes.end();
 		for (; it != ite; it++) {
@@ -101,6 +101,7 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 				m_Now = &(*it);
 			}
 		}
+		*/
 
 		if (!suc)
 			return false;
