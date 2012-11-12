@@ -63,7 +63,7 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
 
-	rebuildNextMap();
+	//rebuildNextMap();
 
 	if (pathInfoFull) {
 		std::cout << "Find " << (char)syllable << " in:" << std::endl;

@@ -22,6 +22,25 @@ public:
 		add_first_node(node);
 	}
 
+	Path(const Path &rhs) {
+		operator=(rhs);
+	}
+
+	Path& operator=(const Path &rhs) {
+
+		if (this == &rhs)
+			return *this;
+
+		m_NodeWithWord = rhs.m_NodeWithWord;
+		
+		PathNodeList::const_iterator it = rhs.m_Nodes.begin();
+		PathNodeList::const_iterator ite = rhs.m_Nodes.end();
+		for (; it != ite; it++) {
+			add(const_cast<PathNode &>(*it));
+		}
+		return *this;
+	}
+
 	void add(PathNode &node) {
 		if (m_Nodes.empty()) {
 			add_first_node(node);

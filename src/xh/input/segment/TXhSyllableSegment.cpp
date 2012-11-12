@@ -58,7 +58,7 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 
 	for (it = itn; it != ite; it++) {
 		(*it).getPath().printNodes();
-		(*it).getPath().rebuildNextMap();
+		//(*it).getPath().rebuildNextMap();
 		(*it).getPath().printNextMap();
 	}
 
