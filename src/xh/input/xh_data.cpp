@@ -54,6 +54,14 @@ CXhData::xhDataMaps[] = {
 	XhKeyMapPair('n', "S19"),
 	XhKeyMapPair('n', "S21"),
 	XhKeyMapPair('n', "S22"),
+	XhKeyMapPair('n', "S23"),
+	XhKeyMapPair('n', "S24"),
+	XhKeyMapPair('n', "S25"),
+	XhKeyMapPair('n', "S26"),
+	XhKeyMapPair('n', "S27"),
+	XhKeyMapPair('n', "S28"),
+	XhKeyMapPair('n', "S29"),
+	XhKeyMapPair('n', "S30"),
 	XhKeyMapPair(0, ""),
 };
 
