@@ -82,7 +82,6 @@ get_wid(const char* word, const TLexicon& lexicon)
     TLexicon::const_iterator lexi = lexicon.find(word);
     unsigned wid;
     if (lexi != lexicon.end()) {
-        cout << "Found: \"" << word << "\" in lexicon." << endl;
         wid = lexi->second;
     } else {
         cerr << "Error:\"" << word << "\" not found in lexicon." << endl;
