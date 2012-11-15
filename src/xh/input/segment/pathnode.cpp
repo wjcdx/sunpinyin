@@ -6,30 +6,29 @@
 
 using namespace TrieThreadModel;
 
-PathNodeList
-PathNode::getChildren(TSyllable syllable)
+bool
+PathNode::getChildren(TSyllable syllable, PathNodeList &children)
 {
-	PathNodeList nodes;
-
 	unsigned int sz = m_TNode->m_nTransfer;
 
 	if (sz == 0)
-		return nodes;
+		return false;
 
     TTransUnit* ptrans = (TTransUnit *)m_TNode->getTrans();
     for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit; 
         TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
-		nodes.push_back(PathNode(&ptrans[i], pch));
+		children.push_back(PathNode(&ptrans[i], pch));
     }
-	return nodes;
+	return true;
 }
 
 bool
 PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 {
-	PathNodeList children = getChildren(syllable);
-	if (children.empty()) {
+	PathNodeList children;
+	
+	if (!getChildren(syllable, children)) {
 		return false;
 	}
 
@@ -42,8 +41,8 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			Path path;
 			path.add(*nit);
 			paths.push_back(path);
+
 		} else {
-			(*nit).flag = PathNode::JUMPED;
 			
 			bool suc = false;
 			PathList subPaths;
@@ -65,8 +64,9 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 bool
 PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths)
 {
-	PathNodeList children = getChildren(syllable);
-	if (children.empty()) {
+	PathNodeList children;
+	
+	if (!getChildren(syllable, children)) {
 		return false;
 	}
 
@@ -74,10 +74,7 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths)
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 		if ((*nit).transFrom(syllable)) {
-			(*nit).flag = PathNode::CHECKPOINT;
 			num -= 1;
-		} else {
-			(*nit).flag = PathNode::FUTURE;
 		}
 
 		int wnum = (*nit).getTNode()->m_nWordId;

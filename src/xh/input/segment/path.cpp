@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdio.h>
+#include <assert.h>
 #include "pathnode.h"
 #include "path.h"
 #include "checkpoint.h"
@@ -95,7 +96,6 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 int
 Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 {
-	int c = 0;
 	int len = cpset.size();
 
 	if (len < count) {
@@ -113,14 +113,17 @@ Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 	CheckPoint &cp = *it;
 	for (cp = *it, it++; it != ite; cp = *it, it++) {
 		if (next(cp.m_PNode) == (*it).m_Start) {
-			c++;
 			cphooks.push_back(cp);
 		} else {
-			c = 0;
 			cphooks.clear();
 		}
 
-		if (c+1 >= count)
+		/*
+		 * a_a_a
+		 * size: num of 'a'
+		 * count: number of '_';
+		 */
+		if ((int)cphooks.size() + 1 >= count)
 			return 1;
 	}
 	return 0;
@@ -189,26 +192,14 @@ Path::findCheckPoints(TSyllable syllable)
 void
 Path::labelPath(CheckPointList &cphooks)
 {
+	assert(!cphooks.empty());
+	/*
 	if (cphooks.empty())
 		return;
+	*/
 
-	CheckPointList::iterator it = cphooks.begin();
-	CheckPointList::iterator ite = cphooks.end();
-
-	CheckPoint &cp = *it;
-	PathNode *node = getNow();
-	for (; node != (*it).m_Start; node = next(node)) {
-		node->flag = PathNode::JUMPED;
-	}
-
-	for (; it != ite; it++) {
-		cp = *it;
-		node = cp.m_Start;
-		for (; node != cp.m_PNode; node = next(node)) {
-			node->flag = PathNode::HISTORY;
-		}
-	}
-	cp.m_PNode->flag = PathNode::JUSTNOW;
+	CheckPoint &cp = cphooks.back();
+	cp.m_PNode->setFlag(PathNode::JUSTNOW);
 }
 
 bool

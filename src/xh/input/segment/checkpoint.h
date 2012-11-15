@@ -12,8 +12,14 @@ public:
 	}
 
 	bool operator==(CheckPoint &cp) {
-		return (m_Start == cp.m_Start)
+		return notNull() && cp.notNull()
+			&& (m_Start == cp.m_Start)
 			&& (m_PNode == cp.m_PNode);
+	}
+
+	bool notNull()
+	{
+		return (m_Start != NULL && m_PNode != NULL);
 	}
 };
 
