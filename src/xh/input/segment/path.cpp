@@ -11,6 +11,7 @@ Path::operator=(const Path &rhs) {
 		return *this;
 
 	m_NodeWithWord = rhs.m_NodeWithWord;
+	m_FullForwarded = rhs.m_FullForwarded;
 	
 	PathNodeList::const_iterator it = rhs.m_Nodes.begin();
 	PathNodeList::const_iterator ite = rhs.m_Nodes.end();
@@ -152,11 +153,11 @@ Path::printNextMap()
 }
 
 bool
-Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
+Path::forward(TSyllable syllable, int num, bool &forward, PathList &paths)
 {
 	bool suc = false;
 
-	if (pathInfoFull) {
+	if (m_FullForwarded) {
 
 		if (num > 1) {
 			suc = checkNumInPath(syllable, num);
@@ -167,31 +168,25 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 		if (!cp) {
 			return false;
 		}
-		forward();
+		this->forward();
 		return true;
 	}
 
-	//if (num == 1) {
-	//	suc = m_Now->findNextSubNode(syllable, paths);
-	//} else {
-		//m_Now will be unconsciously changed by c++
-		//PathNode node = *m_Now;
+	if (forward) {
 		suc = m_Now->findAllSubNode(syllable, num, paths);
-		/*
-		PathNodeList::iterator it = m_Nodes.begin();
-		PathNodeList::iterator ite = m_Nodes.end();
-		for (; it != ite; it++) {
-			if ((*it) == node) {
-				m_Now = &(*it);
-			}
-		}
-		*/
-
 		if (!suc)
 			return false;
-		//add into or remove from paths;
+
+		m_FullForwarded = true;
 		suc = checkNumInPaths(syllable, num, paths);
-	//}
+	} else {
+		//it will be rebuild at
+		//the next key event
+		if (num > 1) {
+			return false;
+		}
+		suc = m_Now->findNextSubNode(syllable, paths);
+	}
 
 	return suc;
 }
