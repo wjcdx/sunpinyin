@@ -27,3 +27,12 @@ clean:
 
 distclean:
 	rm -rf lm_sc.t3g.orig lm_sc.t3g lm_sc.t3g.*.log *dict3_sc.bin
+
+todbg:
+	cp dict.utf8.xh.dbg dict.utf8.xh
+	cp lm_sc.t3g.arpa.dbg lm_sc.t3g.arpa
+
+touse:
+	cp dict.utf8.xh.all dict.utf8.xh
+	cp lm_sc.t3g.arpa.all lm_sc.t3g.arpa
+
