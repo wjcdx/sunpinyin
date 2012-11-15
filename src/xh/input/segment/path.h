@@ -8,135 +8,37 @@
 #include <list>
 
 class Path {
-private:
-	PathNodeList m_Nodes;
-	std::map<PathNode *, PathNode *> m_NextMap;
-	PathNode *m_Now;
-	PathNode m_NodeWithWord;
-
 public:
-	Path(){};
-
-	Path(PathNode &node)
-	{
-		add_first_node(node);
-	}
+	Path()
+		: m_Now(NULL)
+	{}
 
 	Path(const Path &rhs) {
 		operator=(rhs);
 	}
+	Path& operator=(const Path &rhs);
 
-	Path& operator=(const Path &rhs) {
+	void add(PathNode &node);
+	void push_front(PathNode &node);
 
-		if (this == &rhs)
-			return *this;
-
-		m_NodeWithWord = rhs.m_NodeWithWord;
-		
-		PathNodeList::const_iterator it = rhs.m_Nodes.begin();
-		PathNodeList::const_iterator ite = rhs.m_Nodes.end();
-		for (; it != ite; it++) {
-			add(const_cast<PathNode &>(*it));
-		}
-		return *this;
-	}
-
-	void add(PathNode &node) {
-		if (m_Nodes.empty()) {
-			add_first_node(node);
-			return;
-		}
-
-		PathNode *priv = &m_Nodes.back();
-		m_Nodes.push_back(node);
-
-		PathNode *n = &m_Nodes.back();
-		m_NextMap[priv] = n;
-
-		if (n->flag == PathNode::JUSTNOW) {
-			m_Now->flag = PathNode::HISTORY;
-			m_Now = n;
-		}
-	}
-	
-	void push_front(PathNode &node) {
-		if (m_Nodes.empty()) {
-			add_first_node(node);
-			return;
-		}
-		PathNode *next = &m_Nodes.front();
-		m_Nodes.push_front(node);
-
-		PathNode *n = &m_Nodes.front();
-		m_NextMap[n] = next;
-
-		if (n->flag == PathNode::JUSTNOW) {
-			m_Now->flag = PathNode::FUTURE;
-			m_Now = n;
-		}
-	}
-
-	PathNode *getNow() {
-		return m_Now;
-	}
-
+	PathNode *getNow() { return m_Now; }
 	void resetNowNode() {
 		if (m_Nodes.empty())
 			return;
 		m_Now = &m_Nodes.front();
 	}
 	
-	PathNodeList &getPathNodes() {
-		return m_Nodes;
-	}
+	PathNodeList &getPathNodes() { return m_Nodes; }
 
-	PathNode *next(PathNode *node) {
-		if (m_NextMap.find(node) != m_NextMap.end())
-			return m_NextMap[node];
-		return NULL;
-	}
+	PathNode *next(PathNode *node);
+	PathNode *next(TSyllable s);
 
-	PathNode *next(TSyllable s) {
-		while (true) {
-			if (m_NextMap.find(m_Now) != m_NextMap.end()) {
-				PathNode *nxt = m_NextMap[m_Now];
-				if (nxt->transFrom(s)) {
-					return nxt;
-				} else {
-					forward();
-				}
-			} else {
-				return NULL;
-			}
-		}
-	}
-
-	void forward() {
-		if (m_NextMap.find(m_Now) == m_NextMap.end())
-			return;
-		PathNode *nxt = m_NextMap[m_Now];
-		m_Now->flag = PathNode::HISTORY;
-		nxt->flag = PathNode::JUSTNOW;
-		m_Now = nxt;
-	}
+	void forward();
 	
-	int getTransNum(TSyllable s) {
-		int c = 0;
-		PathNodeList::iterator it = m_Nodes.begin();
-		PathNodeList::iterator ite = m_Nodes.end();
-		for (; it != ite; it++)
-			if ((*it).transFrom(s))
-				c++;
-		return c;
-	}
+	int getTransNum(TSyllable s);
 
-	void setWordNode(PathNode &node) {
-		m_NodeWithWord = node;
-	}
-	
-	PathNode &getWordNode() {
-		return m_NodeWithWord;
-	}
+	void setWordNode(PathNode &node) { m_NodeWithWord = node; }
+	PathNode &getWordNode() { return m_NodeWithWord; }
 
 public:
 	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
@@ -146,16 +48,21 @@ public:
 	
 	void
 	printNextMap();
-	
-private:
 
-	void add_first_node(PathNode &node)
-	{
+private:	
+	void add_first_node(PathNode &node) {
 		m_Nodes.push_back(node);
 		m_Now = &m_Nodes.back();
 	}
 
+private:
+	PathNodeList m_Nodes;
+	std::map<PathNode *, PathNode *> m_NextMap;
+	PathNode *m_Now;
+	PathNode m_NodeWithWord;
+
 	CheckPointList cpset;
+
 	int getRepeaterStatus(int count, CheckPointList &cphooks);
 	void forwardCheckPoint();
 	int getSameRepNumber(CheckPoint &cp);

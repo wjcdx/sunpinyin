@@ -5,6 +5,107 @@
 #include "path.h"
 #include "checkpoint.h"
 
+Path&
+Path::operator=(const Path &rhs) {
+	if (this == &rhs)
+		return *this;
+
+	m_NodeWithWord = rhs.m_NodeWithWord;
+	
+	PathNodeList::const_iterator it = rhs.m_Nodes.begin();
+	PathNodeList::const_iterator ite = rhs.m_Nodes.end();
+	for (; it != ite; it++) {
+		add(const_cast<PathNode &>(*it));
+	}
+	return *this;
+}
+
+void
+Path::add(PathNode &node) {
+	if (m_Nodes.empty()) {
+		add_first_node(node);
+		return;
+	}
+
+	PathNode *priv = &m_Nodes.back();
+	m_Nodes.push_back(node);
+
+	PathNode *n = &m_Nodes.back();
+	m_NextMap[priv] = n;
+
+	if (n->isNow()) {
+		m_Now->flag = PathNode::HISTORY;
+		m_Now = n;
+	}
+}
+
+void
+Path::push_front(PathNode &node)
+{
+	if (m_Nodes.empty()) {
+		add_first_node(node);
+		return;
+	}
+	PathNode *next = &m_Nodes.front();
+	m_Nodes.push_front(node);
+
+	PathNode *n = &m_Nodes.front();
+	m_NextMap[n] = next;
+
+	if (n->isNow()) {
+		m_Now->flag = PathNode::FUTURE;
+		m_Now = n;
+	}
+}
+
+PathNode*
+Path::next(PathNode *node)
+{
+	if (m_NextMap.find(node) != m_NextMap.end())
+		return m_NextMap[node];
+	return NULL;
+}
+
+PathNode*
+Path::next(TSyllable s)
+{
+	while (true) {
+		if (m_NextMap.find(m_Now) != m_NextMap.end()) {
+			PathNode *nxt = m_NextMap[m_Now];
+			if (nxt->transFrom(s)) {
+				return nxt;
+			} else {
+				forward();
+			}
+		} else {
+			return NULL;
+		}
+	}
+}
+
+void
+Path::forward()
+{
+	if (m_NextMap.find(m_Now) == m_NextMap.end())
+		return;
+	PathNode *nxt = m_NextMap[m_Now];
+	m_Now->flag = PathNode::HISTORY;
+	nxt->flag = PathNode::JUSTNOW;
+	m_Now = nxt;
+}
+
+int
+Path::getTransNum(TSyllable s)
+{
+	int c = 0;
+	PathNodeList::iterator it = m_Nodes.begin();
+	PathNodeList::iterator ite = m_Nodes.end();
+	for (; it != ite; it++)
+		if ((*it).transFrom(s))
+			c++;
+	return c;
+}
+
 void
 Path::printNodes()
 {

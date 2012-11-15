@@ -42,9 +42,8 @@ public:
 				&& m_TNode == node.m_TNode);
 	}
 
-	void setFlag(PathNodeFlag f) {
-		flag = f;
-	}
+	void setFlag(PathNodeFlag f) { flag = f; }
+	bool isNow() { return flag == PathNode::JUSTNOW; }
 
 	bool transFrom(TSyllable s) { return (m_Trans->m_Unit == s); }
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }

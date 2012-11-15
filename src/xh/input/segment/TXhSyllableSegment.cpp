@@ -10,9 +10,10 @@ TXhSyllableSegment::prepare()
 {
 	m_TrieBranches.clear();
 	PathNode node(NULL,
-			(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
-			PathNode::JUSTNOW);
-	Path path(node);
+		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
+		PathNode::JUSTNOW);
+	Path path;
+	path.add(node);
 	TrieBranch branch;
 	branch.m_Path = path;
 	//branch.newAdded = false;
@@ -57,10 +58,12 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
+	/*
 	for (it = itn; it != ite; it++) {
-		//(*it).getPath().printNodes();
-		//(*it).getPath().printNextMap();
+		(*it).getPath().printNodes();
+		(*it).getPath().printNextMap();
 	}
+	*/
 
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
 		//newAdded maybe not needed
