@@ -66,10 +66,11 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 	//rebuildNextMap();
 
 	if (pathInfoFull) {
-		std::cout << "Find " << (char)syllable << " in:" << std::endl;
-		fflush(stdout);
+		//std::cout << "Find " << (char)syllable << " in:" << std::endl;
+		//fflush(stdout);
 
 		for (int i = 0; i < num; i++) {
+			/*
 			std::cout << "\tnext is: ";
 			PathNode *nxt = next(m_Now);
 			if (nxt) {
@@ -77,8 +78,9 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 			}
 			std::cout << std::endl;
 			fflush(stdout);
-			printNodes();
-			printNextMap();
+			*/
+			//printNodes();
+			//printNextMap();
 
 			PathNode *cp = next(syllable);
 			if (cp == NULL || cp->isEnd()) {

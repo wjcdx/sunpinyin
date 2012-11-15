@@ -58,9 +58,9 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
 	for (it = itn; it != ite; it++) {
-		(*it).getPath().printNodes();
+		//(*it).getPath().printNodes();
 		//(*it).getPath().rebuildNextMap();
-		(*it).getPath().printNextMap();
+		//(*it).getPath().printNextMap();
 	}
 
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
@@ -114,14 +114,11 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		//b.getPath().printNextMap();
 
 		m_TrieBranches.push_back(b);
-		TrieBranch &b2 = m_TrieBranches.back();
-		b2.getPath().printNodes();
-		b2.getPath().printNextMap();
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
-	branch.getPath().printNodes();
-	branch.getPath().printNextMap();
+	//branch.getPath().printNodes();
+	//branch.getPath().printNextMap();
 	return true;
 }
 
