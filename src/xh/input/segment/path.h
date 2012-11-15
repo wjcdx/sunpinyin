@@ -80,7 +80,7 @@ public:
 		return m_Now;
 	}
 
-	void initNodeNow() {
+	void resetNowNode() {
 		if (m_Nodes.empty())
 			return;
 		m_Now = &m_Nodes.front();
@@ -147,8 +147,6 @@ public:
 	void
 	printNextMap();
 	
-	void
-	rebuildNextMap();
 private:
 
 	void add_first_node(PathNode &node)

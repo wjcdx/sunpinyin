@@ -41,23 +41,6 @@ Path::printNextMap()
 	fflush(stdout);
 }
 
-void
-Path::rebuildNextMap()
-{
-	m_NextMap.clear();
-	
-	PathNodeList::iterator it, itn = m_Nodes.begin();
-	PathNodeList::iterator ite = m_Nodes.end();
-	
-	for (it = itn, itn++; itn != ite; it = itn, itn++) {
-		if ((*it).flag == PathNode::JUSTNOW) {
-			m_Now = &(*it);
-		}
-
-		m_NextMap[&(*it)] = &(*itn);
-	}
-}
-
 bool
 Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
@@ -71,7 +54,7 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 		}
 
 		PathNode *cp = next(syllable);
-		if (cp == NULL || cp->isEnd()) {
+		if (!cp) {
 			return false;
 		}
 		forward();
@@ -192,11 +175,12 @@ Path::iterateRepeaters(int count)
 void
 Path::findCheckPoints(TSyllable syllable)
 {
-	PathNodeList::iterator it = m_Nodes.begin();
-	PathNodeList::iterator ite = m_Nodes.end();
-	for (; it != ite; it++) {
-		if ((*it).flag == PathNode::CHECKPOINT) {
-			CheckPoint cp(&(*it));
+	cpset.clear();
+
+	PathNode *n = next(m_Now);
+	for (; n != NULL; n = next(n)) {
+		if (n->transFrom(syllable)) {
+			CheckPoint cp(n);
 			cpset.push_back(cp);
 		}
 	}
@@ -256,7 +240,7 @@ Path::checkNumInPaths(TSyllable syllable, int num, PathList &paths)
 	PathList::iterator it, itn = paths.begin();
 	PathList::iterator ite = paths.end();
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		(*it).initNodeNow();
+		(*it).resetNowNode();
 		if (!(*it).checkNumInPath(syllable, num)) {
 			paths.erase(it);
 		}

@@ -19,8 +19,7 @@ public:
 		HISTORY,
 		FUTURE,
 		JUSTNOW,
-		CHECKPOINT,
-		END
+		CHECKPOINT
 	};
 
 	TrieThreadModel::TTransUnit *m_Trans;
@@ -28,13 +27,14 @@ public:
 	unsigned flag;
 	
 	PathNode() {}
-	PathNode(PathNodeFlag f) : flag(f)
+	PathNode(PathNodeFlag f)
+		: flag(f)
 	{}
 	
 	PathNode(TrieThreadModel::TTransUnit *trans,
 			TrieThreadModel::TThreadNode *node,
 			unsigned f = FUTURE)
-	: m_Trans(trans), m_TNode(node), flag(f)
+		: m_Trans(trans), m_TNode(node), flag(f)
 	{}
 
 	bool operator==(PathNode &node) {
@@ -42,7 +42,6 @@ public:
 				&& m_TNode == node.m_TNode);
 	}
 
-	bool isEnd() { return (flag == END); }
 	bool transFrom(TSyllable s) { return (m_Trans->m_Unit == s); }
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }
 

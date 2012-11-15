@@ -59,7 +59,6 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 
 	for (it = itn; it != ite; it++) {
 		//(*it).getPath().printNodes();
-		//(*it).getPath().rebuildNextMap();
 		//(*it).getPath().printNextMap();
 	}
 
@@ -84,7 +83,6 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	bool suc = false;
 	PathList fwdPaths;
 	
-	//branch.getPath().rebuildNextMap();
 	//branch.getPath().printNodes();
 	//branch.getPath().printNextMap();
 
@@ -146,19 +144,6 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
 			(*it).getPath().getWordNode().getTNode(),
 			syls, seg_path);
 		fr.m_lexiconStates.push_back(new_lxst);
-	/*
-		PathNodeList &nodes = (*it).m_Path.getPathNodes();
-
-		PathNodeList::iterator nit = nodes.begin();
-		PathNodeList::iterator nite = nodes.end();
-        for (; nit != nite; nit++) {
-			if ((*nit).getTNode()->m_nWordId <= 0) {
-				continue;
-			}
-			TXhLexiconState new_lxst = TXhLexiconState(i, (*nit).getTNode(), syls, seg_path);
-			fr.m_lexiconStates.push_back(new_lxst);
-		}
-	*/
 	}
 }
 
