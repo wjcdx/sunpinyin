@@ -26,9 +26,11 @@ public:
 	TrieThreadModel::TThreadNode *m_TNode;
 	PathNodeFlag flag;
 	
-	PathNode() {}
+	PathNode()
+		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE)
+	{}
 	PathNode(PathNodeFlag f)
-		: flag(f)
+		: m_Trans(NULL), m_TNode(NULL), flag(f)
 	{}
 	
 	PathNode(TrieThreadModel::TTransUnit *trans,
@@ -48,6 +50,7 @@ public:
 	bool transFrom(TSyllable s) { return (m_Trans->m_Unit == s); }
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }
 
+	void print();
 	bool getChildren(TSyllable syllable, PathNodeList &children);
 	bool findNextSubNode(TSyllable syllable, PathList &paths);
 	bool findAllSubNode(TSyllable syllable, int num, PathList &paths);

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "pathnode.h" 
 #include "path.h" 
 #include "checkpoint.h" 
@@ -5,6 +6,16 @@
 #include "common/lexicon/trie.h" 
 
 using namespace TrieThreadModel;
+
+void
+PathNode::print()
+{
+	if (m_Trans) {
+		std::cout << (char)m_Trans->m_Unit << " ";
+		std::cout << std::endl;
+		fflush(stdout);
+	}
+}
 
 bool
 PathNode::getChildren(TSyllable syllable, PathNodeList &children)

@@ -34,7 +34,7 @@ Path::add(PathNode &node) {
 	m_NextMap[priv] = n;
 
 	if (n->isNow()) {
-		m_Now->flag = PathNode::HISTORY;
+		m_Now->setFlag(PathNode::HISTORY);
 		m_Now = n;
 	}
 }
@@ -53,9 +53,20 @@ Path::push_front(PathNode &node)
 	m_NextMap[n] = next;
 
 	if (n->isNow()) {
-		m_Now->flag = PathNode::FUTURE;
+		m_Now->setFlag(PathNode::FUTURE);
 		m_Now = n;
 	}
+}
+
+void
+Path::addPseudoHead()
+{
+	if (m_Nodes.empty())
+		return;
+	static PathNode node;
+	PathNode *head = &m_Nodes.front();
+	m_Now = &node;
+	m_NextMap[m_Now] = head;
 }
 
 PathNode*
@@ -69,28 +80,25 @@ Path::next(PathNode *node)
 PathNode*
 Path::next(TSyllable s)
 {
-	while (true) {
-		if (m_NextMap.find(m_Now) != m_NextMap.end()) {
-			PathNode *nxt = m_NextMap[m_Now];
-			if (nxt->transFrom(s)) {
-				return nxt;
-			} else {
-				forward();
-			}
+	PathNode *nxt = next(m_Now);
+	for (; nxt; nxt = next(nxt)) {
+		if (nxt->transFrom(s)) {
+			return nxt;
 		} else {
-			return NULL;
+			forward();
 		}
 	}
+	return NULL;
 }
 
 void
 Path::forward()
 {
-	if (m_NextMap.find(m_Now) == m_NextMap.end())
+	PathNode *nxt = next(m_Now);
+	if (!nxt)
 		return;
-	PathNode *nxt = m_NextMap[m_Now];
-	m_Now->flag = PathNode::HISTORY;
-	nxt->flag = PathNode::JUSTNOW;
+	m_Now->setFlag(PathNode::HISTORY);
+	nxt->setFlag(PathNode::JUSTNOW);
 	m_Now = nxt;
 }
 
@@ -117,7 +125,7 @@ Path::printNodes()
 		if ((*nit).m_Trans) {
 			std::cout << (char)(*nit).m_Trans->m_Unit << " ";
 			fflush(stdout);
-		}
+	    }
 	}
 	std::cout << std::endl;
 	fflush(stdout);
@@ -281,8 +289,8 @@ Path::findCheckPoints(TSyllable syllable)
 {
 	cpset.clear();
 
-	PathNode *n = next(m_Now);
-	for (; n != NULL; n = next(n)) {
+	PathNode *n = next(syllable);
+	for (; n; n = next(n)) {
 		if (n->transFrom(syllable)) {
 			CheckPoint cp(n);
 			cpset.push_back(cp);
@@ -332,7 +340,7 @@ Path::checkNumInPaths(TSyllable syllable, int num, PathList &paths)
 	PathList::iterator it, itn = paths.begin();
 	PathList::iterator ite = paths.end();
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		(*it).resetNowNode();
+		(*it).addPseudoHead();
 		if (!(*it).checkNumInPath(syllable, num)) {
 			paths.erase(it);
 		}

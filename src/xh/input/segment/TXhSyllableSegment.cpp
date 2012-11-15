@@ -105,21 +105,13 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	PathList::iterator ite = fwdPaths.end();
 
 	for (it++; it != ite; it++) {
-		TrieBranch b;
+		TrieBranch b(branch);
 
-		b.addPathInfo(branch.getPath());
 		b.addPathInfo(*it);
-		//b.newAdded = true;
-		//
-		//b.getPath().printNodes();
-		//b.getPath().printNextMap();
-
 		m_TrieBranches.push_back(b);
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
-	//branch.getPath().printNodes();
-	//branch.getPath().printNextMap();
 	return true;
 }
 

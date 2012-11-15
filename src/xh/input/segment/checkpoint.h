@@ -17,8 +17,7 @@ public:
 			&& (m_PNode == cp.m_PNode);
 	}
 
-	bool notNull()
-	{
+	bool notNull() {
 		return (m_Start != NULL && m_PNode != NULL);
 	}
 };

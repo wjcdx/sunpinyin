@@ -22,11 +22,8 @@ public:
 	void push_front(PathNode &node);
 
 	PathNode *getNow() { return m_Now; }
-	void resetNowNode() {
-		if (m_Nodes.empty())
-			return;
-		m_Now = &m_Nodes.front();
-	}
+
+	void addPseudoHead();
 	
 	PathNodeList &getPathNodes() { return m_Nodes; }
 
