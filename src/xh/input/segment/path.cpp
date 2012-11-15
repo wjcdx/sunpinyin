@@ -63,31 +63,18 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
 
-	//rebuildNextMap();
-
 	if (pathInfoFull) {
-		//std::cout << "Find " << (char)syllable << " in:" << std::endl;
-		//fflush(stdout);
 
-		for (int i = 0; i < num; i++) {
-			/*
-			std::cout << "\tnext is: ";
-			PathNode *nxt = next(m_Now);
-			if (nxt) {
-				std::cout << (char)nxt->m_Trans->m_Unit;
-			}
-			std::cout << std::endl;
-			fflush(stdout);
-			*/
-			//printNodes();
-			//printNextMap();
-
-			PathNode *cp = next(syllable);
-			if (cp == NULL || cp->isEnd()) {
-				return false;
-			}
-			this->forward();
+		if (num > 1) {
+			suc = checkNumInPath(syllable, num);
+			return suc;
 		}
+
+		PathNode *cp = next(syllable);
+		if (cp == NULL || cp->isEnd()) {
+			return false;
+		}
+		forward();
 		return true;
 	}
 
