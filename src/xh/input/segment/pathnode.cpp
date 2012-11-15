@@ -48,11 +48,15 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 	for (; nit != nite; nit++) {
 		if ((*nit).transFrom(syllable)) {
 			(*nit).flag = PathNode::JUSTNOW;
-
+			
 			Path path;
+			int wnum = (*nit).getTNode()->m_nWordId;
+			if (wnum > 0) {
+				path.setWordNode(*nit);
+			}
+
 			path.add(*nit);
 			paths.push_back(path);
-
 		} else {
 			
 			bool suc = false;
@@ -93,6 +97,7 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths)
 			Path path;
 			path.push_front(*nit);
 			path.setWordNode(*nit);
+			path.setFullForwarded(true);
 			paths.push_back(path);
 		}
 

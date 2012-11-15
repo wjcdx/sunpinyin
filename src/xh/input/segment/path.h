@@ -10,7 +10,7 @@
 class Path {
 public:
 	Path()
-		: m_Now(NULL)
+		: m_Now(NULL), m_FullForwarded(false)
 	{}
 
 	Path(const Path &rhs) {
@@ -37,14 +37,17 @@ public:
 	void setWordNode(PathNode &node) { m_NodeWithWord = node; }
 	PathNode &getWordNode() { return m_NodeWithWord; }
 
-public:
-	bool forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths);
+	bool forward(TSyllable syllable, int num,
+			bool &forward, PathList &paths);
 
 	void
 	printNodes();
 	
 	void
 	printNextMap();
+
+	bool isFullForwarded() { return m_FullForwarded; }
+	void setFullForwarded(bool fwd) { m_FullForwarded = fwd; }
 
 private:	
 	void add_first_node(PathNode &node) {
@@ -57,6 +60,7 @@ private:
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
 	PathNode m_NodeWithWord;
+	bool m_FullForwarded;
 
 	CheckPointList cpset;
 
@@ -75,18 +79,13 @@ typedef std::list<Path> PathList;
 class TrieBranch {
 public:
 	Path m_Path;
-	bool newAdded;
 
-	TrieBranch()
-	 : newAdded(false)
-	{}
+	TrieBranch() {}
 
-	Path &getPath() {
-		return m_Path;
-	}
+	Path &getPath() { return m_Path; }
 
-	bool forward(TSyllable s, int num, bool numMet, PathList &paths) {
-		return m_Path.forward(s, num, numMet, paths);
+	bool forward(TSyllable s, int num, bool &forward, PathList &paths) {
+		return m_Path.forward(s, num, forward, paths);
 	}
 	void addPathInfo(Path &path) {
 		PathNodeList::iterator it = path.getPathNodes().begin();
@@ -94,8 +93,11 @@ public:
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
+		m_Path.setFullForwarded(path.isFullForwarded());
 		m_Path.setWordNode(path.getWordNode());
 	}
+
+	bool isFullForwarded() { return m_Path.isFullForwarded(); }
 };
 
 typedef std::list<TrieBranch> BranchList;

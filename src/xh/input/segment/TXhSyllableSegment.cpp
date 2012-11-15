@@ -4,6 +4,8 @@
 #include "ime-core/lattice/lattice_manager.h"
 #include "TXhSyllableSegment.h"
 
+unsigned int TXhSyllableSegment::m_FwdedBranchNum = 0;
+const unsigned int TXhSyllableSegment::MAX_FWD_BRANCH_NUM = 20;
 
 void
 TXhSyllableSegment::prepare()
@@ -12,14 +14,11 @@ TXhSyllableSegment::prepare()
 	PathNode node(NULL,
 		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
 		PathNode::JUSTNOW);
-	Path path;
-	path.add(node);
 	TrieBranch branch;
-	branch.m_Path = path;
-	//branch.newAdded = false;
+	branch.m_Path.add(node);
 	m_TrieBranches.push_back(branch);
-	m_NumMet = false;
 	m_FwdStrokeNum = 1;
+	m_FwdedBranchNum = 0;
 }
 
 void
@@ -58,24 +57,13 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
     std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
     std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
-	/*
-	for (it = itn; it != ite; it++) {
-		(*it).getPath().printNodes();
-		(*it).getPath().printNextMap();
-	}
-	*/
-
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		//newAdded maybe not needed
-		//because newAdded is behind
-		//ite, which is not changed
-		//if (!it->newAdded) {
-			if (!_forwardBranch(*it, syllable)) {
-				m_TrieBranches.erase(it);
+		if (!_forwardBranch(*it, syllable)) {
+			if ((*it).isFullForwarded()) {
+				m_FwdedBranchNum--;
 			}
-		//} else {
-		//	it->newAdded = false;
-		//}
+			m_TrieBranches.erase(it);
+		}
 	}
 }
 
@@ -84,20 +72,17 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 						TSyllable &syllable)
 {
 	bool suc = false;
-	PathList fwdPaths;
-	
-	//branch.getPath().printNodes();
-	//branch.getPath().printNextMap();
 
-	suc = branch.forward(syllable, m_FwdStrokeNum, m_NumMet, fwdPaths);
+	bool fwded = branch.isFullForwarded();
+	bool forward = m_FwdedBranchNum < MAX_FWD_BRANCH_NUM;
+	
+	PathList fwdPaths;
+	suc = branch.forward(syllable, m_FwdStrokeNum, forward, fwdPaths);
 	
 	if (!suc)
 		return false;
 
-	//if (!m_NumMet && m_FwdStrokeNum > 1) {
-	if (!m_NumMet) {
-		m_NumMet = true;
-	} else {
+	if (fwded) {
 		return true;
 	}
 
@@ -109,6 +94,9 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 
 		b.addPathInfo(*it);
 		m_TrieBranches.push_back(b);
+		if (b.isFullForwarded()) {
+			m_FwdedBranchNum++;
+		}
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
