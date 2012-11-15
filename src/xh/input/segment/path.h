@@ -97,13 +97,18 @@ public:
 	}
 
 	PathNode *next(TSyllable s) {
-		if (m_NextMap.find(m_Now) != m_NextMap.end()) {
-			PathNode *nxt = m_NextMap[m_Now];
-			if (nxt->transFrom(s)) {
-				return nxt;
+		while (true) {
+			if (m_NextMap.find(m_Now) != m_NextMap.end()) {
+				PathNode *nxt = m_NextMap[m_Now];
+				if (nxt->transFrom(s)) {
+					return nxt;
+				} else {
+					forward();
+				}
+			} else {
+				return NULL;
 			}
 		}
-		return NULL;
 	}
 
 	void forward() {
