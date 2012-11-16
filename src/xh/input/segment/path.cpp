@@ -153,7 +153,7 @@ Path::printNextMap()
 }
 
 bool
-Path::forward(TSyllable syllable, int num, bool &forward, PathList &paths)
+Path::forward(TSyllable syllable, int num, bool forward, PathList &paths)
 {
 	bool suc = false;
 

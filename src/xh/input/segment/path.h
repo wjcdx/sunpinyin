@@ -38,7 +38,7 @@ public:
 	PathNode &getWordNode() { return m_NodeWithWord; }
 
 	bool forward(TSyllable syllable, int num,
-			bool &forward, PathList &paths);
+			bool forward, PathList &paths);
 
 	void
 	printNodes();
@@ -84,7 +84,7 @@ public:
 
 	Path &getPath() { return m_Path; }
 
-	bool forward(TSyllable s, int num, bool &forward, PathList &paths) {
+	bool forward(TSyllable s, int num, bool forward, PathList &paths) {
 		return m_Path.forward(s, num, forward, paths);
 	}
 	void addPathInfo(Path &path) {
