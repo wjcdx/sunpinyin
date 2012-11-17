@@ -206,7 +206,7 @@ Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 		return -1;
 	}
 
-	CheckPointList::iterator it = cpset.begin();
+	CheckPointList::iterator it, itn = cpset.begin();
 	CheckPointList::iterator ite = cpset.end();
 
 	if (len == 1 && count == 1) {
@@ -214,10 +214,9 @@ Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 		return 1;
 	}
 
-	CheckPoint &cp = *it;
-	for (cp = *it, it++; it != ite; cp = *it, it++) {
-		if (next(cp.m_PNode) == (*it).m_Start) {
-			cphooks.push_back(cp);
+	for (it = itn, itn++; itn != ite; it = itn, itn++) {
+		if (next(it->m_PNode) == itn->m_Start) {
+			cphooks.push_back(*it);
 		} else {
 			cphooks.clear();
 		}

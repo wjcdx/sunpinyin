@@ -35,6 +35,10 @@ public:
 protected:
     CTreeNode*
     insertTransfer(CTreeNode* pnode, unsigned s);
+
+private:
+    void
+    threadNonCompletedXh();
 };
 
 #endif

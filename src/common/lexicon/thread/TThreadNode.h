@@ -7,15 +7,15 @@
 namespace TrieThreadModel {
     struct TThreadNode {
     #ifdef WORDS_BIGENDIAN
-        unsigned m_other      : 6;
+        unsigned m_nMaxStroke : 4;
         unsigned m_csLevel    : 2;
-        unsigned m_nTransfer  : 12;
-        unsigned m_nWordId    : 12;
+        unsigned m_nTransfer  : 13;
+        unsigned m_nWordId    : 13;
     #else
-        unsigned m_nWordId    : 12;
-        unsigned m_nTransfer  : 12;
+        unsigned m_nWordId    : 13;
+        unsigned m_nTransfer  : 13;
         unsigned m_csLevel    : 2;
-        unsigned m_other      : 6;
+        unsigned m_nMaxStroke : 4;
     #endif
 
         static unsigned int size_for(unsigned int nTransfer,

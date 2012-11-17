@@ -40,6 +40,7 @@ env.Program('dict/genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer
                    	   'common/lexicon/tree/PNodeSet.o',
                    	   'common/lexicon/CUnigramSorter.o',
                        'xh/lexicon/CXhTrieMaker.o',
+                       'xh/lexicon/path.o',
                        'xh/input/xh_data.o',
                        'pinyin/lexicon/pytrie_maker.o',
                    	   'pinyin/input/pinyin_data.o'])

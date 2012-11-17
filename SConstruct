@@ -45,6 +45,7 @@ slmsource = [
     'src/pinyin/lexicon/pytrie_maker.cpp',
     'src/pinyin/input/pinyin_data.cpp',
     'src/xh/lexicon/CXhTrieMaker.cpp',
+    'src/xh/lexicon/path.cpp',
     'src/xh/input/xh_data.cpp',
     ]
 

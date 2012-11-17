@@ -16,6 +16,7 @@
 #include "common/lexicon/tree/TTreeWordId.h"
 #include "common/lexicon/trie_writer.h"
 #include "CXhTrieMaker.h"
+#include "path.h"
 
 CXhTrieMaker::CXhTrieMaker()
 {
@@ -115,8 +116,10 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
         }
     }
     fclose(fp);
-
     printf("\n    %zd primitive nodes\n", CTreeNode::m_AllNodes.size());  fflush(stdout);
+
+    threadNonCompletedXh();
+
     return suc;
 }
 
@@ -131,6 +134,13 @@ CXhTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
         return p;
     }
     return itt->second;
+}
+
+void
+CXhTrieMaker::threadNonCompletedXh()
+{
+    Path path;
+    path.buildTrieInfo(m_pRootNode);
 }
 
 bool
@@ -177,6 +187,7 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
+        outNode.m_nMaxStroke = pnode->m_nMaxStroke;
         outNode.m_csLevel = 0;
 
         CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();
