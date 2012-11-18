@@ -153,38 +153,27 @@ Path::printNextMap()
 }
 
 bool
-Path::forward(TSyllable syllable, int num, bool forward, PathList &paths)
+Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 {
 	bool suc = false;
 
-	if (m_FullForwarded) {
+	if (pathInfoFull) {
 
 		if (num > 1) {
-			suc = checkNumInPath(syllable, num);
-			return suc;
+			return checkNumInPath(syllable, num);
 		}
 
-		PathNode *cp = next(syllable);
-		if (!cp) {
+		PathNode *node = next(syllable);
+		if (!node) {
 			return false;
 		}
-		this->forward();
+		setNow(node);
 		return true;
 	}
 
-	if (forward) {
+	if (num > 1) {
 		suc = m_Now->findAllSubNode(syllable, num, paths);
-		if (!suc)
-			return false;
-
-		m_FullForwarded = true;
-		suc = checkNumInPaths(syllable, num, paths);
 	} else {
-		//it will be rebuild at
-		//the next key event
-		if (num > 1) {
-			return false;
-		}
 		suc = m_Now->findNextSubNode(syllable, paths);
 	}
 

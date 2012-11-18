@@ -22,6 +22,7 @@ public:
 	void push_front(PathNode &node);
 
 	PathNode *getNow() { return m_Now; }
+	void setNow(PathNode *node) { m_Now = node; }
 
 	void addPseudoHead();
 	

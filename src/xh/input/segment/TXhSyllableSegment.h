@@ -13,7 +13,7 @@ struct TXhSyllableSegment : TSyllableSegment {
               unsigned start,
               unsigned length)
         : TSyllableSegment(syllable, start, length),
-		m_FwdStrokeNum(1)
+		m_FwdStrokeNum(1), m_bNumMet(false)
     {
 	}
 	
@@ -41,10 +41,8 @@ private:
 
 protected:
 	unsigned m_FwdStrokeNum;
+	bool m_bNumMet;
 	BranchList m_TrieBranches;
-	
-	static unsigned int m_FwdedBranchNum; 
-	static const unsigned int MAX_FWD_BRANCH_NUM; 
 };
 
 #endif

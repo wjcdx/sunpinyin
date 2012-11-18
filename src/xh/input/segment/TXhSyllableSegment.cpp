@@ -73,16 +73,16 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 {
 	bool suc = false;
 
-	bool fwded = branch.isFullForwarded();
-	bool forward = m_FwdedBranchNum < MAX_FWD_BRANCH_NUM;
-	
 	PathList fwdPaths;
-	suc = branch.forward(syllable, m_FwdStrokeNum, forward, fwdPaths);
+	suc = branch.forward(syllable, m_FwdStrokeNum, m_bNumMet, fwdPaths);
 	
 	if (!suc)
 		return false;
 
-	if (fwded) {
+	if (!m_bNumMet) {
+		if (m_FwdedBranchNum > 1)
+			m_bNumMet = true;
+	} else {
 		return true;
 	}
 
