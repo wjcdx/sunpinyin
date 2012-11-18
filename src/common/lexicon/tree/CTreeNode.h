@@ -21,11 +21,12 @@ public:
         CTreeWordSet m_WordIdSet;
         CTrans m_Trans;
 		unsigned m_nMaxStroke;
+		bool m_bOwnWord;
 
 public:
 		CTreeNode()
+			: m_nMaxStroke(0), m_bOwnWord(false)
 		{
-			m_nMaxStroke = 0;
 			m_AllNodes.push_back(this);
 		}
     };

@@ -19,12 +19,13 @@
 void
 Path::buildTrieInfo(CTreeNode *pnode)
 {
+	pnode->m_bOwnWord = !pnode->m_WordIdSet.empty();
+
     if (pnode->m_Trans.empty()) {
 
         pnode->m_nMaxStroke = getMostPopularPartialNum();
 
     } else {
-
         CTrans::iterator it = pnode->m_Trans.begin();
         CTrans::iterator ite = pnode->m_Trans.end();
 
