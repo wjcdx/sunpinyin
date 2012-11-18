@@ -10,7 +10,7 @@
 class Path {
 public:
 	Path()
-		: m_Now(NULL), m_FullForwarded(false)
+		: m_Now(NULL)
 	{}
 
 	Path(const Path &rhs) {
@@ -35,9 +35,6 @@ public:
 	
 	int getTransNum(TSyllable s);
 
-	void setWordNode(PathNode &node) { m_NodeWithWord = node; }
-	PathNode &getWordNode() { return m_NodeWithWord; }
-
 	bool forward(TSyllable syllable, int num,
 			bool forward, PathList &paths);
 
@@ -46,9 +43,6 @@ public:
 	
 	void
 	printNextMap();
-
-	bool isFullForwarded() { return m_FullForwarded; }
-	void setFullForwarded(bool fwd) { m_FullForwarded = fwd; }
 
 private:	
 	void add_first_node(PathNode &node) {
@@ -72,8 +66,6 @@ private:
 	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
-	PathNode m_NodeWithWord;
-	bool m_FullForwarded;
 
 	CheckPointList cpset;
 };

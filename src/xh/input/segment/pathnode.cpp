@@ -80,6 +80,7 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 			return false;
 		}
 
+		path.add(*this);
 		path.addPseudoHead();
 		if (path.checkNumInPath(syllable, num)) {
 			paths.push_back(path);
@@ -93,20 +94,24 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 	for (; nit != nite; nit++) {
 		int most = (*nit).getTNode()->m_nMaxStroke;
 		if (most < num) {
-			return false;
+			continue;
 		}
 
 		bool has = (*nit).getTNode()->hasItsOwnWord();
 		if (has) {
-			Path p = path;
+			Path p(path);
+			p.add(*nit);
 			p.addPseudoHead();
 			if (p.checkNumInPath(syllable, num)) {
 				paths.push_back(p);
-				return true;
+				//full forward this branch
+				//half forward will be done later
+				//if the performance is still low
+				//return true;
 			}
 		}
 
-		Path subPath = path;
+		Path subPath(path);
 		subPath.add(*nit);
 		(*nit).findAllSubNode(syllable, num, paths, subPath);
 	}

@@ -202,7 +202,8 @@ Path::getRepeaterStatus(int count, CheckPointList &cphooks)
 
 	for (it = itn, itn++; itn != ite; it = itn, itn++) {
 		if (next(it->m_PNode) == itn->m_Start) {
-			cphooks.push_back(*it);
+			//label the most forwarded stroke
+			cphooks.push_back(*itn);
 		} else {
 			cphooks.clear();
 		}
