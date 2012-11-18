@@ -65,20 +65,13 @@ bool
 TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 						TSyllable &syllable)
 {
-	bool suc = false;
+	bool forwarded = false;
 
 	PathList fwdPaths;
-	suc = branch.forward(syllable, m_FwdStrokeNum, m_bNumMet, fwdPaths);
+	forwarded = branch.forward(syllable, m_FwdStrokeNum, fwdPaths);
 	
-	if (!suc)
+	if (!forwarded)
 		return false;
-
-	if (!m_bNumMet) {
-		if (m_FwdStrokeNum > 1)
-			m_bNumMet = true;
-	} else {
-		return true;
-	}
 
 	PathList::iterator it = fwdPaths.begin();
 	PathList::iterator ite = fwdPaths.end();

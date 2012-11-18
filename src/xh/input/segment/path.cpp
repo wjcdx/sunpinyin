@@ -15,6 +15,7 @@ Path::operator=(const Path &rhs) {
 	for (; it != ite; it++) {
 		add(const_cast<PathNode &>(*it));
 	}
+	m_bFullForwarded = rhs.m_bFullForwarded;
 	return *this;
 }
 
@@ -150,11 +151,9 @@ Path::printNextMap()
 }
 
 bool
-Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
+Path::forward(TSyllable syllable, int num, PathList &paths)
 {
-	bool suc = false;
-
-	if (pathInfoFull) {
+	if (m_bFullForwarded) {
 		if (num > 1) {
 			return checkNumInPath(syllable, num);
 		}
@@ -167,14 +166,15 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 		return true;
 	}
 
+	bool forwarded = false;
 	if (num > 1) {
 		Path path;
-		suc = m_Now->findAllSubNode(syllable, num, paths, path);
+		forwarded = m_Now->findAllSubNode(syllable, num, paths, path);
 	} else {
-		suc = m_Now->findNextSubNode(syllable, paths);
+		forwarded = m_Now->findNextSubNode(syllable, paths);
 	}
 
-	return suc;
+	return forwarded;
 }
 
 /**

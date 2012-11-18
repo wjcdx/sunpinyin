@@ -81,6 +81,7 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 		}
 
 		path.add(*this);
+		path.setFullForwarded(true);
 		path.addPseudoHead();
 		if (path.checkNumInPath(syllable, num)) {
 			paths.push_back(path);
@@ -103,11 +104,8 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 			p.add(*nit);
 			p.addPseudoHead();
 			if (p.checkNumInPath(syllable, num)) {
+				p.setFullForwarded(true);
 				paths.push_back(p);
-				//full forward this branch
-				//half forward will be done later
-				//if the performance is still low
-				//return true;
 			}
 		}
 

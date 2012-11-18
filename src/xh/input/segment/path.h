@@ -10,7 +10,7 @@
 class Path {
 public:
 	Path()
-		: m_Now(NULL)
+		: m_Now(NULL), m_bFullForwarded(false)
 	{}
 
 	Path(const Path &rhs) {
@@ -24,6 +24,9 @@ public:
 	PathNode *getNow() { return m_Now; }
 	void setNow(PathNode *node) { m_Now = node; }
 
+	bool getFullForwarded() { return m_bFullForwarded; }
+	void setFullForwarded(bool fwd) { m_bFullForwarded = fwd; }
+
 	void addPseudoHead();
 	
 	PathNodeList &getPathNodes() { return m_Nodes; }
@@ -35,8 +38,7 @@ public:
 	
 	int getTransNum(TSyllable s);
 
-	bool forward(TSyllable syllable, int num,
-			bool forward, PathList &paths);
+	bool forward(TSyllable syllable, int num, PathList &paths);
 
 	void
 	printNodes();
@@ -66,6 +68,7 @@ private:
 	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
+	bool m_bFullForwarded;
 
 	CheckPointList cpset;
 };
@@ -80,8 +83,8 @@ public:
 
 	Path &getPath() { return m_Path; }
 
-	bool forward(TSyllable s, int num, bool forward, PathList &paths) {
-		return m_Path.forward(s, num, forward, paths);
+	bool forward(TSyllable s, int num, PathList &paths) {
+		return m_Path.forward(s, num, paths);
 	}
 	void addPathInfo(Path &path) {
 		PathNodeList::iterator it = path.getPathNodes().begin();
@@ -89,6 +92,7 @@ public:
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
+		m_Path.setFullForwarded(path.getFullForwarded());
 	}
 };
 
