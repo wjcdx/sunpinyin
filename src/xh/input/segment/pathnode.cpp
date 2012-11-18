@@ -50,8 +50,8 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			(*nit).flag = PathNode::JUSTNOW;
 			
 			Path path;
-			int wnum = (*nit).getTNode()->m_nWordId;
-			if (wnum > 0) {
+			bool has = (*nit).getTNode()->hasItsOwnWord();
+			if (has) {
 				path.setWordNode(*nit);
 			}
 
@@ -77,44 +77,49 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 }
 
 bool
-PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths)
+PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path)
 {
 	PathNodeList children;
 	
 	if (!getChildren(syllable, children)) {
+		int most = getTNode()->m_nMaxStroke;
+		if (most < num) {
+			return false;
+		}
+
+		path.setWordNode(*this);
+		path.setFullForwarded(true);
+		path.addPseudoHead();
+		if (path.checkNumInPath(syllable, num)) {
+			paths.push_back(path);
+			return true;
+		}
 		return false;
 	}
 
 	PathNodeList::iterator nit = children.begin();
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
-		if ((*nit).transFrom(syllable)) {
-			num -= 1;
+		int most = (*nit).getTNode()->m_nMaxStroke;
+		if (most < num) {
+			return false;
 		}
 
-		int wnum = (*nit).getTNode()->m_nWordId;
-		if (wnum > 0) {
-			Path path;
-			path.push_front(*nit);
-			path.setWordNode(*nit);
-			path.setFullForwarded(true);
-			paths.push_back(path);
+		bool has = (*nit).getTNode()->hasItsOwnWord();
+		if (has) {
+			Path p = path;
+			p.setWordNode(*nit);
+			p.setFullForwarded(true);
+			p.addPseudoHead();
+			if (p.checkNumInPath(syllable, num)) {
+				paths.push_back(p);
+				return true;
+			}
 		}
 
-		bool suc = false;
-		PathList subPaths;
-		suc = (*nit).findAllSubNode(syllable, num, subPaths);
-		if (!suc)
-			continue;
-
-		PathList::iterator pit = subPaths.begin();
-		PathList::iterator pite = subPaths.end();
-		for (; pit != pite; pit++) {
-			if ((*pit).getTransNum(syllable) < num)
-				continue;
-			(*pit).push_front(*nit);
-			paths.push_back(*pit);
-		}
+		Path subPath = path;
+		subPath.add(*nit);
+		(*nit).findAllSubNode(syllable, num, paths, subPath);
 	}
 	return !paths.empty();
 }
