@@ -4,9 +4,6 @@
 #include "ime-core/lattice/lattice_manager.h"
 #include "TXhSyllableSegment.h"
 
-unsigned int TXhSyllableSegment::m_FwdedBranchNum = 0;
-const unsigned int TXhSyllableSegment::MAX_FWD_BRANCH_NUM = 20;
-
 void
 TXhSyllableSegment::prepare()
 {
@@ -18,7 +15,7 @@ TXhSyllableSegment::prepare()
 	branch.m_Path.add(node);
 	m_TrieBranches.push_back(branch);
 	m_FwdStrokeNum = 1;
-	m_FwdedBranchNum = 0;
+	m_bNumMet = false;
 }
 
 void
@@ -59,9 +56,6 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 
 	for (it = itn, itn++; it != ite; it = itn, itn++) {
 		if (!_forwardBranch(*it, syllable)) {
-			if ((*it).isFullForwarded()) {
-				m_FwdedBranchNum--;
-			}
 			m_TrieBranches.erase(it);
 		}
 	}
@@ -80,7 +74,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		return false;
 
 	if (!m_bNumMet) {
-		if (m_FwdedBranchNum > 1)
+		if (m_FwdStrokeNum > 1)
 			m_bNumMet = true;
 	} else {
 		return true;
@@ -94,9 +88,6 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 
 		b.addPathInfo(*it);
 		m_TrieBranches.push_back(b);
-		if (b.isFullForwarded()) {
-			m_FwdedBranchNum++;
-		}
 	}
 	Path &p = fwdPaths.front();
 	branch.addPathInfo(p);
@@ -124,7 +115,7 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
     BranchList::iterator ite = m_TrieBranches.end();
 	for (; it != ite; it++) {
 		TXhLexiconState new_lxst = TXhLexiconState(i,
-			(*it).getPath().getWordNode().getTNode(),
+			(*it).getPath().getNow()->getTNode(),
 			syls, seg_path);
 		fr.m_lexiconStates.push_back(new_lxst);
 	}

@@ -50,11 +50,6 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			(*nit).flag = PathNode::JUSTNOW;
 			
 			Path path;
-			bool has = (*nit).getTNode()->hasItsOwnWord();
-			if (has) {
-				path.setWordNode(*nit);
-			}
-
 			path.add(*nit);
 			paths.push_back(path);
 		} else {
@@ -87,8 +82,6 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 			return false;
 		}
 
-		path.setWordNode(*this);
-		path.setFullForwarded(true);
 		path.addPseudoHead();
 		if (path.checkNumInPath(syllable, num)) {
 			paths.push_back(path);
@@ -108,8 +101,6 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 		bool has = (*nit).getTNode()->hasItsOwnWord();
 		if (has) {
 			Path p = path;
-			p.setWordNode(*nit);
-			p.setFullForwarded(true);
 			p.addPseudoHead();
 			if (p.checkNumInPath(syllable, num)) {
 				paths.push_back(p);

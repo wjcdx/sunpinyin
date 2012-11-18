@@ -10,9 +10,6 @@ Path::operator=(const Path &rhs) {
 	if (this == &rhs)
 		return *this;
 
-	m_NodeWithWord = rhs.m_NodeWithWord;
-	m_FullForwarded = rhs.m_FullForwarded;
-	
 	PathNodeList::const_iterator it = rhs.m_Nodes.begin();
 	PathNodeList::const_iterator ite = rhs.m_Nodes.end();
 	for (; it != ite; it++) {
@@ -158,7 +155,6 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 	bool suc = false;
 
 	if (pathInfoFull) {
-
 		if (num > 1) {
 			return checkNumInPath(syllable, num);
 		}

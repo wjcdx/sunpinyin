@@ -94,11 +94,7 @@ public:
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
-		m_Path.setFullForwarded(path.isFullForwarded());
-		m_Path.setWordNode(path.getWordNode());
 	}
-
-	bool isFullForwarded() { return m_Path.isFullForwarded(); }
 };
 
 typedef std::list<TrieBranch> BranchList;
