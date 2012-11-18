@@ -17,7 +17,7 @@
 #include "path.h"
 
 void
-Path::buildTrieInfo(CTreeNode *pnode)
+Path::buildTrieInfo(CTreeNode *pnode, bool add)
 {
 	pnode->m_bOwnWord = !pnode->m_WordIdSet.empty();
 
@@ -35,13 +35,15 @@ Path::buildTrieInfo(CTreeNode *pnode)
             p.add(it->first);
 
             CTreeNode *sub = it->second;
-            p.buildTrieInfo(sub);
+            p.buildTrieInfo(sub, true);
 
-            CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
-            CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
-            for (; wit != wite; wit++) {
-                pnode->m_WordIdSet.insert(*wit);
-            }
+			if (add) {
+				CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
+				CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
+				for (; wit != wite; wit++) {
+					pnode->m_WordIdSet.insert(*wit);
+				}
+			}
 
             if ((int)sub->m_nMaxStroke > max) {
                 max = sub->m_nMaxStroke;

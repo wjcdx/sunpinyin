@@ -28,7 +28,6 @@ CXhTrieMaker::~CXhTrieMaker()
     delete m_pRootNode;
 }
 
-
 bool
 CXhTrieMaker::parseLine(char* buf,
           char* word_buf,
@@ -140,7 +139,7 @@ void
 CXhTrieMaker::threadNonCompletedXh()
 {
     Path path;
-    path.buildTrieInfo(m_pRootNode);
+    path.buildTrieInfo(m_pRootNode, false);
 }
 
 bool

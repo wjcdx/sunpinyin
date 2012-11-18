@@ -12,7 +12,7 @@ public:
 	}
 
 	void
-	buildTrieInfo(CTreeNode *pnode);
+	buildTrieInfo(CTreeNode *pnode, bool add);
 	int
 	getRepeaterStatus(int count);
 
