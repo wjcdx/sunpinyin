@@ -7,7 +7,8 @@
 namespace TrieThreadModel {
     struct TThreadNode {
     #ifdef WORDS_BIGENDIAN
-        unsigned m_nMaxStroke : 4;
+        unsigned m_nMaxStroke : 3;
+        unsigned m_bOwnWord   : 1;
         unsigned m_csLevel    : 2;
         unsigned m_nTransfer  : 13;
         unsigned m_nWordId    : 13;
@@ -15,7 +16,8 @@ namespace TrieThreadModel {
         unsigned m_nWordId    : 13;
         unsigned m_nTransfer  : 13;
         unsigned m_csLevel    : 2;
-        unsigned m_nMaxStroke : 4;
+        unsigned m_bOwnWord   : 1;
+        unsigned m_nMaxStroke : 3;
     #endif
 
         static unsigned int size_for(unsigned int nTransfer,
@@ -29,6 +31,9 @@ namespace TrieThreadModel {
 
         bool hasChild(void) const
         { return(m_nTransfer > 1); }
+        
+		bool hasItsOwnWord(void) const
+        { return (m_bOwnWord == 1); }
 
         const TTransUnit*getTrans() const
         { return (TTransUnit *) (this + 1); }

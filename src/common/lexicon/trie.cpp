@@ -128,6 +128,8 @@ CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
         fprintf(fp, "%s", prefix.c_str());
         if (pRoot->m_csLevel)
             fprintf(fp, "(GBK+)");
+        fprintf(fp, " m:%d ", pRoot->m_nMaxStroke);
+        fprintf(fp, " w:%d ", pRoot->m_bOwnWord);
         unsigned int sz = pRoot->m_nWordId;
         const TWordIdInfo *pwids = pRoot->getWordIdPtr();
         for (unsigned int i = 0; i < sz; ++i) {
