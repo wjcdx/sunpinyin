@@ -4,7 +4,7 @@ export PATH=${PREVPATH}
 DICTGEN = ./sunpinyin-dictgen
 
 gen_all:
-	${DICTGEN} bin_data
+	${DICTGEN} xhdict3_sc.bin
 
 lm_sc:
 	${DICTGEN} lm_sc.t3g
@@ -12,7 +12,7 @@ lm_sc:
 xhdict:
 	${DICTGEN} xhdict3_sc.bin
 
-xhdict-gdb:
+gdb-xh:
 	gdb --args ./genpyt -e le -i dict.utf8.xh \
 		-s lm_sc.t3g -l lm_sc.t3g.xh.log -t xh -o xhdict3_sc.bin
 
