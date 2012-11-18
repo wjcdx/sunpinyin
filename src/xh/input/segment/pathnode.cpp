@@ -38,7 +38,6 @@ bool
 PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 {
 	PathNodeList children;
-	
 	if (!getChildren(syllable, children)) {
 		return false;
 	}
@@ -75,7 +74,6 @@ bool
 PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path)
 {
 	PathNodeList children;
-	
 	if (!getChildren(syllable, children)) {
 		int most = getTNode()->m_nMaxStroke;
 		if (most < num) {

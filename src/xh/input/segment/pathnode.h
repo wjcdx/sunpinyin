@@ -53,7 +53,7 @@ public:
 	void print();
 	bool getChildren(TSyllable syllable, PathNodeList &children);
 	bool findNextSubNode(TSyllable syllable, PathList &paths);
-	bool findAllSubNode(TSyllable syllable, int num, PathList &paths);
+	bool findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path);
 };
 
 #endif

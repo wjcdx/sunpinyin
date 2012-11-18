@@ -168,7 +168,8 @@ Path::forward(TSyllable syllable, int num, bool pathInfoFull, PathList &paths)
 	}
 
 	if (num > 1) {
-		suc = m_Now->findAllSubNode(syllable, num, paths);
+		Path path;
+		suc = m_Now->findAllSubNode(syllable, num, paths, path);
 	} else {
 		suc = m_Now->findNextSubNode(syllable, paths);
 	}
