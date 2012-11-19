@@ -75,18 +75,6 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 {
 	PathNodeList children;
 	if (!getChildren(syllable, children)) {
-		int most = getTNode()->m_nMaxStroke;
-		if (most < num) {
-			return false;
-		}
-
-		path.add(*this);
-		path.setFullForwarded(true);
-		path.addPseudoHead();
-		if (path.checkNumInPath(syllable, num)) {
-			paths.push_back(path);
-			return true;
-		}
 		return false;
 	}
 
