@@ -130,7 +130,7 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
     BranchList::iterator it = m_TrieBranches.begin();
     BranchList::iterator ite = m_TrieBranches.end();
 	for (; it != ite; it++) {
-		CInputTrieSource::m_pTrie->print((*it).getPath().getNow()->getTNode());
+		//CInputTrieSource::m_pTrie->print((*it).getPath().getNow()->getTNode());
 		TXhLexiconState new_lxst = TXhLexiconState(i,
 			it->getPath().getNow()->getTNode(),
 			syls, seg_path);
