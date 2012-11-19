@@ -67,7 +67,8 @@ TStringSegment::forward(unsigned i, unsigned j)
             _forwardOrdinaryChar(i, j, ch);
         }
     } else {
-        CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j); 
+        CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
+		fr.m_type = CLatticeFrame::SYMBOL;
         fr.m_wstr.assign(strbuf.begin(), strbuf.end());
         fr.m_lexiconStates.push_back(TLexiconState(i, 0));
     }
