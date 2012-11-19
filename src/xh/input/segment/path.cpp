@@ -240,7 +240,7 @@ Path::getSameRepNumber(CheckPoint &cp)
 	for (; it != ite; it++) {
 		if (*it == cp)
 			continue;
-		if (n1 == (*it).m_PNode) {
+		if (n1 != NULL && n1->isTransSameAs((*it).m_PNode)) {
 			c++;
 		}
 	}

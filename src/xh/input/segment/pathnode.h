@@ -48,6 +48,12 @@ public:
 	bool isNow() { return flag == PathNode::JUSTNOW; }
 
 	bool transFrom(TSyllable s) { return (m_Trans->m_Unit == s); }
+	unsigned getTransUnit() { return m_Trans->m_Unit; }
+	bool isTransSameAs(PathNode *node) {
+		return node != NULL && (getTransUnit() == node->getTransUnit());
+	}
+
+
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }
 
 	void print();
