@@ -163,4 +163,40 @@ CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
     }
 }
 
+void
+CTrie::print(const TThreadNode* pRoot) const
+{
+    FILE *fp = stdout;
+    char buf[1024];
+    
+    fprintf(fp, "%d", pRoot->m_nWordId);
+    if (pRoot->m_nWordId > 0) {
+        if (pRoot->m_csLevel)
+            fprintf(fp, "(GBK+)");
+        fprintf(fp, " m:%d ", pRoot->m_nMaxStroke);
+        fprintf(fp, " w:%d ", pRoot->m_bOwnWord);
+        unsigned int sz = pRoot->m_nWordId;
+        const TWordIdInfo *pwids = pRoot->getWordIdPtr();
+        for (unsigned int i = 0; i < sz; ++i) {
+            unsigned int id = pwids[i].m_id;
+            fprintf(fp, " %d:", id);
+            const TWCHAR *pw = operator[](id);
+            int len = WCSLEN(pw);
+            if (len != lengthAt(id)) {
+                printf(" (lengthAt %d error) ", id);
+            }
+            WCSTOMBS(buf, pw, 1024);
+            fprintf(fp, " %s", buf);
+            /*
+            if (pwids[i].m_bSeen == 0)
+                fprintf(fp, "[x]");
+            else
+                fprintf(fp, "[o]");
+
+            fprintf(fp, "(%d)", pwids[i].m_cost);
+            */
+        }
+        fprintf(fp, "\n");
+    }
+}
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

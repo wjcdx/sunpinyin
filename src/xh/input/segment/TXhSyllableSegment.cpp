@@ -12,6 +12,7 @@ TXhSyllableSegment::prepare()
 		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
 		PathNode::JUSTNOW);
 	TrieBranch branch;
+	branch.setNewAdded(false);
 	branch.m_Path.add(node);
 	m_TrieBranches.push_back(branch);
 	m_FwdStrokeNum = 1;
@@ -52,13 +53,19 @@ void
 TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 {
     std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
-    std::list<TrieBranch>::iterator ite = m_TrieBranches.end();
 
-	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		if (!_forwardBranch(*it, syllable)) {
-			m_TrieBranches.erase(it);
+	fprintf(stdout, "N: %lu\n", m_TrieBranches.size());
+	for (it = itn, itn++; it != m_TrieBranches.end();
+			it = itn, itn++) {
+		if (it->isNewAdded()) {
+			it->setNewAdded(false);
+		} else {
+			if (!_forwardBranch(*it, syllable)) {
+				m_TrieBranches.erase(it);
+			}
 		}
 	}
+	fprintf(stdout, "N: %lu\n", m_TrieBranches.size());
 }
 
 bool
@@ -66,6 +73,21 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 						TSyllable &syllable)
 {
 	bool forwarded = false;
+
+#if 0
+	{
+		TThreadNode *now = branch.getPath().getNow()->getTNode();
+		unsigned int sz = now->m_nWordId;
+		const TWordIdInfo *pwids = now->getWordIdPtr();
+		for (unsigned int i = 0; i < sz; ++i) {
+			unsigned int id = pwids[i].m_id;
+			if (id == 765) {
+				CInputTrieSource::m_pTrie->print(now);
+				break;
+			}
+		}
+	}
+#endif
 
 	PathList fwdPaths;
 	forwarded = branch.forward(syllable, m_FwdStrokeNum, fwdPaths);
@@ -79,6 +101,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	for (it++; it != ite; it++) {
 		TrieBranch b(branch);
 
+		b.setNewAdded(true);
 		b.addPathInfo(*it);
 		m_TrieBranches.push_back(b);
 	}
@@ -107,8 +130,9 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
     BranchList::iterator it = m_TrieBranches.begin();
     BranchList::iterator ite = m_TrieBranches.end();
 	for (; it != ite; it++) {
+		CInputTrieSource::m_pTrie->print((*it).getPath().getNow()->getTNode());
 		TXhLexiconState new_lxst = TXhLexiconState(i,
-			(*it).getPath().getNow()->getTNode(),
+			it->getPath().getNow()->getTNode(),
 			syls, seg_path);
 		fr.m_lexiconStates.push_back(new_lxst);
 	}

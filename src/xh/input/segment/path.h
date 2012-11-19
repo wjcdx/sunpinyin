@@ -78,10 +78,14 @@ typedef std::list<Path> PathList;
 class TrieBranch {
 public:
 	Path m_Path;
+	bool m_bNewAdded;
 
-	TrieBranch() {}
+	TrieBranch() : m_bNewAdded(true) {}
 
 	Path &getPath() { return m_Path; }
+
+	bool isNewAdded() { return m_bNewAdded; }
+	void setNewAdded(bool fresh) { m_bNewAdded = fresh; }
 
 	bool forward(TSyllable s, int num, PathList &paths) {
 		return m_Path.forward(s, num, paths);

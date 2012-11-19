@@ -76,6 +76,9 @@ public:
 
     void
     print(FILE *fp) const;
+    
+    void
+    print(const TThreadNode* pRoot) const;
 
 protected:
     unsigned int m_Size;
