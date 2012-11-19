@@ -9,7 +9,8 @@ template <>
 class OtherEndian<TThreadNode>
 {
     struct TThreadNode_BE {
-        unsigned m_nMaxStroke : 4;
+        unsigned m_nMaxStroke : 3;
+        unsigned m_bOwnWord   : 1;
         unsigned m_csLevel    : 2;
         unsigned m_nTransfer  : 13;
         unsigned m_nWordId    : 13;
@@ -19,7 +20,8 @@ class OtherEndian<TThreadNode>
         unsigned m_nWordId    : 13;
         unsigned m_nTransfer  : 13;
         unsigned m_csLevel    : 2;
-        unsigned m_nMaxStroke : 4;
+        unsigned m_bOwnWord   : 1;
+        unsigned m_nMaxStroke : 3;
     };
 public:
     DEFINE_OTHER_TYPE(TThreadNode);
@@ -29,6 +31,7 @@ public:
         to.m_nTransfer = from.m_nTransfer;
         to.m_nWordId = from.m_nWordId;
         to.m_csLevel = from.m_csLevel;
+        to.m_bOwnWord = from.m_bOwnWord;
         to.m_nMaxStroke = from.m_nMaxStroke;
         return to;
     }
