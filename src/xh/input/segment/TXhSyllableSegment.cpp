@@ -52,16 +52,18 @@ TXhSyllableSegment::_forwardNumber(unsigned n)
 void
 TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 {
-    std::list<TrieBranch>::iterator it, itn = m_TrieBranches.begin();
+    std::list<TrieBranch>::iterator it = m_TrieBranches.begin();
 
 	fprintf(stdout, "N: %lu\n", m_TrieBranches.size());
-	for (it = itn, itn++; it != m_TrieBranches.end();
-			it = itn, itn++) {
+	for (; it != m_TrieBranches.end();) {
 		if (it->isNewAdded()) {
 			it->setNewAdded(false);
+			it++;
 		} else {
 			if (!_forwardBranch(*it, syllable)) {
-				m_TrieBranches.erase(it);
+				it = m_TrieBranches.erase(it);
+			} else {
+				it++;
 			}
 		}
 	}

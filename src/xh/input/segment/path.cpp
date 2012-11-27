@@ -255,12 +255,13 @@ Path::iterateRepeaters(int count)
 	
 	forwardCheckPoint();
 
-	CheckPointList::iterator it, itn = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (it = itn, itn++; it != ite; it = itn, itn++) {
+	CheckPointList::iterator it = cpset.begin();
+	for (; it != cpset.end(); ) {
 		int c = getSameRepNumber(*it);
 		if (c+1 < count) {
-			cpset.erase(it);
+			it = cpset.erase(it);
+		} else {
+			it++;
 		}
 	}
 }
@@ -318,12 +319,13 @@ Path::checkNumInPath(TSyllable syllable, int num)
 bool
 Path::checkNumInPaths(TSyllable syllable, int num, PathList &paths)
 {
-	PathList::iterator it, itn = paths.begin();
-	PathList::iterator ite = paths.end();
-	for (it = itn, itn++; it != ite; it = itn, itn++) {
+	PathList::iterator it = paths.begin();
+	for (; it != paths.end();) {
 		(*it).addPseudoHead();
 		if (!(*it).checkNumInPath(syllable, num)) {
-			paths.erase(it);
+			it = paths.erase(it);
+		} else {
+			it++;
 		}
 	}
 	return !paths.empty();
