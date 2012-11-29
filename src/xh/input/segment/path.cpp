@@ -291,6 +291,7 @@ Path::labelPath(CheckPointList &cphooks)
 
 	CheckPoint &cp = cphooks.back();
 	cp.m_PNode->setFlag(PathNode::JUSTNOW);
+	setNow(cp.m_PNode);
 }
 
 bool

@@ -67,7 +67,7 @@ TXhSyllableSegment::_forwardStroke(TSyllable &syllable)
 			}
 		}
 	}
-	fprintf(stdout, "N: %lu\n", m_TrieBranches.size());
+	fprintf(stdout, "N: %lu\n\n", m_TrieBranches.size());
 }
 
 bool
