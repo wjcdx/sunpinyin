@@ -89,11 +89,11 @@ public:
     bool searchFrom(unsigned from = 1);
 
     size_t getMaxBest() const {
-        return m_pLatticeMgr->getLatticeFrame(0)
-                   .m_latticeStates.getMaxBest();
+        return m_maxBest;
     }
 
     void setMaxBest(size_t maxBest) {
+        m_maxBest = maxBest;
         for (int i = 0; i < MAX_LATTICE_LENGTH; i++) {
             m_pLatticeMgr->getLatticeFrame(i)
                 .m_latticeStates.setMaxBest(maxBest);
