@@ -11,6 +11,7 @@
 #include "imi_ibus_win.h"
 #include "ibus_portable.h"
 #include "sunpinyin_engine.h"
+#include "debug.h"
 
 extern ibus::Config config;
 
@@ -469,7 +470,11 @@ SunPinyinEngine::update_max_best()
         return;
     }
     int oldval = (int) m_pv->getIC()->getMaxBest();
+    ibus::log << "old MaxBest: " << oldval << "\n";
+    ibus::log.flush();
     m_pv->getIC()->setMaxBest(m_config.get(CONFIG_GENERAL_MAX_BEST, oldval));
+    ibus::log << "MaxBest got: " << m_config.get(CONFIG_GENERAL_MAX_BEST, oldval) << "\n";
+    ibus::log.flush();
 }
 
 void
