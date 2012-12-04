@@ -6,7 +6,7 @@ version="2.0.4"
 abi_major = 3
 abi_minor = 0
 
-cflags = '-g -Wall'
+cflags = '-g -Wall -DDEBUG'
 
 slmsource = [
     'src/slm/ids2ngram/ids2ngram.cpp',
