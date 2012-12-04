@@ -135,6 +135,10 @@ public:
 
     iterator begin();
     iterator end();
+
+    size_t size() {
+        return m_size;
+    }
 private:
     void _pushScoreHeap(TSentenceScore score, CSlmState slmState);
     void _popScoreHeap();

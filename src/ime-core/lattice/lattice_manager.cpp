@@ -51,11 +51,11 @@ static double exp2_tbl[32] = {
 };
 
 bool
-CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info)
+CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
 {
 	bool affectCandidates;
-    for (; rebuildFrom <= m_tailIdx; ++rebuildFrom) {
-        CLatticeFrame &fr = m_lattice[rebuildFrom];
+    for (; idx <= m_tailIdx; ++idx) {
+        CLatticeFrame &fr = m_lattice[idx];
 
         if (fr.m_type == CLatticeFrame::UNUSED)
             continue;
@@ -64,7 +64,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &inf
 
         /* user selected word might be cut in next step */
         if (fr.m_bwType & CLatticeFrame::USER_SELECTED) {
-            _transferBetween(fr.m_selWord.m_start, rebuildFrom,
+            _transferBetween(fr.m_selWord.m_start, idx,
                              fr.m_selWord.m_pLexiconState,
                              fr.m_selWord.m_wordId);
         }
@@ -79,7 +79,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &inf
             if (!word_num)
                 continue;
 
-            if (lxst.m_start == info.m_candiStarts && rebuildFrom > info.m_candiEnds)
+            if (lxst.m_start == info.m_candiStarts && idx > info.m_candiEnds)
                 affectCandidates = true;
 
             // only selected the word with higher unigram probablities, and
@@ -95,7 +95,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &inf
             while (count < sz && i < sz && (words[i].m_bSeen || count < 2)) {
                 if (info.m_csLevel >= words[i].m_csLevel) {
                     // printf("cost %d\n", words[i].m_cost);
-                    _transferBetween(lxst.m_start, rebuildFrom, &lxst, words[i].m_id,
+                    _transferBetween(lxst.m_start, idx, &lxst, words[i].m_id,
                                      ic * exp2_tbl[words[i].m_cost]);
                     ++count;
                 }
@@ -108,7 +108,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &inf
                     if (info.m_csLevel >= words[i].m_csLevel
                         && CIMIContext::m_pHistory->seenBefore(words[i].m_id)) {
                         // printf("history cost %d\n", words[i].m_cost);
-                        _transferBetween(lxst.m_start, rebuildFrom, &lxst,
+                        _transferBetween(lxst.m_start, idx, &lxst,
                                          words[i].m_id,
                                          ic * exp2_tbl[words[i].m_cost]);
                     }
@@ -116,6 +116,7 @@ CLatticeManager::buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &inf
                 }
             }
         }
+		//fr.m_latticeStates.size();
     }
 	return affectCandidates;
 }
@@ -173,6 +174,7 @@ CLatticeManager::_transferBetween(unsigned start, unsigned end,
 
         node.m_score = it->m_score * efic * TSentenceScore(ts);
         end_fr.m_latticeStates.add(node);
+		//printf("end_fr.m_latticeStates.size: %d\n", (int)end_fr.m_latticeStates.size());
     }
 }
 

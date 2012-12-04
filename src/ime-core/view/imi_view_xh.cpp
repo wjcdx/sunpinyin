@@ -17,7 +17,7 @@ CIMIXhView::onKeyEvent(const CKeyEvent& key)
     unsigned modifiers = key.modifiers;
 
 #ifdef DEBUG
-    printf("Xh View got a key (0x%x-0x%x-0x%x)...",
+    printf("Xh View got a key (0x%x-0x%x-0x%x)...\n",
            keycode, keyvalue, modifiers);
     if (((modifiers & IM_CTRL_MASK) != 0) &&
         (keyvalue == 'P' || keyvalue == 'p'))

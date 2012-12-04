@@ -159,6 +159,10 @@ public:
     void setHistoryMemory(CICHistory *phm) { m_pHistory = phm; }
     CICHistory * getHistoryMemory() { return m_pHistory; }
 
+    void printLattice() {
+        m_pLatticeMgr->printLattice();
+    }
+
 public:
     static CICHistory* m_pHistory;
 

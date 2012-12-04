@@ -79,7 +79,7 @@ CIMIContext::backTracePaths()
             .m_latticeStates.getFilteredResult();
 
 #ifdef DEBUG
-    for (int i = 0; i < tail_states.size(); i++) {
+    for (unsigned i = 0; i < tail_states.size(); i++) {
         std::string score;
         tail_states[i].m_score.toString(score);
         printf("score[%d]: %s\n", i, score.c_str());
