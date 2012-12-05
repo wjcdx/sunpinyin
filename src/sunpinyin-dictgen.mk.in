@@ -45,9 +45,11 @@ ${DICT_AR}:
 dict.utf8: ${DICT_AR}
 	${TAR} xmf $^
 
-${DICT_UTF8_PY}:
+${DICT_UTF8_PY}: dict.utf8
+	cp $^ $@
 
-${DICT_UTF8_XH}:
+${DICT_UTF8_XH}: dict.utf8
+	dconv dict.utf8.xh.oc dict.utf8.py dict.utf8.xh
 
 ${DICT_UTF8_XH_OC}:
 

@@ -47,6 +47,7 @@ slmsource = [
     'src/xh/lexicon/oc/CXhocTrieMaker.cpp',
     'src/xh/lexicon/oc/path.cpp',
     'src/xh/lexicon/xh/CXhTrieMaker.cpp',
+    'src/xh/lexicon/DictConv.cpp',
     'src/xh/input/xh_data.cpp',
     'src/xh/input/xhoc_data.cpp',
     ]
@@ -220,6 +221,7 @@ bins = [
     'src/dict/tslminfo',
     'src/dict/tslmpack',
     'src/dict/genpyt',
+    'src/dict/dconv',
     'src/dict/getwordfreq',
     'src/dict/sunpinyin-dictgen',
     ]
