@@ -18,7 +18,7 @@ PathNode::print()
 }
 
 bool
-PathNode::getChildren(TSyllable syllable, PathNodeList &children)
+PathNode::getChildren(PathNodeList &children)
 {
 	unsigned int sz = m_TNode->m_nTransfer;
 
@@ -38,7 +38,7 @@ bool
 PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 {
 	PathNodeList children;
-	if (!getChildren(syllable, children)) {
+	if (!getChildren(children)) {
 		return false;
 	}
 
@@ -90,7 +90,7 @@ bool
 PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path)
 {
 	PathNodeList children;
-	if (!getChildren(syllable, children)) {
+	if (!getChildren(children)) {
 		return false;
 	}
 

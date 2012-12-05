@@ -18,10 +18,11 @@ CXhSimplifiedChinesePolicy::loadResources()
 
     bool suc = true;
     std::string data_dir = m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
-    std::string lm_path = data_dir + "/lm_sc.t3g";
-    std::string dict_path = data_dir + "/xhdict3_sc.bin";
+    std::string lm_path = data_dir + "/lm_sc.t3g.xh";
+    std::string dict_path = data_dir + "/dict3_sc.bin.xh";
+    std::string oc_dict_path = data_dir + "/dict3_sc.bin.xh.oc";
 
-    suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
+    suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str(), oc_dict_path.c_str());
 
     if (!m_user_data_dir.size()) {
         char path[256];

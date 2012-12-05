@@ -1,7 +1,8 @@
 #include "CInputTrieSource.h"
 
-CTrie *CInputTrieSource::m_pTrie;
-CUserDict* CInputTrieSource::m_pUserDict;
+CTrie *CInputTrieSource::m_pTrie = NULL;
+CTrie *CInputTrieSource::m_pTrieOc = NULL;
+CUserDict* CInputTrieSource::m_pUserDict = NULL;
 
 const TWCHAR *
 CInputTrieSource::getWstr(unsigned wid)

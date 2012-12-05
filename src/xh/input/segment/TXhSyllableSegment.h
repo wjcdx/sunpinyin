@@ -7,6 +7,8 @@
 #include "ime-core/helper/CInputTrieSource.h"
 #include "common/lexicon/trie.h"
 
+class CLatticeFrame;
+
 struct TXhSyllableSegment : TSyllableSegment {
 
 	TXhSyllableSegment (unsigned syllable,
@@ -35,6 +37,10 @@ private:
 
 	bool
 	_forwardBranch(TrieBranch &branch, TSyllable &syllable);
+
+	void
+	_buildForSingleSyllable(int i, CLatticeFrame &ifr,
+			CLatticeFrame &jfr, TSyllable syllable);
 
 	void
 	_buildLexiconStates(unsigned i, unsigned j);

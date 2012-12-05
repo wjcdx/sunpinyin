@@ -4,12 +4,14 @@
 #include "ime-core/lattice/lattice_manager.h"
 #include "TXhSyllableSegment.h"
 
+using namespace TrieThreadModel;
+
 void
 TXhSyllableSegment::prepare()
 {
 	m_TrieBranches.clear();
 	PathNode node(NULL,
-		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
+		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrieOc->getRootNode(),
 		PathNode::JUSTNOW);
 	TrieBranch branch;
 	branch.setNewAdded(false);
@@ -84,7 +86,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		for (unsigned int i = 0; i < sz; ++i) {
 			unsigned int id = pwids[i].m_id;
 			if (id == 765) {
-				CInputTrieSource::m_pTrie->print(now);
+				CInputTrieSource::m_pTrieOc->print(now);
 				break;
 			}
 		}
@@ -113,30 +115,63 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 }
 
 void
+TXhSyllableSegment::_buildForSingleSyllable(int i, CLatticeFrame &ifr,
+		CLatticeFrame &jfr, TSyllable syllable)
+{
+    const TThreadNode * pn = NULL;
+	
+	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
+    CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
+    for (; it != ite; ++it) {
+        TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
+
+        if (lxst.m_pNode) {
+            // try to match a word from lattice i to lattice j
+            // and if match, we'll count it as a new lexicon on lattice j
+            pn = CInputTrieSource::m_pTrie->transfer(lxst.m_pNode, syllable);
+            if (pn) {
+                TXhLexiconState new_lxst = TXhLexiconState(lxst.m_start,
+                                                       pn,
+                                                       lxst.m_syls,
+                                                       lxst.m_seg_path);
+                new_lxst.m_syls.push_back(syllable);
+                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
+                jfr.m_lexiconStates.push_back(new_lxst);
+            }
+        }
+	}
+    
+	// last, create a lexicon for single character with only one syllable
+    pn = CInputTrieSource::m_pTrie->transfer(syllable);
+    if (pn) {
+        CSyllables syls;
+        syls.push_back(syllable);
+        std::vector<unsigned> seg_path;
+        seg_path.push_back(this->m_start);
+        seg_path.push_back(this->m_start + this->m_len);
+        TXhLexiconState new_lxst = TXhLexiconState(i, pn, syls, seg_path);
+        jfr.m_lexiconStates.push_back(new_lxst);
+    }
+}
+
+void
 TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
 {
-    CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
-    fr.m_type = CLatticeFrame::SYLLABLE;
-
-	CSyllables syls;
-	std::vector<unsigned>::iterator sit = m_syllables.begin();
-	std::vector<unsigned>::iterator site = m_syllables.end();
-	for (; sit != site; sit++) {
-		syls.push_back(TSyllable(*sit));
-	}
-
-	std::vector<unsigned> seg_path;
-	seg_path.push_back(m_start);
-	seg_path.push_back(m_start + m_len);
+    CLatticeFrame &ifr = CLatticeManager::getLatticeFrame(i);
+    CLatticeFrame &jfr = CLatticeManager::getLatticeFrame(j);
+    jfr.m_type = CLatticeFrame::SYLLABLE;
 
     BranchList::iterator it = m_TrieBranches.begin();
     BranchList::iterator ite = m_TrieBranches.end();
+	
 	for (; it != ite; it++) {
-		//CInputTrieSource::m_pTrie->print((*it).getPath().getNow()->getTNode());
-		TXhLexiconState new_lxst = TXhLexiconState(i,
-			it->getPath().getNow()->getTNode(),
-			syls, seg_path);
-		fr.m_lexiconStates.push_back(new_lxst);
+		TThreadNode *pn = it->getPath().getNow()->getTNode();
+		unsigned int sz = pn->m_nWordId;
+		const TWordIdInfo *pwids = pn->getWordIdPtr();
+		for (unsigned int idx = 0; idx < sz; idx++) {
+			_buildForSingleSyllable(i, ifr, jfr, pwids[idx].m_id);
+		}
 	}
+    
 }
 
