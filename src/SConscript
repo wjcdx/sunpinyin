@@ -47,6 +47,9 @@ env.Program('dict/genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer
                        'pinyin/lexicon/pytrie_maker.o',
                    	   'pinyin/input/pinyin_data.o'])
 
+env.Program('dict/dconv', ['portability.o',
+                       'xh/lexicon/DictConv.o'])
+
 env.Program('dict/getwordfreq', ['portability.o', 'slm/slm.o',
                             'slm/getwordfreq/getwordfreq.o'])
 

@@ -157,9 +157,12 @@ CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
         const TThreadNode *pch = transfer(pRoot, u);
         const char *str = CUnitData::decode(TUnit(u));
         if (!str) break;
+        int slen = strlen(str);
         prefix = prefix + str + '\'';
         print(pch, prefix, fp);
-        prefix.resize(prefix.size() - strlen(str) - 1);
+        //the content str pointed may be changed
+        //in sub print.
+        prefix.resize(prefix.size() - slen - 1);
     }
 }
 

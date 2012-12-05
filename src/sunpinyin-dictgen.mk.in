@@ -92,6 +92,5 @@ install: ${DATA_TSLM} ${DATA_DICT}
 	install -Dm644 $^ ${DATA_DIR}
 
 clean:
-	rm -rf dict.utf8 lm_sc.t3g.arpa \
-		lm_sc.t3g.orig* lm_sc.t3g*.log dict3_sc.bin*
+	rm -rf lm_sc.t3g.orig* lm_sc.t3g*.log dict3_sc.bin*
 

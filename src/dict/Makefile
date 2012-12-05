@@ -14,7 +14,11 @@ xhdict:
 
 gdb-xh:
 	gdb --args ./genpyt -e le -i dict.utf8.xh \
-		-s lm_sc.t3g -l lm_sc.t3g.xh.log -t xh -o xhdict3_sc.bin
+		-s lm_sc.t3g.xh -l lm_sc.t3g.xh.log -t xh -o dict3_sc.bin.xh
+
+xh:
+	./genpyt -e le -i dict.utf8.xh \
+		-s lm_sc.t3g.xh -l lm_sc.t3g.xh.log -t xh -o dict3_sc.bin.xh
 
 pydict:
 	${DICTGEN} pydict3_sc.bin
@@ -35,4 +39,12 @@ todbg:
 touse:
 	cp dict.utf8.xh.all dict.utf8.xh
 	cp lm_sc.t3g.arpa.all lm_sc.t3g.arpa
+
+dconv-dbg:
+	gdb --args ./dconv dict.utf8.xh.oc dict.utf8.py dict.utf8.xh
+
+dconv:
+	./dconv dict.utf8.xh.oc dict.utf8.py dict.utf8.xh
+
+.PHONY: dconv
 
