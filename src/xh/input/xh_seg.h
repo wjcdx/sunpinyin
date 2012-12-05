@@ -4,7 +4,7 @@
 #include "portability.h"
 #include "common/input/segmentor.h"
 #include "common/input/segment/segment_types.h"
-#include "xh_data.h"
+#include "xhoc_data.h"
 
 #include <algorithm>
 #include <climits>
@@ -40,7 +40,7 @@ private:
                                 unsigned from = UINT_MAX);
     inline void _locateSegment(unsigned idx, unsigned &strIdx, unsigned &segIdx);
 
-    CXhData m_trie;
+    CXhocData m_trie;
     std::string m_inputstr;
     wstring m_inputBuf;
     TSegmentVec m_segs;

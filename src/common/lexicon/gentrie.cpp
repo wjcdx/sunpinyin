@@ -42,6 +42,8 @@ static CTrie::TrieType parse_type(const char *type)
         return CTrie::PINYIN;
     } else if (strcmp(type, "xh") == 0) {
         return CTrie::XINGHUA;
+    } else if (strcmp(type, "oc") == 0) {
+        return CTrie::XINGHUA_OC;
     }
     return CTrie::INVALID;
 }

@@ -13,6 +13,9 @@ MakerFactory::getMaker(CTrie::TrieType t)
 	case CTrie::XINGHUA:
 		m_Maker = new CXhTrieMaker();
 		break;
+	case CTrie::XINGHUA_OC:
+		m_Maker = new CXhocTrieMaker();
+		break;
 	default:
 		m_Maker = new CTrieMaker();
 		break;

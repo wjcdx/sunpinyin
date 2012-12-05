@@ -67,7 +67,7 @@ CIMIClassicView::updateWindows(unsigned mask)
             if (word_num == 0) goto pass;  // when sentence is not worthy of
 
 #ifdef DEBUG
-            printf("%d ", i);
+            printf("%d ", (int)i);
             print_wide(sentence.c_str());
             printf("\n");
 #endif

@@ -84,7 +84,7 @@ get_wid(const char* word, const TLexicon& lexicon)
     if (lexi != lexicon.end()) {
         wid = lexi->second;
     } else {
-        cerr << "Error:\"" << word << "\" not found in lexicon." << endl;
+        //cerr << "Error:\"" << word << "\" not found in lexicon." << endl;
         wid = 0;
     }
     return wid;

@@ -14,6 +14,29 @@ TSLM_PAT = 'lm_sc\.t3g\.arpa-[0-9]\+.tar.bz2'
 DICT_AR = $(shell w3m -dump ${DL_LIST} | grep -o ${DICT_PAT} | sort | tail -n 1)
 TSLM_AR = $(shell w3m -dump ${DL_LIST} | grep -o ${TSLM_PAT} | sort | tail -n 1)
 
+DICT_UTF8_PY = "dict.utf8.py"
+DICT_UTF8_XH = "dict.utf8.xh"
+DICT_UTF8_XH_OC = "dict.utf8.xh.oc"
+
+DICT_BIN_PY = "dict3_sc.bin.py"
+DICT_BIN_XH = "dict3_sc.bin.xh"
+DICT_BIN_XH_OC = "dict3_sc.bin.xh.oc"
+
+TSLM_PY = "lm_sc.t3g.py"
+TSLM_XH = "lm_sc.t3g.xh"
+TSLM_XH_OC = "lm_sc.t3g.xh.oc"
+
+TSLM_ORG_PY = "lm_sc.t3g.orig.py"
+TSLM_ORG_XH = "lm_sc.t3g.orig.xh"
+TSLM_ORG_XH_OC = "lm_sc.t3g.orig.xh.oc"
+
+TSLM_LOG_PY = "lm_sc.t3g.py.log"
+TSLM_LOG_XH = "lm_sc.t3g.xh.log"
+TSLM_LOG_XH_OC = "lm_sc.t3g.xh.oc.log"
+
+DATA_DICT = ${DICT_BIN_PY} ${DICT_BIN_XH} ${DICT_BIN_XH_OC}
+DATA_TSLM = ${TSLM_PY} ${TSLM_XH}
+
 all: install
 
 ${DICT_AR}:
@@ -22,31 +45,53 @@ ${DICT_AR}:
 dict.utf8: ${DICT_AR}
 	${TAR} xmf $^
 
+${DICT_UTF8_PY}:
+
+${DICT_UTF8_XH}:
+
+${DICT_UTF8_XH_OC}:
+
 ${TSLM_AR}:
 	${WGET} ${DL_ROOT}/$@
 
 lm_sc.t3g.arpa: ${TSLM_AR}
 	${TAR} xmf $^
 
-lm_sc.t3g.orig: dict.utf8.py lm_sc.t3g.arpa
-	tslmpack lm_sc.t3g.arpa dict.utf8.py $@
+${TSLM_ORG_PY}: ${DICT_UTF8_PY} lm_sc.t3g.arpa
+	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_PY} $@
 
-lm_sc.t3g: lm_sc.t3g.orig
-	tslmendian -e ${ENDIANNESS} -i $^ -o $@
+${TSLM_ORG_XH_OC}: ${DICT_UTF8_XH_OC} lm_sc.t3g.arpa
+	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH_OC} $@
 
-pydict3_sc.bin: dict.utf8.py lm_sc.t3g
-	genpyt -e ${ENDIANNESS} -i dict.utf8.py -s lm_sc.t3g \
-		-l lm_sc.t3g.py.log -t py -o $@
+${TSLM_ORG_XH}: ${DICT_UTF8_XH} lm_sc.t3g.arpa
+	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH} $@
 
-xhdict3_sc.bin: dict.utf8.xh lm_sc.t3g
-	genpyt -e ${ENDIANNESS} -i dict.utf8.xh -s lm_sc.t3g \
-		-l lm_sc.t3g.xh.log -t xh -o $@
+${TSLM_PY}: ${DICT_UTF8_PY} ${TSLM_ORG_PY}
+	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_PY} -o $@
 
-install: lm_sc.t3g pydict3_sc.bin xhdict3_sc.bin
+${TSLM_XH_OC}: ${DICT_UTF8_XH_OC} ${TSLM_ORG_XH_OC}
+	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH_OC} -o $@
+
+${TSLM_XH}: ${DICT_UTF8_XH} ${TSLM_ORG_XH}
+	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH} -o $@
+
+${DICT_BIN_PY}: ${DICT_UTF8_PY} ${TSLM_PY}
+	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_PY} -s ${TSLM_PY} \
+		-l ${TSLM_LOG_PY} -t py -o $@
+
+${DICT_BIN_XH_OC}: ${DICT_UTF8_XH_OC} ${TSLM_XH_OC}
+	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH_OC} -s ${TSLM_XH_OC} \
+		-l ${TSLM_LOG_XH_OC} -t oc -o $@
+
+${DICT_BIN_XH}: ${DICT_UTF8_XH} ${TSLM_XH}
+	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH} -s ${TSLM_XH} \
+		-l ${TSLM_LOG_XH} -t xh -o $@
+
+install: ${DATA_TSLM} ${DATA_DICT}
 	install -d ${DATA_DIR}
 	install -Dm644 $^ ${DATA_DIR}
 
 clean:
-	rm -rf ${DICT_AR} ${TSLM_AR} dict.utf8 lm_sc.t3g.arpa \
-		lm_sc.t3g.orig lm_sc.t3g lm_sc.t3g.log pydict3_sc.bin
+	rm -rf dict.utf8 lm_sc.t3g.arpa \
+		lm_sc.t3g.orig* lm_sc.t3g*.log dict3_sc.bin*
 

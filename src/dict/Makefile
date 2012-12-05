@@ -4,7 +4,7 @@ export PATH=${PREVPATH}
 DICTGEN = ./sunpinyin-dictgen
 
 gen_all:
-	${DICTGEN} xhdict3_sc.bin
+	${DICTGEN} dict3_sc.bin.xh
 
 lm_sc:
 	${DICTGEN} lm_sc.t3g

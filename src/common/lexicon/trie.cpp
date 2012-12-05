@@ -187,14 +187,6 @@ CTrie::print(const TThreadNode* pRoot) const
             }
             WCSTOMBS(buf, pw, 1024);
             fprintf(fp, " %s", buf);
-            /*
-            if (pwids[i].m_bSeen == 0)
-                fprintf(fp, "[x]");
-            else
-                fprintf(fp, "[o]");
-
-            fprintf(fp, "(%d)", pwids[i].m_cost);
-            */
         }
         fprintf(fp, "\n");
     }

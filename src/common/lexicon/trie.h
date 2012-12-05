@@ -19,7 +19,8 @@ public:
     enum TrieType {
         INVALID,
         PINYIN,
-        XINGHUA
+        XINGHUA,
+        XINGHUA_OC
     };
 
     friend class CTrieMaker;

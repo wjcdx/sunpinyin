@@ -3,7 +3,8 @@
 
 #include "trie.h"
 #include "pinyin/lexicon/pytrie_maker.h"
-#include "xh/lexicon/CXhTrieMaker.h"
+#include "xh/lexicon/xh/CXhTrieMaker.h"
+#include "xh/lexicon/oc/CXhocTrieMaker.h"
 
 class MakerFactory {
 public:

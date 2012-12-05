@@ -15,21 +15,21 @@
 #include "common/lexicon/trie_maker.h"
 #include "common/lexicon/tree/TTreeWordId.h"
 #include "common/lexicon/trie_writer.h"
-#include "CXhTrieMaker.h"
+#include "CXhocTrieMaker.h"
 #include "path.h"
 
-CXhTrieMaker::CXhTrieMaker()
+CXhocTrieMaker::CXhocTrieMaker()
 {
     m_pRootNode = new CTreeNode();
 }
 
-CXhTrieMaker::~CXhTrieMaker()
+CXhocTrieMaker::~CXhocTrieMaker()
 {
     delete m_pRootNode;
 }
 
 bool
-CXhTrieMaker::parseLine(char* buf,
+CXhocTrieMaker::parseLine(char* buf,
           char* word_buf,
           unsigned& id,
           std::set<TUnitInfo>& unitset)
@@ -81,7 +81,7 @@ CXhTrieMaker::parseLine(char* buf,
 **********************************************************/
 
 bool
-CXhTrieMaker::constructFromLexicon(const char* fileName)
+CXhocTrieMaker::constructFromLexicon(const char* fileName)
 {
     static char buf[4096];
     static char word_buf[2048];
@@ -91,7 +91,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     std::set<TUnitInfo> unitset;
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
-    printf("CXhTrieMaker...\n"); fflush(stdout);
+    printf("CXhocTrieMaker...\n"); fflush(stdout);
     printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, unitset)) {
@@ -123,7 +123,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
 }
 
 CTreeNode*
-CXhTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
+CXhocTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 {
     CTrans::const_iterator itt = pnode->m_Trans.find(s);
     CTrans::const_iterator ite = pnode->m_Trans.end();
@@ -136,14 +136,14 @@ CXhTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
 }
 
 void
-CXhTrieMaker::threadNonCompletedXh()
+CXhocTrieMaker::threadNonCompletedXh()
 {
     Path path;
     path.buildTrieInfo(m_pRootNode, false);
 }
 
 bool
-CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
+CXhocTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 {
     bool suc = true;
     static TWCHAR wbuf[1024];

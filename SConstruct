@@ -44,9 +44,11 @@ slmsource = [
     'src/common/lexicon/tree/PNodeSet.cpp',
     'src/pinyin/lexicon/pytrie_maker.cpp',
     'src/pinyin/input/pinyin_data.cpp',
-    'src/xh/lexicon/CXhTrieMaker.cpp',
-    'src/xh/lexicon/path.cpp',
+    'src/xh/lexicon/oc/CXhocTrieMaker.cpp',
+    'src/xh/lexicon/oc/path.cpp',
+    'src/xh/lexicon/xh/CXhTrieMaker.cpp',
     'src/xh/input/xh_data.cpp',
+    'src/xh/input/xhoc_data.cpp',
     ]
 
 imesource = [
@@ -73,6 +75,7 @@ imesource = [
     'src/pinyin/lattice/CPyLatticeManager.cpp',
     'src/xh/input/xh_seg.cpp',
     'src/xh/input/xh_data.cpp',
+    'src/xh/input/xhoc_data.cpp',
     'src/xh/input/segment/TXhSyllableSegment.cpp',
     'src/xh/input/segment/pathnode.cpp',
     'src/xh/input/segment/path.cpp',
@@ -185,6 +188,7 @@ headers = [
     'src/pinyin/input/datrie_impl.h',
     'src/pinyin/input/segment/TPySyllableSegment.h',
     'src/xh/input/xh_data.h',
+    'src/xh/input/xhoc_data.h',
     'src/xh/input/xh_seg.h',
     'src/xh/input/segment/pathnode.h',
     'src/xh/input/segment/path.h',

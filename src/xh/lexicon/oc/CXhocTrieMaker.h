@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef _SUNPINYIN_XHTRIE_MAKER_H__
-#define _SUNPINYIN_XHTRIE_MAKER_H__
+#ifndef _SUNPINYIN_XHOCTRIE_MAKER_H__
+#define _SUNPINYIN_XHOCTRIE_MAKER_H__
 
 #include "portability.h"
 
@@ -14,11 +14,11 @@
 #include "common/lexicon/tree/TrieTreeModel.h"
 #include "common/lexicon/CWordEvaluator.h"
 
-class CXhTrieMaker : public CTrieMaker {
+class CXhocTrieMaker : public CTrieMaker {
 public:
-    CXhTrieMaker();
+    CXhocTrieMaker();
 
-    ~CXhTrieMaker(); //forget this
+    ~CXhocTrieMaker(); //forget this
 
     bool
     parseLine(char* buf,
