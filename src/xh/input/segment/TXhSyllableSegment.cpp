@@ -148,8 +148,6 @@ TXhSyllableSegment::_buildForSingleSyllable(CLatticeFrame &ifr,
         CSyllables syls;
         syls.push_back(syllable);
         std::vector<unsigned> seg_path;
-        //seg_path.push_back(m_Index);
-        //seg_path.push_back(m_Index + 1);
         seg_path.push_back(m_start);
         seg_path.push_back(m_start + m_len);
         TXhLexiconState new_lxst = TXhLexiconState(m_start, pn, syls, seg_path);
