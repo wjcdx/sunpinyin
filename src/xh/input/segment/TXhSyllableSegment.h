@@ -40,7 +40,7 @@ private:
 	_forwardBranch(TrieBranch &branch, TSyllable &syllable);
 
 	void
-	_buildForSingleSyllable(int i, CLatticeFrame &ifr,
+	_buildForSingleSyllable(CLatticeFrame &ifr,
 			CLatticeFrame &jfr, TSyllable syllable);
 
 	void
