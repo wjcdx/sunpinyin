@@ -24,22 +24,15 @@ CLatticeManager::printLattice()
 void
 CLatticeManager::clear()
 {
-    _clearFrom(1);
+    clearFrom(1);
 	setTailIdx(1);
-}
-
-void
-CLatticeManager::_clearFrom(unsigned idx) 
-{
-	    for (size_t i = idx; i < m_tailIdx + 1; i++) 
-			        m_lattice[i].clear();
 }
 
 void
 CLatticeManager::clearFrom(unsigned idx)
 {
-    for (size_t i = idx; i < m_tailIdx + 1; i++)
-        m_lattice[i].clear();
+	for (size_t i = idx; i < m_tailIdx + 1; i++)
+		m_lattice[i].clear();
 }
 
 static double exp2_tbl[32] = {

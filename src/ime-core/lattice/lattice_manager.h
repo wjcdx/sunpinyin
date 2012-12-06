@@ -39,7 +39,6 @@ public:
 
     void printLattice();
 	void clear();
-	void _clearFrom(unsigned idx);
 	void clearFrom(unsigned idx);
 
 	unsigned getTailIdx() { return m_tailIdx; }

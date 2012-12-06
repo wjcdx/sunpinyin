@@ -51,7 +51,7 @@ CIMIContext::_buildLattice(TSegmentVec &segments,
                            unsigned rebuildFrom,
                            bool doSearch)
 {
-    m_pLatticeMgr->_clearFrom(rebuildFrom);
+    m_pLatticeMgr->clearFrom(rebuildFrom);
     m_pLatticeMgr->buildLexiconStates(segments, rebuildFrom);
     return doSearch && searchFrom(rebuildFrom);
 }

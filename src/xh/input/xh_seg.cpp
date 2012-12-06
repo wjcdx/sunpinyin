@@ -164,8 +164,18 @@ CXhSegmentor::_push(unsigned ch)
 
     } else if (m_trie.isPattern(ch)) {
 
-        ret = m_inputstr.size() - 1;
-        m_segs.push_back(new TXhSyllableSegment(ch, ret, 1));
+        unsigned i, idx = 0;
+        unsigned sz = m_inputstr.size();
+        for (i=0; i < sz; i++) {
+            if (m_trie.isPattern(m_inputstr.at(i))) {
+                idx++;
+            }
+        }
+        //idx is counted from 0.
+        idx--;
+
+        ret = sz - 1;
+        m_segs.push_back(new TXhSyllableSegment(ch, ret, 1, idx));
 
     } else {
 

@@ -28,7 +28,7 @@ PathNode::getChildren(PathNodeList &children)
     TTransUnit* ptrans = (TTransUnit *)m_TNode->getTrans();
     for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit; 
-        TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
+        TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrieOc->transfer(m_TNode, u);
 		children.push_back(PathNode(&ptrans[i], pch));
     }
 	return true;
@@ -53,12 +53,12 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			for (unsigned int i = 0; i < sz; ++i) {
 				unsigned int id = pwids[i].m_id;
 				if (id == 765) {
-					CInputTrieSource::m_pTrie->print(now);
+					CInputTrieSource::m_pTrieOc->print(now);
 					break;
 				}
 			}
 		}
-		CInputTrieSource::m_pTrie->print((*nit).getTNode());
+		CInputTrieSource::m_pTrieOc->print((*nit).getTNode());
 #endif
 
 		if ((*nit).transFrom(syllable)) {

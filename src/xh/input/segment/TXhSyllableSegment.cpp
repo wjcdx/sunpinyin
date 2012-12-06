@@ -122,6 +122,7 @@ TXhSyllableSegment::_buildForSingleSyllable(int i, CLatticeFrame &ifr,
 	
 	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
     CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
+
     for (; it != ite; ++it) {
         TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
 
@@ -135,7 +136,7 @@ TXhSyllableSegment::_buildForSingleSyllable(int i, CLatticeFrame &ifr,
                                                        lxst.m_syls,
                                                        lxst.m_seg_path);
                 new_lxst.m_syls.push_back(syllable);
-                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
+                new_lxst.m_seg_path.push_back(m_Index + 1);
                 jfr.m_lexiconStates.push_back(new_lxst);
             }
         }
@@ -147,9 +148,9 @@ TXhSyllableSegment::_buildForSingleSyllable(int i, CLatticeFrame &ifr,
         CSyllables syls;
         syls.push_back(syllable);
         std::vector<unsigned> seg_path;
-        seg_path.push_back(this->m_start);
-        seg_path.push_back(this->m_start + this->m_len);
-        TXhLexiconState new_lxst = TXhLexiconState(i, pn, syls, seg_path);
+        seg_path.push_back(m_Index);
+        seg_path.push_back(m_Index + 1);
+        TXhLexiconState new_lxst = TXhLexiconState(m_Index, pn, syls, seg_path);
         jfr.m_lexiconStates.push_back(new_lxst);
     }
 }
@@ -172,6 +173,5 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
 			_buildForSingleSyllable(i, ifr, jfr, pwids[idx].m_id);
 		}
 	}
-    
 }
 
