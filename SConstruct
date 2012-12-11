@@ -6,7 +6,7 @@ version="2.0.4"
 abi_major = 3
 abi_minor = 0
 
-cflags = '-g -Wall -DDEBUG'
+cflags = '-g -Wall -pg'
 
 slmsource = [
     'src/slm/ids2ngram/ids2ngram.cpp',
@@ -303,6 +303,7 @@ def CreateEnvironment():
         tar = 'gtar'
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')
     env = Environment(ENV = os.environ, CFLAGS = cflags, CXXFLAGS = cflags,
+                      LINKFLAGS='-pg',
                       MAKE = make, WGET = wget, TAR = tar,
                       CPPPATH = ['.'] + allinc(),
                       tools = ['default', 'textfile'])
@@ -521,11 +522,12 @@ libname = '%s.%d' % (libname_soname, abi_minor)
 lib = None
 
 if GetOS() != 'Darwin':
-    lib = env.SharedLibrary(libname, SHLIBSUFFIX='', source=imesource,
-                            parse_flags='-Wl,-soname=%s' % libname_soname)
+    #lib = env.StaticLibrary(libname, SHLIBSUFFIX='', source=imesource,
+    #                        parse_flags='-Wl,-soname=%s' % libname_soname)
+    lib = env.StaticLibrary(libname, SHLIBSUFFIX='', source=imesource)
 else:
     # TODO: add install_name on Darwin?
-    lib = env.SharedLibrary('sunpinyin', source=imesource)
+    lib = env.StaticLibrary('sunpinyin', source=imesource)
 
 def DoInstall():
     lib_target = None

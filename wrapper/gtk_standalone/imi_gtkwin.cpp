@@ -52,6 +52,12 @@ button_click_cn_en(GtkWidget* button, gpointer data)
 }
 
 static void
+button_click_close(GtkWidget* button, gpointer data)
+{
+    gtk_main_quit();
+}
+
+static void
 button_click_fullhalf_punc(GtkWidget* button, gpointer data)
 {
     /*
@@ -199,6 +205,11 @@ CGTKWinHandler::createWindows()
     gtk_container_add(GTK_CONTAINER(button), hanzi_image);
     gtk_box_pack_end(GTK_BOX(box1), button, FALSE, FALSE, 2);
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(button_click_cn_en), mp_view);
+
+    m_pCloseButton = button = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(button), hanzi_image);
+    gtk_box_pack_end(GTK_BOX(box1), button, FALSE, FALSE, 2);
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(button_click_close), mp_view);
 
     gtk_window_set_decorated((GtkWindow*)window, FALSE);
     g_signal_connect(G_OBJECT(window), "key_press_event", G_CALLBACK(key_press_cb), mp_view);

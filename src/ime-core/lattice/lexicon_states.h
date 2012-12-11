@@ -19,6 +19,7 @@ using namespace TrieThreadModel;
  */
 struct TLexiconState {
 	typedef std::vector<TWordIdInfo> TWordIdInfoVec;
+	typedef std::vector<const TThreadNode *> TThreadNodeVec;
 public:
     virtual const TWordIdInfo *getWords(unsigned &num);
 	virtual const double getWeight() {
@@ -49,7 +50,6 @@ public:
     }
 	
 public:
-	//unsigned m_start;
 	unsigned m_start                 : 16;
     unsigned m_num_of_inner_fuzzies  : 14; 
     bool m_bFuzzy                : 1;
@@ -60,6 +60,7 @@ public:
 	CSyllables m_syls;
 
 	TWordIdInfoVec m_words;
+	TThreadNodeVec m_nodes;
 	// accumulated segments,  may contain fuzzy segments
 	std::vector<unsigned> m_seg_path;
 };

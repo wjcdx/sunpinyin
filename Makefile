@@ -1,13 +1,13 @@
 
 all:
-	scons --prefix=/usr --enable-plugins
+	scons --prefix=/usr
 
 install:
-	scons --prefix=/usr --enable-plugins install
+	scons --prefix=/usr install
 
 clean:
-	scons --prefix=/usr --enable-plugins -c
+	scons --prefix=/usr -c
 
 uninstall:
-	scons --prefix=/usr --enable-plugins -c install
+	scons --prefix=/usr -c install
 

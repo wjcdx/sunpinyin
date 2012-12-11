@@ -79,6 +79,9 @@ protected:
 
     /** Button for FULL/HALF Simbol state */
     GtkWidget          *m_pSimbButton;
+
+    /** Button for close the window */
+    GtkWidget          *m_pCloseButton;
     /*@}*/
 
 private:

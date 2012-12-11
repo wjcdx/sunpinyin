@@ -116,7 +116,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 
 void
 TXhSyllableSegment::_buildForSingleSyllable(CLatticeFrame &ifr,
-		CLatticeFrame &jfr, TSyllable syllable)
+		CLatticeFrame &jfr, TSyllable syllable, CLexiStateMap &statesMap)
 {
     const TThreadNode * pn = NULL;
 	
@@ -126,32 +126,24 @@ TXhSyllableSegment::_buildForSingleSyllable(CLatticeFrame &ifr,
     for (; it != ite; ++it) {
         TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
 
-        if (lxst.m_pNode) {
+		TThreadNodeVec::iterator nit = lxst.m_nodes.begin();
+		TThreadNodeVec::iterator nite = lxst.m_nodes.end();
+        for (; nit != nite; nit++) {
             // try to match a word from lattice i to lattice j
             // and if match, we'll count it as a new lexicon on lattice j
-            pn = CInputTrieSource::m_pTrie->transfer(lxst.m_pNode, syllable);
+            pn = CInputTrieSource::m_pTrie->transfer(*nit, syllable);
             if (pn) {
-                TXhLexiconState new_lxst = TXhLexiconState(lxst.m_start,
-                                                       pn,
-                                                       lxst.m_syls,
-                                                       lxst.m_seg_path);
-                new_lxst.m_syls.push_back(syllable);
-                new_lxst.m_seg_path.push_back(m_start + m_len);
-                jfr.m_lexiconStates.push_back(new_lxst);
+				LexiStateKey key(lxst.m_start, lxst.m_syls, lxst.m_seg_path);
+				statesMap[key].push_back(pn);
             }
         }
 	}
-    
+   
 	// last, create a lexicon for single character with only one syllable
     pn = CInputTrieSource::m_pTrie->transfer(syllable);
     if (pn) {
-        CSyllables syls;
-        syls.push_back(syllable);
-        std::vector<unsigned> seg_path;
-        seg_path.push_back(m_start);
-        seg_path.push_back(m_start + m_len);
-        TXhLexiconState new_lxst = TXhLexiconState(m_start, pn, syls, seg_path);
-        jfr.m_lexiconStates.push_back(new_lxst);
+		LexiStateKey key(m_start);
+		statesMap[key].push_back(pn);
     }
 }
 
@@ -162,6 +154,8 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
     CLatticeFrame &jfr = CLatticeManager::getLatticeFrame(j);
     jfr.m_type = CLatticeFrame::SYLLABLE;
 
+	CLexiStateMap statesMap;
+
     BranchList::iterator it = m_TrieBranches.begin();
     BranchList::iterator ite = m_TrieBranches.end();
 	
@@ -170,8 +164,38 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
 		unsigned int sz = pn->m_nWordId;
 		const TWordIdInfo *pwids = pn->getWordIdPtr();
 		for (unsigned int idx = 0; idx < sz; idx++) {
-			_buildForSingleSyllable(ifr, jfr, pwids[idx].m_id);
+			_buildForSingleSyllable(ifr, jfr, pwids[idx].m_id, statesMap);
 		}
 	}
+	
+	CLexiStateMap::iterator mit = statesMap.begin();
+	CLexiStateMap::iterator mite = statesMap.end();
+	for (; mit != mite; mit++) {
+		LexiStateKey &key = const_cast<LexiStateKey &>(mit->first);
+		TThreadNodeVec &nodes = mit->second;
+		TXhLexiconState new_lxst = TXhLexiconState(
+										key.m_start,
+										(const TThreadNode *)NULL,
+										key.m_syls,
+										key.m_seg_path);
+		
+		new_lxst.m_syls.push_back(0);
+		new_lxst.m_seg_path.push_back(m_start + m_len);
+
+		TThreadNodeVec::iterator nit = nodes.begin();
+		TThreadNodeVec::iterator nite = nodes.end();
+		//int idx = 0;
+		for (; nit != nite; nit++) {
+			//if (++idx > 40) {
+			//	break;
+			//}
+			new_lxst.m_nodes.push_back(*nit);
+			new_lxst.m_words.push_back(*(*nit)->getWordIdPtr());
+		}
+		jfr.m_lexiconStates.push_back(new_lxst);
+		printf("segment %u nodes start: %u\tsize: %d\n", i,
+				key.m_start, (int)new_lxst.m_nodes.size());
+	}
+	printf("segment %u jfr.lxst.size: %d\n", i, (int)jfr.m_lexiconStates.size());
 }
 
