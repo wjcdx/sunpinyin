@@ -119,24 +119,24 @@ TXhSyllableSegment::_buildForSingleSyllable(CLatticeFrame &ifr,
 		CLatticeFrame &jfr, TSyllable syllable, CLexiStateMap &statesMap)
 {
     const TThreadNode * pn = NULL;
-	
-	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
-    CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
 
-    for (; it != ite; ++it) {
-        TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
+	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
+	CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
+
+	if (it != ite) {
+		TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
+		LexiStateKey key(lxst.m_start, lxst.m_syls, lxst.m_seg_path);
 
 		TThreadNodeVec::iterator nit = lxst.m_nodes.begin();
 		TThreadNodeVec::iterator nite = lxst.m_nodes.end();
-        for (; nit != nite; nit++) {
-            // try to match a word from lattice i to lattice j
-            // and if match, we'll count it as a new lexicon on lattice j
-            pn = CInputTrieSource::m_pTrie->transfer(*nit, syllable);
-            if (pn) {
-				LexiStateKey key(lxst.m_start, lxst.m_syls, lxst.m_seg_path);
+		for (; nit != nite; nit++) {
+			// try to match a word from lattice i to lattice j
+			// and if match, we'll count it as a new lexicon on lattice j
+			pn = CInputTrieSource::m_pTrie->transfer(*nit, syllable);
+			if (pn) {
 				statesMap[key].push_back(pn);
-            }
-        }
+			}
+		}
 	}
    
 	// last, create a lexicon for single character with only one syllable
