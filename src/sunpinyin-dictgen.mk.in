@@ -49,7 +49,8 @@ ${DICT_UTF8_PY}: dict.utf8
 	cp $^ $@
 
 ${DICT_UTF8_XH}: dict.utf8
-	dconv dict.utf8.xh.oc dict.utf8.py dict.utf8.xh
+	dconv dict.utf8.xh.oc dict.utf8.py $@
+	sed -i '/XXX/d' $@
 
 ${DICT_UTF8_XH_OC}:
 

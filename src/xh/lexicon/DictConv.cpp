@@ -38,15 +38,42 @@ DictConv::parseLine(char* buf,
     if (*t)
         *t++ = 0;
     id = atoi(p);
-    return true;;
+    return true;
 }
+
+bool
+DictConv::parseLine(char* buf,
+          char* word_buf,
+          std::string& syls)
+{
+    /* ignore the empty lines and comment lines */
+    if (*buf == '\n' || *buf == '#')
+        return false;
+
+    char* p = (char*)skipSpace(buf);
+    char* t = (char*)skipNonSpace(p);
+    while (p < t) *word_buf++ = *p++;
+    *word_buf = 0;
+
+    p = (char*)skipSpace(p);
+    t = (char*)skipNonSpace(p);
+    if (*t)
+        *t++ = 0;
+	p = (char*)skipSpace(t);
+    t = (char*)skipNonSpace(p);
+    if (*t)
+        *t++ = 0;
+	syls.assign(p);
+    return true;
+}
+
 bool
 DictConv::constructLexicon(const char *filename)
 {
     static char buf[4096];
     static char word_buf[2048];
 	static TWCHAR wbuf[1024];
-    unsigned id;
+    static std::string syls;
 
     FILE *fp = fopen(filename, "r");
     if (!fp)
@@ -54,12 +81,10 @@ DictConv::constructLexicon(const char *filename)
 
     printf("Adding id and corresponding words...\n"); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
-        if (parseLine(buf, word_buf, id)) {
+        if (parseLine(buf, word_buf, syls)) {
             if (word_buf[0] != L'<' && word_buf[0] != 0) {
-				if (id > m_MaxId)
-					m_MaxId = id;
 				MBSTOWCS(wbuf, word_buf, 1024);
-                m_Lexicon[wstring(wbuf)] = id;
+                m_Lexicon[wstring(wbuf)] = syls;
             }
             continue;
         }
@@ -108,10 +133,9 @@ DictConv::convertDictUsingLexicon(const char *ofile, const char *ifile)
 					wstring key(&wbuf[i], size_t(1));
 					CLexicon::iterator it = m_Lexicon.find(key);
 					if (it != m_Lexicon.end()) {
-						fprintf(ofp, "%d", m_Lexicon[key]);
+						fprintf(ofp, "%s", m_Lexicon[key].c_str());
 					} else {
-						m_Lexicon[key] = m_MaxId++;
-						fprintf(ofp, "%d", m_Lexicon[key]);
+						fprintf(ofp, "XXX");
 					}
 				}
 				fprintf(ofp, "\n");
@@ -123,7 +147,6 @@ DictConv::convertDictUsingLexicon(const char *ofile, const char *ifile)
     fclose(ifp);
     fclose(ofp);
 
-	printf("m_MaxId: %d\n", m_MaxId);
 	return true;
 }
 
