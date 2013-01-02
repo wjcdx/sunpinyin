@@ -22,8 +22,8 @@ public:
     static const char *decode(TUnit u, const char **i = NULL,
 			const char **f = NULL);
 
-	bool isPattern(unsigned ch);
-	bool isStroke(unsigned ch);
+	static bool isPattern(unsigned ch);
+	static bool isStroke(unsigned ch);
 
 	static XhKeyMapPair &findPair(std::string name);
 	static XhKeyMapPair &findPair(int key);

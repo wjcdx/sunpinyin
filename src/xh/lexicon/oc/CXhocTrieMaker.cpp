@@ -15,6 +15,7 @@
 #include "common/lexicon/trie_maker.h"
 #include "common/lexicon/tree/TTreeWordId.h"
 #include "common/lexicon/trie_writer.h"
+#include "xh/input/xhoc_data.h"
 #include "CXhocTrieMaker.h"
 #include "path.h"
 
@@ -135,11 +136,85 @@ CXhocTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
     return itt->second;
 }
 
+CTreeNode*
+CXhocTrieMaker::addCombinedTransfers(CTreeNode *pnode,
+                                       unsigned s,
+                                       const CTreeNodeSet& nodes)
+{
+	assert(!nodes.empty());
+
+    CTreeNode *p = NULL;
+    if (nodes.size() == 1) {
+        p = (CTreeNode *)(*(nodes.begin()));
+    } else {
+        p = new CTreeNode();
+        p->m_cmbNodes = nodes;
+        m_StateMap[&p->m_cmbNodes] = p;
+
+        CTreeNodeSet::const_iterator it = nodes.begin();
+        CTreeNodeSet::const_iterator ite = nodes.end();
+        for (; it != ite; ++it) {
+            CTreeWordSet::const_iterator wit  = (*it)->m_WordIdSet.begin();
+            CTreeWordSet::const_iterator wite = (*it)->m_WordIdSet.end();
+
+            for (; wit != wite; ++wit) {
+                CTreeWordSet::iterator tmp = p->m_WordIdSet.find (*wit);
+
+                if (tmp == p->m_WordIdSet.end()) {
+                    p->m_WordIdSet.insert (*wit);
+                } else if (tmp->anony.m_cost > wit->anony.m_cost) {
+                    p->m_WordIdSet.erase (tmp);
+                    p->m_WordIdSet.insert (*wit);
+                }
+            }
+        }
+    }
+
+    pnode->m_Trans[s] = p;
+    return p;
+}
+
+
+void
+CXhocTrieMaker::linkWordsTogether(CTreeNode *pnode, bool add)
+{
+    if (pnode->m_Trans.empty()) {
+
+    } else {
+        CTrans::iterator it = pnode->m_Trans.begin();
+        CTrans::iterator ite = pnode->m_Trans.end();
+
+		std::map<unsigned, CTreeNodeSet> combTrans;
+        for (; it != ite; it++) {
+			if (CXhocData::isPattern(it->first)) {
+				combTrans[it->first].insert(it->second);
+			}
+        }
+	
+		std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
+		for (; itCombTrans != combTrans.end(); ++itCombTrans) {
+			CTreeNode* p = NULL;
+			unsigned s = itCombTrans->first;
+			CTreeNodeSet nodes = itCombTrans->second;
+
+			CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
+			if (itStateMap != m_StateMap.end())
+				p = itStateMap->second;
+			else
+				p = addCombinedTransfers(pnode, s, nodes);
+
+			pnode->m_Trans[s] = p;
+		}
+    }
+}
+
 void
 CXhocTrieMaker::threadNonCompletedXh()
 {
     Path path;
     path.buildTrieInfo(m_pRootNode, false);
+
+    linkWordsTogether(m_pRootNode, false);
 }
 
 bool

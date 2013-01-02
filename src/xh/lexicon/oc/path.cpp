@@ -14,6 +14,7 @@
 
 #include "common/lexicon/trie_maker.h"
 #include "common/lexicon/tree/TrieTreeModel.h"
+#include "xh/input/xhoc_data.h"
 #include "path.h"
 
 void
@@ -30,25 +31,50 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
         CTrans::iterator ite = pnode->m_Trans.end();
 
         int max = 0;
+		std::map<unsigned, CTreeNodeSet> combTrans;
         for (; it != ite; it++) {
-        	Path p = *this;
-            p.add(it->first);
 
+			Path p;
+			unsigned syl = it->first;
             CTreeNode *sub = it->second;
-            p.buildTrieInfo(sub, true);
+			if (CXhocData::isPattern(syl)) {
+        		pnode->m_nMaxStroke = getMostPopularPartialNum();
+            	p.buildTrieInfo(sub, true);
+				combTrans[syl].insert(sub);
+			} else {
+				p = *this;
+				p.add(it->first);
+				p.buildTrieInfo(sub, true);
 
-			if (add) {
-				CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
-				CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
-				for (; wit != wite; wit++) {
-					pnode->m_WordIdSet.insert(*wit);
+				if (add) {
+					CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
+					CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
+					for (; wit != wite; wit++) {
+						pnode->m_WordIdSet.insert(*wit);
+					}
+				}
+
+				if ((int)sub->m_nMaxStroke > max) {
+					max = sub->m_nMaxStroke;
 				}
 			}
-
-            if ((int)sub->m_nMaxStroke > max) {
-                max = sub->m_nMaxStroke;
-            }
         }
+	
+		std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
+		for (; itCombTrans != combTrans.end(); ++itCombTrans) {
+			CTreeNode* p = NULL;
+			unsigned s = itCombTrans->first;
+			CTreeNodeSet nodes = itCombTrans->second;
+
+			CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
+			if (itStateMap != m_StateMap.end())
+				p = itStateMap->second;
+			else
+				p = addCombinedTransfers(pnode, s, nodes);
+
+			pnode->m_Trans[s] = p;
+		}
+
         pnode->m_nMaxStroke = max;
     }
 }
