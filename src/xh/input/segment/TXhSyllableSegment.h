@@ -6,33 +6,11 @@
 #include "path.h"
 #include "ime-core/helper/CInputTrieSource.h"
 #include "common/lexicon/trie.h"
+#include "xh/lattice/TXhLexiconState.h"
 
 #include <map>
 
 class CLatticeFrame;
-
-struct LexiStateKey {
-public:
-	unsigned m_start;
-	CSyllables m_syls;
-	std::vector<unsigned> m_seg_path;
-
-	LexiStateKey() : m_start(0) {}
-	LexiStateKey(unsigned start) : m_start(start) {
-		m_seg_path.push_back(m_start);
-	}
-	LexiStateKey(unsigned start, CSyllables syls,
-			std::vector<unsigned> seg_path)
-		: m_start(start), m_syls(syls), m_seg_path(seg_path)
-	{}
-
-	bool operator< (const LexiStateKey &rhs) const {
-		return m_start < rhs.m_start;
-	}
-};
-
-typedef std::vector<const TThreadNode *> TThreadNodeVec;
-typedef std::map<LexiStateKey, TThreadNodeVec> CLexiStateMap;
 
 struct TXhSyllableSegment : TSyllableSegment {
 
@@ -49,7 +27,16 @@ public:
 
 private:
 	void
-	prepare();
+	prepare(const TrieThreadModel::TThreadNode *pTNode);
+
+	void
+	_forwardFromTNode(const TrieThreadModel::TThreadNode *pTNode);
+
+	void
+	_forwardFromLastSegment(CLatticeFrame &jfr, TXhLexiconState &lxst);
+
+	void
+	_forwardFromRoot(unsigned i, CLatticeFrame &jfr);
 
 	void
 	_forwardSingleSyllable(TSyllable syllable);
@@ -62,13 +49,6 @@ private:
 
 	bool
 	_forwardBranch(TrieBranch &branch, TSyllable &syllable);
-
-	void
-	_buildForSingleSyllable(CLatticeFrame &ifr,
-			CLatticeFrame &jfr, TSyllable syllable, CLexiStateMap &statesMap);
-
-	void
-	_buildLexiconStates(unsigned i, unsigned j);
 
 protected:
 	unsigned m_FwdStrokeNum;

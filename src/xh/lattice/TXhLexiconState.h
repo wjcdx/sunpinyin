@@ -1,5 +1,5 @@
-#ifndef SUNPY_PYLEXICON_STATES_H
-#define SUNPY_PYLEXICON_STATES_H
+#ifndef SUNPY_XHLEXICON_STATES_H
+#define SUNPY_XHLEXICON_STATES_H
 
 #include <vector>
 #include <map>

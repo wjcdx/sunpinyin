@@ -3,7 +3,8 @@
 #include "path.h" 
 #include "checkpoint.h" 
 #include "ime-core/helper/CInputTrieSource.h" 
-#include "common/lexicon/trie.h" 
+#include "common/lexicon/trie.h"
+#include "xh/input/xh_data.h"
 
 using namespace TrieThreadModel;
 
@@ -18,18 +19,47 @@ PathNode::print()
 }
 
 bool
-PathNode::getChildren(PathNodeList &children)
+PathNode::getChildrenFromPesudoTNode(TThreadNode *psuNode, PathNodeList &children)
+{
+	unsigned int sz = psuNode->m_nTransfer;
+	TTransUnit *ptrans = (TTransUnit *)psuNode->getTrans();
+	for (unsigned int i = 0; i < sz; ++i) {
+        unsigned u = ptrans[i].m_Unit;
+		TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(psuNode, u);
+		children.push_back(PathNode(&ptrans[i], pch));
+	}
+	return true;
+}
+
+bool
+PathNode::getChildren(PathNodeList &children, TSyllable syllable)
 {
 	unsigned int sz = m_TNode->m_nTransfer;
 
 	if (sz == 0)
 		return false;
 
-    TTransUnit* ptrans = (TTransUnit *)m_TNode->getTrans();
+	bool pattern = CXhData::isPattern(syllable);
+
+    TTransUnit *ptrans = (TTransUnit *)m_TNode->getTrans();
     for (unsigned int i = 0; i < sz; ++i) {
-        unsigned u = ptrans[i].m_Unit; 
-        TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
-		children.push_back(PathNode(&ptrans[i], pch));
+        unsigned u = ptrans[i].m_Unit;
+		if (pattern) {
+			if (u == syllable) {
+				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
+				if (pch->m_bPesudo) {
+					getChildrenFromPesudoTNode(pch, children);
+				} else {
+					children.push_back(PathNode(&ptrans[i], pch));
+				}
+				break;
+			}
+		} else {
+			if (CXhData::isStroke(u)) {
+				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
+				children.push_back(PathNode(&ptrans[i], pch));
+			}
+		}
     }
 	return true;
 }
@@ -38,7 +68,7 @@ bool
 PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 {
 	PathNodeList children;
-	if (!getChildren(children)) {
+	if (!getChildren(children, syllable)) {
 		return false;
 	}
 
@@ -90,7 +120,7 @@ bool
 PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path)
 {
 	PathNodeList children;
-	if (!getChildren(children)) {
+	if (!getChildren(children, syllable)) {
 		return false;
 	}
 

@@ -57,7 +57,8 @@ public:
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }
 
 	void print();
-	bool getChildren(PathNodeList &children);
+	bool getChildrenFromPesudoTNode(TrieThreadModel::TThreadNode *psuNode, PathNodeList &children);
+	bool getChildren(PathNodeList &children, TSyllable syllable);
 	bool findNextSubNode(TSyllable syllable, PathList &paths);
 	bool findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &path);
 };

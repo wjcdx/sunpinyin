@@ -7,12 +7,31 @@
 using namespace TrieThreadModel;
 
 void
-TXhSyllableSegment::prepare()
+TXhSyllableSegment::forward(unsigned i, unsigned j)
+{
+    CLatticeFrame &ifr = CLatticeManager::getLatticeFrame(i);
+    CLatticeFrame &jfr = CLatticeManager::getLatticeFrame(j);
+    jfr.m_type = CLatticeFrame::SYLLABLE;
+
+	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
+	CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
+	for (; it != ite; it++) {
+		TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
+
+        if (lxst.m_pNode) {
+            // try to match a word from lattice i to lattice j
+            // and if match, we'll count it as a new lexicon on lattice j
+			_forwardFromLastSegment(jfr, lxst);
+        }
+		_forwardFromRoot(i, jfr);
+	}
+}
+
+void
+TXhSyllableSegment::prepare(const TThreadNode *pTNode)
 {
 	m_TrieBranches.clear();
-	PathNode node(NULL,
-		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
-		PathNode::JUSTNOW);
+	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), PathNode::JUSTNOW);
 	TrieBranch branch;
 	branch.setNewAdded(false);
 	branch.m_Path.add(node);
@@ -21,17 +40,59 @@ TXhSyllableSegment::prepare()
 	m_bNumMet = false;
 }
 
-void
-TXhSyllableSegment::forward(unsigned i, unsigned j)
+void TXhSyllableSegment::_forwardFromTNode(const TThreadNode *pTNode)
 {
-	prepare();
+	prepare(pTNode);
     std::vector<unsigned>::const_iterator it = m_syllables.begin();
     std::vector<unsigned>::const_iterator ite = m_syllables.end();
 
     for (; it != ite; ++it)
         _forwardSingleSyllable(*it);
+}
 
-	_buildLexiconStates(i, j);
+void TXhSyllableSegment::_forwardFromLastSegment(CLatticeFrame &jfr,
+		TXhLexiconState &lxst)
+{
+	_forwardFromTNode(lxst.m_pNode);
+
+	if (!m_TrieBranches.empty()) {
+		BranchList::iterator bit = m_TrieBranches.begin();
+		BranchList::iterator bite = m_TrieBranches.end();
+
+		for (; bit != bite; bit++) {
+
+			TXhLexiconState new_lxst = TXhLexiconState(lxst.m_start,
+												   bit->getPath().getNow()->getTNode(),
+												   lxst.m_syls,
+												   lxst.m_seg_path);
+			new_lxst.m_syls.push_back(m_syllables[0]);
+			new_lxst.m_seg_path.push_back(m_start + m_len);
+			jfr.m_lexiconStates.push_back(new_lxst);
+		}
+	}
+}
+
+void TXhSyllableSegment::_forwardFromRoot(unsigned i, CLatticeFrame &jfr)
+{
+	_forwardFromTNode((TrieThreadModel::TThreadNode*)
+			CInputTrieSource::m_pTrie->getRootNode());
+
+	if (!m_TrieBranches.empty()) {
+		BranchList::iterator bit = m_TrieBranches.begin();
+		BranchList::iterator bite = m_TrieBranches.end();
+
+		for (; bit != bite; bit++) {
+			CSyllables syls;
+			syls.push_back(m_syllables[0]);
+			std::vector<unsigned> seg_path;
+			seg_path.push_back(m_start);
+			seg_path.push_back(m_start + m_len);
+			TXhLexiconState new_lxst = TXhLexiconState(i, 
+									bit->getPath().getNow()->getTNode(),
+									syls, seg_path);
+			jfr.m_lexiconStates.push_back(new_lxst);
+		}
+	}
 }
 
 void
@@ -114,6 +175,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 	return true;
 }
 
+/*
 void
 TXhSyllableSegment::_buildForSingleSyllable(CLatticeFrame &ifr,
 		CLatticeFrame &jfr, TSyllable syllable, CLexiStateMap &statesMap)
@@ -198,4 +260,5 @@ TXhSyllableSegment::_buildLexiconStates(unsigned i, unsigned j)
 	}
 	printf("segment %u jfr.lxst.size: %d\n", i, (int)jfr.m_lexiconStates.size());
 }
+*/
 
