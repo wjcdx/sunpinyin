@@ -18,6 +18,10 @@ namespace TrieTreeModel {
     class CTreeNode {
 public:
         static CTreeNodeList m_AllNodes;
+
+public:
+		bool m_bExpanded;
+		CTreeNodeSet m_cmbNodes;
         CTreeWordSet m_WordIdSet;
         CTrans m_Trans;
 		unsigned m_nMaxStroke;
@@ -25,7 +29,7 @@ public:
 
 public:
 		CTreeNode()
-			: m_nMaxStroke(0), m_bOwnWord(false)
+			: m_bExpanded(false), m_nMaxStroke(0), m_bOwnWord(false)
 		{
 			m_AllNodes.push_back(this);
 		}
