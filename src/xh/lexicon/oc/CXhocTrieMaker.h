@@ -37,6 +37,12 @@ protected:
     insertTransfer(CTreeNode* pnode, unsigned s);
 
 private:
+    CTreeNode*
+    addCombinedTransfers(CTreeNode *pnode,
+                        unsigned s,
+                        const CTreeNodeSet& nodes);
+    void
+    linkWordsTogether(CTreeNode *pnode);
     void
     threadNonCompletedXh();
 };

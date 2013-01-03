@@ -9,13 +9,15 @@ namespace TrieThreadModel {
     #ifdef WORDS_BIGENDIAN
         unsigned m_nMaxStroke : 3;
         unsigned m_bOwnWord   : 1;
+        unsigned m_bPesudo    : 1;
         unsigned m_csLevel    : 2;
         unsigned m_nTransfer  : 13;
-        unsigned m_nWordId    : 13;
+        unsigned m_nWordId    : 12;
     #else
-        unsigned m_nWordId    : 13;
+        unsigned m_nWordId    : 12;
         unsigned m_nTransfer  : 13;
         unsigned m_csLevel    : 2;
+        unsigned m_bPesudo    : 1;
         unsigned m_bOwnWord   : 1;
         unsigned m_nMaxStroke : 3;
     #endif
@@ -34,6 +36,9 @@ namespace TrieThreadModel {
         
 		bool hasItsOwnWord(void) const
         { return (m_bOwnWord == 1); }
+
+		bool isPesudo(void) const
+        { return (m_bPesudo == 1); }
 
         const TTransUnit*getTrans() const
         { return (TTransUnit *) (this + 1); }

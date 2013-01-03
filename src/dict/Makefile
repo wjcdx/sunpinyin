@@ -12,6 +12,9 @@ lm_sc:
 xhdict:
 	${DICTGEN} xhdict3_sc.bin
 
+gdb-py:
+	gdb --args ./genpyt -e le -i dict.utf8.py \
+		-s lm_sc.t3g.py -l lm_sc.t3g.py.log -t xh -o dict3_sc.bin.py
 gdb-xh:
 	gdb --args ./genpyt -e le -i dict.utf8.xh \
 		-s lm_sc.t3g.xh -l lm_sc.t3g.xh.log -t xh -o dict3_sc.bin.xh

@@ -149,24 +149,14 @@ CXhocTrieMaker::addCombinedTransfers(CTreeNode *pnode,
     } else {
         p = new CTreeNode();
         p->m_cmbNodes = nodes;
+        p->m_bPesudo = true;
         m_StateMap[&p->m_cmbNodes] = p;
 
         CTreeNodeSet::const_iterator it = nodes.begin();
         CTreeNodeSet::const_iterator ite = nodes.end();
+        unsigned syl = 0;
         for (; it != ite; ++it) {
-            CTreeWordSet::const_iterator wit  = (*it)->m_WordIdSet.begin();
-            CTreeWordSet::const_iterator wite = (*it)->m_WordIdSet.end();
-
-            for (; wit != wite; ++wit) {
-                CTreeWordSet::iterator tmp = p->m_WordIdSet.find (*wit);
-
-                if (tmp == p->m_WordIdSet.end()) {
-                    p->m_WordIdSet.insert (*wit);
-                } else if (tmp->anony.m_cost > wit->anony.m_cost) {
-                    p->m_WordIdSet.erase (tmp);
-                    p->m_WordIdSet.insert (*wit);
-                }
-            }
+            p->m_Trans[syl++] = (*it);
         }
     }
 
@@ -174,37 +164,46 @@ CXhocTrieMaker::addCombinedTransfers(CTreeNode *pnode,
     return p;
 }
 
-
 void
-CXhocTrieMaker::linkWordsTogether(CTreeNode *pnode, bool add)
+CXhocTrieMaker::linkWordsTogether(CTreeNode *pnode)
 {
-    if (pnode->m_Trans.empty()) {
+    if (pnode->m_Trans.empty())
+        return;
 
-    } else {
-        CTrans::iterator it = pnode->m_Trans.begin();
-        CTrans::iterator ite = pnode->m_Trans.end();
+    CTrans::iterator it = pnode->m_Trans.begin();
+    CTrans::iterator ite = pnode->m_Trans.end();
 
-		std::map<unsigned, CTreeNodeSet> combTrans;
-        for (; it != ite; it++) {
-			if (CXhocData::isPattern(it->first)) {
-				combTrans[it->first].insert(it->second);
-			}
+    std::map<unsigned, CTreeNodeSet> combTrans;
+    for (; it != ite; it++) {
+        CTreeNode *sub = it->second;
+        linkWordsTogether(sub);
+
+        if (CXhocData::isStroke(it->first)) {
+            CTrans::iterator sit = sub->m_Trans.begin();
+            CTrans::iterator site = sub->m_Trans.end();
+            for (; sit != site; it++) {
+                if (CXhocData::isPattern(sit->first)) {
+                    combTrans[sit->first].insert(sit->second);
+                }
+            }
+        } else {
+            combTrans[it->first].insert(sub);
         }
-	
-		std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
-		for (; itCombTrans != combTrans.end(); ++itCombTrans) {
-			CTreeNode* p = NULL;
-			unsigned s = itCombTrans->first;
-			CTreeNodeSet nodes = itCombTrans->second;
+    }
 
-			CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
-			if (itStateMap != m_StateMap.end())
-				p = itStateMap->second;
-			else
-				p = addCombinedTransfers(pnode, s, nodes);
+    std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
+    for (; itCombTrans != combTrans.end(); ++itCombTrans) {
+        CTreeNode* p = NULL;
+        unsigned s = itCombTrans->first;
+        CTreeNodeSet nodes = itCombTrans->second;
 
-			pnode->m_Trans[s] = p;
-		}
+        CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
+        if (itStateMap != m_StateMap.end())
+            p = itStateMap->second;
+        else
+            p = addCombinedTransfers(pnode, s, nodes);
+
+        pnode->m_Trans[s] = p;
     }
 }
 
@@ -214,7 +213,7 @@ CXhocTrieMaker::threadNonCompletedXh()
     Path path;
     path.buildTrieInfo(m_pRootNode, false);
 
-    linkWordsTogether(m_pRootNode, false);
+    linkWordsTogether(m_pRootNode);
 }
 
 bool

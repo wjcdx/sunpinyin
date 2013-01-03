@@ -31,7 +31,6 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
         CTrans::iterator ite = pnode->m_Trans.end();
 
         int max = 0;
-		std::map<unsigned, CTreeNodeSet> combTrans;
         for (; it != ite; it++) {
 
 			Path p;
@@ -40,7 +39,6 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 			if (CXhocData::isPattern(syl)) {
         		pnode->m_nMaxStroke = getMostPopularPartialNum();
             	p.buildTrieInfo(sub, true);
-				combTrans[syl].insert(sub);
 			} else {
 				p = *this;
 				p.add(it->first);
@@ -60,21 +58,6 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 			}
         }
 	
-		std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
-		for (; itCombTrans != combTrans.end(); ++itCombTrans) {
-			CTreeNode* p = NULL;
-			unsigned s = itCombTrans->first;
-			CTreeNodeSet nodes = itCombTrans->second;
-
-			CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
-			if (itStateMap != m_StateMap.end())
-				p = itStateMap->second;
-			else
-				p = addCombinedTransfers(pnode, s, nodes);
-
-			pnode->m_Trans[s] = p;
-		}
-
         pnode->m_nMaxStroke = max;
     }
 }

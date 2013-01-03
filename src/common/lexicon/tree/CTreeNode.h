@@ -21,6 +21,7 @@ public:
 
 public:
 		bool m_bExpanded;
+		bool m_bPesudo;
 		CTreeNodeSet m_cmbNodes;
         CTreeWordSet m_WordIdSet;
         CTrans m_Trans;
@@ -29,7 +30,7 @@ public:
 
 public:
 		CTreeNode()
-			: m_bExpanded(false), m_nMaxStroke(0), m_bOwnWord(false)
+			: m_bExpanded(false), m_bPesudo(false), m_nMaxStroke(0), m_bOwnWord(false)
 		{
 			m_AllNodes.push_back(this);
 		}
