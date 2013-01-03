@@ -124,7 +124,7 @@ void
 CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
 {
     static char buf[1024];
-    if (pRoot->m_nWordId > 0) {
+    if (pRoot->m_nWordId > 0 && pRoot->m_bOwnWord == 1) {
         fprintf(fp, "%s", prefix.c_str());
         if (pRoot->m_csLevel)
             fprintf(fp, "(GBK+)");
@@ -158,6 +158,7 @@ CTrie::print(const TThreadNode* pRoot, std::string& prefix, FILE *fp) const
         const char *str = CUnitData::decode(TUnit(u));
         if (!str) break;
         int slen = strlen(str);
+        if (slen == 0) break;
         prefix = prefix + str + '\'';
         print(pch, prefix, fp);
         //the content str pointed may be changed

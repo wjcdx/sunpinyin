@@ -157,7 +157,7 @@ CXhTrieMaker::addCombinedTransfers(CTreeNode *pnode,
 
         CTreeNodeSet::const_iterator it = nodes.begin();
         CTreeNodeSet::const_iterator ite = nodes.end();
-        unsigned syl = 0;
+        unsigned syl = 256;
         for (; it != ite; ++it) {
             p->m_Trans[syl++] = (*it);
         }
@@ -178,7 +178,6 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
 
     std::map<unsigned, CTreeNodeSet> combTrans;
     for (; it != ite; it++) {
-        cout << "linkWordsTogether: " << (char)it->first << endl;
         CTreeNode *sub = it->second;
         linkWordsTogether(sub);
 
@@ -202,10 +201,12 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
         CTreeNodeSet nodes = itCombTrans->second;
 
         CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
-        if (itStateMap != m_StateMap.end())
+        if (itStateMap != m_StateMap.end()) {
             p = itStateMap->second;
-        else
+        } else {
+            cout << "combTrans: " << (char)s << " : " << nodes.size() << endl;
             p = addCombinedTransfers(pnode, s, nodes);
+        }
 
         pnode->m_Trans[s] = p;
     }
