@@ -20,21 +20,17 @@ DICT_UTF8_XH_OC = "dict.utf8.xh.oc"
 
 DICT_BIN_PY = "dict3_sc.bin.py"
 DICT_BIN_XH = "dict3_sc.bin.xh"
-DICT_BIN_XH_OC = "dict3_sc.bin.xh.oc"
 
 TSLM_PY = "lm_sc.t3g.py"
 TSLM_XH = "lm_sc.t3g.xh"
-TSLM_XH_OC = "lm_sc.t3g.xh.oc"
 
 TSLM_ORG_PY = "lm_sc.t3g.orig.py"
 TSLM_ORG_XH = "lm_sc.t3g.orig.xh"
-TSLM_ORG_XH_OC = "lm_sc.t3g.orig.xh.oc"
 
 TSLM_LOG_PY = "lm_sc.t3g.py.log"
 TSLM_LOG_XH = "lm_sc.t3g.xh.log"
-TSLM_LOG_XH_OC = "lm_sc.t3g.xh.oc.log"
 
-DATA_DICT = ${DICT_BIN_PY} ${DICT_BIN_XH} ${DICT_BIN_XH_OC}
+DATA_DICT = ${DICT_BIN_PY} ${DICT_BIN_XH}
 DATA_TSLM = ${TSLM_PY} ${TSLM_XH}
 
 all: install
@@ -49,7 +45,7 @@ ${DICT_UTF8_PY}: dict.utf8
 	cp $^ $@
 
 ${DICT_UTF8_XH}: dict.utf8
-	dconv dict.utf8.xh.oc dict.utf8.py $@
+	dconv ${DICT_UTF8_XH_OC} ${DICT_UTF8_PY} $@
 	sed -i '/XXX/d' $@
 
 ${DICT_UTF8_XH_OC}:
@@ -63,17 +59,11 @@ lm_sc.t3g.arpa: ${TSLM_AR}
 ${TSLM_ORG_PY}: ${DICT_UTF8_PY} lm_sc.t3g.arpa
 	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_PY} $@
 
-${TSLM_ORG_XH_OC}: ${DICT_UTF8_XH_OC} lm_sc.t3g.arpa
-	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH_OC} $@
-
 ${TSLM_ORG_XH}: ${DICT_UTF8_XH} lm_sc.t3g.arpa
 	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH} $@
 
 ${TSLM_PY}: ${DICT_UTF8_PY} ${TSLM_ORG_PY}
 	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_PY} -o $@
-
-${TSLM_XH_OC}: ${DICT_UTF8_XH_OC} ${TSLM_ORG_XH_OC}
-	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH_OC} -o $@
 
 ${TSLM_XH}: ${DICT_UTF8_XH} ${TSLM_ORG_XH}
 	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH} -o $@
@@ -81,10 +71,6 @@ ${TSLM_XH}: ${DICT_UTF8_XH} ${TSLM_ORG_XH}
 ${DICT_BIN_PY}: ${DICT_UTF8_PY} ${TSLM_PY}
 	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_PY} -s ${TSLM_PY} \
 		-l ${TSLM_LOG_PY} -t py -o $@
-
-${DICT_BIN_XH_OC}: ${DICT_UTF8_XH_OC} ${TSLM_XH_OC}
-	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH_OC} -s ${TSLM_XH_OC} \
-		-l ${TSLM_LOG_XH_OC} -t oc -o $@
 
 ${DICT_BIN_XH}: ${DICT_UTF8_XH} ${TSLM_XH}
 	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH} -s ${TSLM_XH} \
@@ -97,3 +83,4 @@ install: ${DATA_TSLM} ${DATA_DICT}
 clean:
 	rm -rf lm_sc.t3g.orig* lm_sc.t3g*.log dict3_sc.bin*
 
+.PHONY: ${DATA_DICT}

@@ -14,7 +14,7 @@
 
 #include "common/lexicon/trie_maker.h"
 #include "common/lexicon/tree/TrieTreeModel.h"
-#include "xh/input/xhoc_data.h"
+#include "xh/input/xh_data.h"
 #include "path.h"
 
 void
@@ -36,7 +36,7 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 			Path p;
 			unsigned syl = it->first;
             CTreeNode *sub = it->second;
-			if (CXhocData::isPattern(syl)) {
+			if (CXhData::isPattern(syl)) {
         		pnode->m_nMaxStroke = getMostPopularPartialNum();
             	p.buildTrieInfo(sub, true);
 			} else {

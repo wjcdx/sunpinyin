@@ -11,11 +11,16 @@
 #endif
 
 #include <algorithm>
+#include <iostream>
 
 #include "common/lexicon/trie_maker.h"
 #include "common/lexicon/tree/TTreeWordId.h"
 #include "common/lexicon/trie_writer.h"
+#include "xh/input/xh_data.h"
 #include "CXhTrieMaker.h"
+#include "path.h"
+
+using namespace std;
 
 CXhTrieMaker::CXhTrieMaker()
 {
@@ -55,7 +60,8 @@ CXhTrieMaker::parseLine(char* buf,
         t = (char*)skipNonSpace(p);
         if (*t)
             *t++ = 0;
-        while ((*p >= '0' && *p <= '9') || (*p == '\''))
+        while ((*p >= '0' && *p <= '9') || (*p == '\'') 
+                || (*p == 'P') || (*p == 'S'))
             ++p;
         if ((p > s) && ((*p == 0) || (*p == ':'))) {
             int cost = 0;
@@ -90,7 +96,7 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     FILE *fp = fopen(fileName, "r");
     if (!fp) return false;
     printf("CXhTrieMaker...\n"); fflush(stdout);
-    printf("Adding xinhua and corresponding words..."); fflush(stdout);
+    printf("Adding pinyin and corresponding words..."); fflush(stdout);
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (!parseLine(buf, word_buf, id, unitset)) {
             if (word_buf[0] != L'<' && word_buf[0] != 0) {
@@ -115,6 +121,8 @@ CXhTrieMaker::constructFromLexicon(const char* fileName)
     fclose(fp);
     printf("\n    %zd primitive nodes\n", CTreeNode::m_AllNodes.size());  fflush(stdout);
 
+    threadNonCompletedXh();
+
     return suc;
 }
 
@@ -129,6 +137,91 @@ CXhTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
         return p;
     }
     return itt->second;
+}
+
+CTreeNode*
+CXhTrieMaker::addCombinedTransfers(CTreeNode *pnode,
+                                       unsigned s,
+                                       const CTreeNodeSet& nodes)
+{
+	assert(!nodes.empty());
+
+    CTreeNode *p = NULL;
+    if (nodes.size() == 1) {
+        p = (CTreeNode *)(*(nodes.begin()));
+    } else {
+        p = new CTreeNode();
+        p->m_cmbNodes = nodes;
+        p->m_bPesudo = true;
+        m_StateMap[&p->m_cmbNodes] = p;
+
+        CTreeNodeSet::const_iterator it = nodes.begin();
+        CTreeNodeSet::const_iterator ite = nodes.end();
+        unsigned syl = 0;
+        for (; it != ite; ++it) {
+            p->m_Trans[syl++] = (*it);
+        }
+    }
+
+    pnode->m_Trans[s] = p;
+    return p;
+}
+
+void
+CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
+{
+    if (pnode->m_Trans.empty())
+        return;
+
+    CTrans::iterator it = pnode->m_Trans.begin();
+    CTrans::iterator ite = pnode->m_Trans.end();
+
+    std::map<unsigned, CTreeNodeSet> combTrans;
+    for (; it != ite; it++) {
+        cout << "linkWordsTogether: " << (char)it->first << endl;
+        CTreeNode *sub = it->second;
+        linkWordsTogether(sub);
+
+        if (CXhData::isStroke(it->first)) {
+            CTrans::iterator sit = sub->m_Trans.begin();
+            CTrans::iterator site = sub->m_Trans.end();
+            for (; sit != site; sit++) {
+                if (CXhData::isPattern(sit->first)) {
+                    combTrans[sit->first].insert(sit->second);
+                }
+            }
+        } else {
+            combTrans[it->first].insert(sub);
+        }
+    }
+
+    std::map<unsigned, CTreeNodeSet>::const_iterator itCombTrans = combTrans.begin();
+    for (; itCombTrans != combTrans.end(); ++itCombTrans) {
+        CTreeNode* p = NULL;
+        unsigned s = itCombTrans->first;
+        CTreeNodeSet nodes = itCombTrans->second;
+
+        CStateMap::const_iterator itStateMap = m_StateMap.find(&nodes);
+        if (itStateMap != m_StateMap.end())
+            p = itStateMap->second;
+        else
+            p = addCombinedTransfers(pnode, s, nodes);
+
+        pnode->m_Trans[s] = p;
+    }
+}
+
+void
+CXhTrieMaker::threadNonCompletedXh()
+{
+    cout << "CXhTrieMaker::threadNonCompletedXh" << endl;
+
+    Path path;
+    path.buildTrieInfo(m_pRootNode, false);
+    cout << "buildTrieInfo done!" << endl;
+
+    linkWordsTogether(m_pRootNode);
+    cout << "linkWordsTogether done!" << endl;
 }
 
 bool
@@ -175,6 +268,9 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
 
         outNode.m_nTransfer = pnode->m_Trans.size();
         outNode.m_nWordId = pnode->m_WordIdSet.size();
+        outNode.m_nMaxStroke = pnode->m_nMaxStroke;
+        outNode.m_bOwnWord = pnode->m_bOwnWord ? 1 : 0;
+        outNode.m_bPesudo = pnode->m_bPesudo ? 1 : 0;
         outNode.m_csLevel = 0;
 
         CTreeWordSet::const_iterator itId = pnode->m_WordIdSet.begin();

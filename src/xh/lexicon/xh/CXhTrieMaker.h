@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
-#ifndef _SUNPINYIN_XHTRIE_MAKER_H__
-#define _SUNPINYIN_XHTRIE_MAKER_H__
+#ifndef _SUNPINYIN_XHOCTRIE_MAKER_H__
+#define _SUNPINYIN_XHOCTRIE_MAKER_H__
 
 #include "portability.h"
 
@@ -35,6 +35,16 @@ public:
 protected:
     CTreeNode*
     insertTransfer(CTreeNode* pnode, unsigned s);
+
+private:
+    CTreeNode*
+    addCombinedTransfers(CTreeNode *pnode,
+                        unsigned s,
+                        const CTreeNodeSet& nodes);
+    void
+    linkWordsTogether(CTreeNode *pnode);
+    void
+    threadNonCompletedXh();
 };
 
 #endif

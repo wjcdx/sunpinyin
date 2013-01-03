@@ -2,7 +2,6 @@
 #include "CUnitData.h"
 #include "pinyin/input/pinyin_data.h"
 #include "xh/input/xh_data.h"
-#include "xh/input/xhoc_data.h"
 
 using namespace TrieThreadModel;
 
@@ -22,8 +21,6 @@ CUnitData::encode(const char *str)
 		return TUnit((unsigned int)CPinyinData::encode(str));
 	case CTrie::XINGHUA:
 		return CXhData::encode(str);
-	case CTrie::XINGHUA_OC:
-		return CXhocData::encode(str);
 	default:
 		return TUnit(0);
 	}
@@ -38,8 +35,6 @@ CUnitData::decode(TrieThreadModel::TUnit u, const char **i,
 		return CPinyinData::decode(TSyllable((unsigned int)u), i, f);
 	case CTrie::XINGHUA:
 		return CXhData::decode(u, i, f);
-	case CTrie::XINGHUA_OC:
-		return CXhocData::decode(u, i, f);
 	default:
 		return NULL;
 	}
