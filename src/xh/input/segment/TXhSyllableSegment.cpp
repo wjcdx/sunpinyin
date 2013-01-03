@@ -11,7 +11,7 @@ TXhSyllableSegment::prepare()
 {
 	m_TrieBranches.clear();
 	PathNode node(NULL,
-		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrieOc->getRootNode(),
+		(TrieThreadModel::TThreadNode*)CInputTrieSource::m_pTrie->getRootNode(),
 		PathNode::JUSTNOW);
 	TrieBranch branch;
 	branch.setNewAdded(false);
@@ -86,7 +86,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		for (unsigned int i = 0; i < sz; ++i) {
 			unsigned int id = pwids[i].m_id;
 			if (id == 765) {
-				CInputTrieSource::m_pTrieOc->print(now);
+				CInputTrieSource::m_pTrie->print(now);
 				break;
 			}
 		}

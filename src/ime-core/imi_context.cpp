@@ -26,7 +26,6 @@ CIMIContext::setCoreData(CIMIData *pCoreData)
 {
     m_pLatticeMgr->setLangModel(pCoreData->getSlm());
     CInputTrieSource::m_pTrie = pCoreData->getTrie();
-    CInputTrieSource::m_pTrieOc = pCoreData->getTrieOc();
 }
 
 void

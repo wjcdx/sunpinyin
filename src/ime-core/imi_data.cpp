@@ -32,14 +32,13 @@ print_wide(const TWCHAR* wstr)
 }
 
 bool
-CIMIData::loadResource(const char* lm_file_path, const char* trie_file_path, const char *trie_oc)
+CIMIData::loadResource(const char* lm_file_path, const char* trie_file_path)
 {
     clear();
 
     #ifdef DEBUG
-    printf("\n    openning lm file %s, trie file %s, trie file for oc %s...",
-           lm_file_path,
-           trie_file_path, (trie_oc == NULL ? "" : trie_oc));
+    printf("\n    openning lm file %s, trie file %s...",
+           lm_file_path, trie_file_path);
     #endif
 
     if ((m_pLM = new CThreadSlm()) != NULL &&
@@ -47,24 +46,12 @@ CIMIData::loadResource(const char* lm_file_path, const char* trie_file_path, con
         (m_pTrie = new CTrie()) != NULL &&
         m_pTrie->load(trie_file_path)) {
         
-        bool ok = true;
-        if (trie_oc != NULL) {
-            m_pTrieOc = new CTrie();
-            if (m_pTrieOc != NULL) {
-                ok = m_pTrieOc->load(trie_oc);
-            } else {
-                ok = false;
-            }
-        }
+        #ifdef DEBUG
+        printf("done! LM @%p, Trie @%p\n", m_pLM, m_pTrie);
+        fflush(stdout);
+        #endif
 
-        if (ok) {
-            #ifdef DEBUG
-            printf("done! LM @%p, Trie @%p\n", m_pLM, m_pTrie);
-            fflush(stdout);
-            #endif
-
-            return true;
-        }
+        return true;
     }
 
     clear();
@@ -89,12 +76,6 @@ CIMIData::clear()
         delete m_pTrie;
         m_pTrie = NULL;
     }
-
-    if (m_pTrieOc) {
-        delete m_pTrieOc;
-        m_pTrieOc = NULL;
-    }
-
 }
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

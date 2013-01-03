@@ -12,13 +12,7 @@ public:
 	static const TWCHAR * getWstr(unsigned wid);
 
 public:
-	//used in lexicon states
-	//and lattice states
 	static CTrie* m_pTrie;
-	//used before lexicon states
-	//find syllables to be transfered
-	//in m_pTrie
-	static CTrie* m_pTrieOc;
     static CUserDict* m_pUserDict;
 };
 

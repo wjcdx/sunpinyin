@@ -16,7 +16,7 @@ void print_wide(const TWCHAR* wstr);
 class CIMIData {
 public:
     CIMIData()
-        : m_pTrie(NULL), m_pTrieOc(NULL), m_pLM(NULL) { }
+        : m_pTrie(NULL), m_pLM(NULL) { }
 
     ~CIMIData()
     { clear(); }
@@ -27,19 +27,14 @@ public:
     CTrie*getTrie()
     { return m_pTrie; }
     
-    CTrie*getTrieOc()
-    { return m_pTrieOc; }
-
     bool
-    loadResource(const char* lm_file_path, const char* trie_file_path,
-            const char* trie_oc);
+    loadResource(const char* lm_file_path, const char* trie_file_path);
 
     void
     clear();
 
 public:
     CTrie     *m_pTrie;
-    CTrie     *m_pTrieOc;
     CThreadSlm      *m_pLM;
 };
 

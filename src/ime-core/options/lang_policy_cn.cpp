@@ -28,7 +28,7 @@ CSimplifiedChinesePolicy::loadResources()
     std::string lm_path = data_dir + "/lm_sc.t3g.py";
     std::string dict_path = data_dir + "/dict3_sc.bin.py";
 
-    suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str(), NULL);
+    suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
 
     if (!m_user_data_dir.size()) {
         char path[256];

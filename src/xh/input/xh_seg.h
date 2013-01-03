@@ -4,7 +4,7 @@
 #include "portability.h"
 #include "common/input/segmentor.h"
 #include "common/input/segment/segment_types.h"
-#include "xhoc_data.h"
+#include "xh_data.h"
 
 #include <algorithm>
 #include <climits>
