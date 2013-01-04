@@ -19,14 +19,15 @@ PathNode::print()
 }
 
 bool
-PathNode::getChildrenFromPesudoTNode(TThreadNode *psuNode, PathNodeList &children)
+PathNode::getChildrenFromPesudoTNode(TTransUnit *pTrans,
+		TThreadNode *psuNode, PathNodeList &children)
 {
 	unsigned int sz = psuNode->m_nTransfer;
 	TTransUnit *ptrans = (TTransUnit *)psuNode->getTrans();
 	for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit;
 		TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(psuNode, u);
-		children.push_back(PathNode(&ptrans[i], pch));
+		children.push_back(PathNode(pTrans, pch));
 	}
 	return true;
 }
@@ -48,7 +49,7 @@ PathNode::getChildren(PathNodeList &children, TSyllable syllable)
 			if (u == syllable) {
 				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
 				if (pch->m_bPesudo) {
-					getChildrenFromPesudoTNode(pch, children);
+					getChildrenFromPesudoTNode(&ptrans[i], pch, children);
 				} else {
 					children.push_back(PathNode(&ptrans[i], pch));
 				}
