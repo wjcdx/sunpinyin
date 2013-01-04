@@ -23,8 +23,8 @@ TXhSyllableSegment::forward(unsigned i, unsigned j)
             // and if match, we'll count it as a new lexicon on lattice j
 			_forwardFromLastSegment(jfr, lxst);
         }
-		_forwardFromRoot(i, jfr);
 	}
+	_forwardFromRoot(i, jfr);
 }
 
 void
