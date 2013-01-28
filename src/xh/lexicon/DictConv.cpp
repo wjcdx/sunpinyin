@@ -154,16 +154,27 @@ int main(int argc, char *argv[])
 {
 	if (argc < 4) {
 		printf("Usage: %s lexicon-file dict-in dict-out\n", argv[0]);
-		return 1;
+		return -1;
 	}
 
 	const char *lexicon = argv[1];
 	const char *idict = argv[2];
 	const char *odict = argv[3];
 
+	bool suc = false;
+
 	DictConv dg;
-	dg.constructLexicon(lexicon);
-	dg.convertDictUsingLexicon(odict, idict);
+	suc = dg.constructLexicon(lexicon);
+	if (suc) {
+		printf("Construct Lexicon from file: %s failed.\n", lexicon);
+		return -1;
+	}
+
+	suc = dg.convertDictUsingLexicon(odict, idict);
+	if (suc) {
+		printf("Convert Dict from %s to %s failed.\n", idict, odict);
+		return -1;
+	}
 
 	return 0;
 }

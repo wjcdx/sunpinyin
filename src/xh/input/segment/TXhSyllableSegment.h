@@ -6,7 +6,9 @@
 #include "path.h"
 #include "ime-core/helper/CInputTrieSource.h"
 #include "common/lexicon/trie.h"
-#include "xh/lattice/TXhLexiconState.h"
+//#include "xh/lattice/TXhLexiconState.h"
+
+struct TXhLexiconState;
 
 #include <map>
 

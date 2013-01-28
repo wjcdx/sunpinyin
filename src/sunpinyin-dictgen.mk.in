@@ -14,21 +14,21 @@ TSLM_PAT = 'lm_sc\.t3g\.arpa-[0-9]\+.tar.bz2'
 DICT_AR = $(shell w3m -dump ${DL_LIST} | grep -o ${DICT_PAT} | sort | tail -n 1)
 TSLM_AR = $(shell w3m -dump ${DL_LIST} | grep -o ${TSLM_PAT} | sort | tail -n 1)
 
-DICT_UTF8_PY = "dict.utf8.py"
-DICT_UTF8_XH = "dict.utf8.xh"
-DICT_UTF8_XH_OC = "dict.utf8.xh.oc"
+DICT_UTF8_PY = dict.utf8.py
+DICT_UTF8_XH = dict.utf8.xh
+DICT_UTF8_XH_OC = dict.utf8.xh.oc
 
-DICT_BIN_PY = "dict3_sc.bin.py"
-DICT_BIN_XH = "dict3_sc.bin.xh"
+DICT_BIN_PY = dict3_sc.bin.py
+DICT_BIN_XH = dict3_sc.bin.xh
 
-TSLM_PY = "lm_sc.t3g.py"
-TSLM_XH = "lm_sc.t3g.xh"
+TSLM_PY = lm_sc.t3g.py
+TSLM_XH = lm_sc.t3g.xh
 
-TSLM_ORG_PY = "lm_sc.t3g.orig.py"
-TSLM_ORG_XH = "lm_sc.t3g.orig.xh"
+TSLM_ORG_PY = lm_sc.t3g.orig.py
+TSLM_ORG_XH = lm_sc.t3g.orig.xh
 
-TSLM_LOG_PY = "lm_sc.t3g.py.log"
-TSLM_LOG_XH = "lm_sc.t3g.xh.log"
+TSLM_LOG_PY = lm_sc.t3g.py.log
+TSLM_LOG_XH = lm_sc.t3g.xh.log
 
 DATA_DICT = ${DICT_BIN_PY} ${DICT_BIN_XH}
 DATA_TSLM = ${TSLM_PY} ${TSLM_XH}
