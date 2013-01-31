@@ -112,7 +112,7 @@ main(int argc, char* argv[])
         fflush(stdout);
         return 0;
     }
-
+/*
     printf("Printing the lexicon out to log_file..."); fflush(stdout);
     CTrie *t = TrieFactory::getTrie(type);
     t->load(result_file);
@@ -120,7 +120,7 @@ main(int argc, char* argv[])
     FILE *fp = fopen(log_file, "w");
     t->print(fp);
     fclose(fp);
-
+*/
     printf("done!\n");
 
     return 0;

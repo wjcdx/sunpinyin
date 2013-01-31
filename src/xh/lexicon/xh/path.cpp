@@ -33,13 +33,18 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
         int max = 0;
         for (; it != ite; it++) {
 
+			int m = 0;
 			Path p;
 			unsigned syl = it->first;
             CTreeNode *sub = it->second;
+
 			if (CXhData::isPattern(syl)) {
-        		pnode->m_nMaxStroke = getMostPopularPartialNum();
+
             	p.buildTrieInfo(sub, true);
+        		m = getMostPopularPartialNum();
+
 			} else {
+
 				p = *this;
 				p.add(it->first);
 				p.buildTrieInfo(sub, true);
@@ -52,10 +57,10 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 					}
 				}
 
-				if ((int)sub->m_nMaxStroke > max) {
-					max = sub->m_nMaxStroke;
-				}
+				m = (int)sub->m_nMaxStroke;
 			}
+
+			max = m > max ? m : max;
         }
 	
         pnode->m_nMaxStroke = max;

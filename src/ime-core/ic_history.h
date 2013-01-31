@@ -44,6 +44,40 @@
 #include <map>
 #include <deque>
 #include <set>
+#include <ctime>
+
+class CHistoryInfo {
+public:
+    CHistoryInfo() : m_freq(0), m_last_touch(0) {}
+    
+    time_t getLastTouchTime() {
+        return m_last_touch;
+    }
+
+    void touch() {
+        m_last_touch = time(NULL);
+    }
+
+    bool olderBy(int seconds) {
+        return (time(NULL) - m_last_touch >= seconds);
+    }
+
+    int getFreq() { return m_freq; }
+
+    void addFreq(int f) { m_freq += f; }
+
+    void incFreq() {
+        m_freq++;
+        touch();
+    }
+
+    void decFreq() { m_freq--; }
+
+private:
+    int m_freq;
+    time_t m_last_touch;
+};
+
 
 /**
  * A forget all history memory
@@ -153,21 +187,26 @@ public:
 
     virtual void addStopWords(const std::set<uint32_t>& stopWords);
     virtual void initStopWords();
+    virtual bool isUnigramStopWords(uint32_t wid);
 
 protected:
     typedef uint32_t TWordId;
     typedef std::pair<TWordId, TWordId>           TBigram;
-    typedef TWordId TUnigram;
-    typedef std::map<TBigram, int>                TBigramPool;
-    typedef std::map<TUnigram, int>               TUnigramPool;
+    typedef TWordId                               TUnigram;
+    typedef std::map<TBigram, CHistoryInfo>       TBigramPool;
+    typedef std::map<TUnigram, CHistoryInfo>      TUnigramPool;
     typedef std::deque<TWordId>                   TContextMemory;
 
     static const size_t contxt_memory_size;
     static const double focus_memory_ratio;
+    static const time_t short_term_time;
 
     TContextMemory m_memory;
-    TUnigramPool m_unifreq;
-    TBigramPool m_bifreq;
+    //short-term and long-term freqs
+    TUnigramPool m_unifreq_st;
+    TBigramPool m_bifreq_st;
+    TUnigramPool m_unifreq_lt;
+    TBigramPool m_bifreq_lt;
 
     std::string m_history_path;
     std::set<uint32_t>  m_stopWords;
@@ -181,6 +220,12 @@ protected:
     void decBiFreq(TBigram& bg);
     void incUniFreq(TUnigram& ug);
     void incBiFreq(TBigram& bg);
+    void ageFreqs();
+
+    void forgetUgInUgPool(uint32_t wid, TUnigramPool& ugp);
+    void forgetUgInBiPool(uint32_t wid, TBigramPool& bip);
+    void forgetBiInBiPool(uint32_t *its_wid,
+            uint32_t *ite_wid, TBigramPool& bip);
 };
 
 #endif

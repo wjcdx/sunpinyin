@@ -15,7 +15,18 @@ TXhSyllableSegment::forward(unsigned i, unsigned j)
 
 	CLexiconStates::iterator it = ifr.m_lexiconStates.begin();
 	CLexiconStates::iterator ite = ifr.m_lexiconStates.end();
+
+	unsigned max = 0;
+	if (it != ite) {
+		max = it->m_syls.size();
+	}
+
 	for (; it != ite; it++) {
+		// just get the longest words, others will be
+		// rebuilded after the front ones are selected.
+		if (it->m_syls.size() < max)
+			break;
+
 		TXhLexiconState &lxst = *(TXhLexiconState *)(&(*it));
 
         if (lxst.m_pNode) {
@@ -68,6 +79,12 @@ void TXhSyllableSegment::_forwardFromLastSegment(CLatticeFrame &jfr,
 			new_lxst.m_syls.push_back(m_syllables[0]);
 			new_lxst.m_seg_path.push_back(m_start + m_len);
 			jfr.m_lexiconStates.push_back(new_lxst);
+#if 1
+			{
+				TThreadNode *now = bit->getPath().getNow()->getTNode();
+				CInputTrieSource::m_pTrie->print(now);
+			}
+#endif
 		}
 	}
 }
@@ -91,6 +108,12 @@ void TXhSyllableSegment::_forwardFromRoot(unsigned i, CLatticeFrame &jfr)
 									bit->getPath().getNow()->getTNode(),
 									syls, seg_path);
 			jfr.m_lexiconStates.push_back(new_lxst);
+#if 1
+			{
+				TThreadNode *now = bit->getPath().getNow()->getTNode();
+				CInputTrieSource::m_pTrie->print(now);
+			}
+#endif
 		}
 	}
 }
@@ -146,10 +169,10 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		const TWordIdInfo *pwids = now->getWordIdPtr();
 		for (unsigned int i = 0; i < sz; ++i) {
 			unsigned int id = pwids[i].m_id;
-			if (id == 765) {
+			//if (id == 765) {
 				CInputTrieSource::m_pTrie->print(now);
-				break;
-			}
+				//break;
+			//}
 		}
 	}
 #endif

@@ -91,7 +91,7 @@ DictConv::constructLexicon(const char *filename)
 	}
     fclose(fp);
 
-    printf("\n    %zd primitive nodes", m_Lexicon.size());  fflush(stdout);
+    printf("\n    %zd primitive nodes\n", m_Lexicon.size());  fflush(stdout);
 	return true;
 }
 
@@ -109,6 +109,7 @@ DictConv::convertDictUsingLexicon(const char *ofile, const char *ifile)
     static char word_buf[2048];
 	static TWCHAR wbuf[1024];
     unsigned id;
+    unsigned real_id = 99;
 
     FILE *ifp = fopen(ifile, "r");
     if (!ifp)
@@ -123,9 +124,10 @@ DictConv::convertDictUsingLexicon(const char *ofile, const char *ifile)
     while (fgets(buf, sizeof(buf), ifp) != NULL) {
         if (parseLine(buf, word_buf, id)) {
             if (word_buf[0] != L'<' && word_buf[0] != 0) {
-				fprintf(ofp, "%s %d ", word_buf, id);
+				fprintf(ofp, "%s %d ", word_buf, ++real_id);
 				MBSTOWCS(wbuf, word_buf, 1024);
 				int i = 0, sz = WCSLEN(wbuf);
+				bool unknown = false;
 				for (; i < sz; i++) {
 					if (i != 0) {
 						fprintf(ofp, "'");
@@ -135,9 +137,12 @@ DictConv::convertDictUsingLexicon(const char *ofile, const char *ifile)
 					if (it != m_Lexicon.end()) {
 						fprintf(ofp, "%s", m_Lexicon[key].c_str());
 					} else {
+						unknown = true;
 						fprintf(ofp, "XXX");
 					}
 				}
+				if (unknown)
+					--real_id;
 				fprintf(ofp, "\n");
             } else {
 				fprintf(ofp, "%s\n", buf);
@@ -165,13 +170,13 @@ int main(int argc, char *argv[])
 
 	DictConv dg;
 	suc = dg.constructLexicon(lexicon);
-	if (suc) {
+	if (!suc) {
 		printf("Construct Lexicon from file: %s failed.\n", lexicon);
 		return -1;
 	}
 
 	suc = dg.convertDictUsingLexicon(odict, idict);
-	if (suc) {
+	if (!suc) {
 		printf("Convert Dict from %s to %s failed.\n", idict, odict);
 		return -1;
 	}

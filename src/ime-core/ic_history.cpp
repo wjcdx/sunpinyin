@@ -58,9 +58,11 @@ CICHistory::~CICHistory()
 
 const size_t CBigramHistory::contxt_memory_size = 8192;
 const double CBigramHistory::focus_memory_ratio = 0.05;
+const time_t CBigramHistory::short_term_time = 60*10;
 
 //FIXME: CBigramHistory need to be thread safe
-CBigramHistory::CBigramHistory() : m_memory(), m_unifreq(), m_bifreq()
+CBigramHistory::CBigramHistory() : m_memory(),
+    m_unifreq_st(), m_bifreq_st(), m_unifreq_lt(), m_bifreq_lt()
 {
     initStopWords();
 }
@@ -104,6 +106,8 @@ CBigramHistory::memorize(uint32_t* its_wid, uint32_t* ite_wid)
         incUniFreq(bigram.second);
         incBiFreq(bigram);
     }
+
+    ageFreqs();
     return true;
 }
 
@@ -111,8 +115,10 @@ void
 CBigramHistory::clear()
 {
     m_memory.clear();
-    m_unifreq.clear();
-    m_bifreq.clear();
+    m_unifreq_st.clear();
+    m_bifreq_st.clear();
+    m_unifreq_lt.clear();
+    m_bifreq_lt.clear();
 }
 
 double
@@ -265,23 +271,18 @@ int
 CBigramHistory::uniFreq(TUnigram& ug)
 {
     int freq = 0;
-    if (m_stopWords.find(ug) == m_stopWords.end()) {
-        TUnigramPool::iterator it = m_unifreq.find(ug);
-        if (it != m_unifreq.end()) {
-            freq = it->second;
-            TContextMemory::reverse_iterator rit = m_memory.rbegin();
-            for (int i =
-                     0;
-                 rit != m_memory.rend() && i < contxt_memory_size *
-                 focus_memory_ratio;
-                 i++) {
-                if (*rit == ug)
-                    freq += 1.0 / focus_memory_ratio;
-                *rit++;
-            }
+    if (!isUnigramStopWords(ug)) {
+        TUnigramPool::iterator it = m_unifreq_lt.find(ug);
+        if (it != m_unifreq_lt.end()) {
+            freq = (it->second).getFreq();
         }
+        
+        it = m_unifreq_st.find(ug);
+        if (it != m_unifreq_st.end()) {
+            freq += (it->second).getFreq() / focus_memory_ratio;
+        }
+
     }
-    //if (freq != 0) printf("uniFreq[%d]-->%d\n", ug, freq);
     return freq / 2;
 }
 
@@ -289,22 +290,15 @@ int
 CBigramHistory::biFreq(TBigram& bg)
 {
     int freq = 0;
-    //std::set<unsigned>::const_iterator ite = m_stopWords.end();
-    if (m_stopWords.find(bg.first) == m_stopWords.end()
-        && m_stopWords.find(bg.second) == m_stopWords.end()) {
-        TBigramPool::const_iterator it = m_bifreq.find(bg);
-        if (it != m_bifreq.end()) {
-            freq = it->second;
-            TContextMemory::reverse_iterator re = m_memory.rbegin();
-            TContextMemory::reverse_iterator rs = re + 1;
-            for (int i = 0;
-                 rs != m_memory.rend() && i < contxt_memory_size *
-                 focus_memory_ratio;
-                 i++) {
-                if (*rs == bg.first && *re == bg.second)
-                    freq += 1.0 / focus_memory_ratio;
-                ++rs; ++re;
-            }
+
+    if (!isUnigramStopWords(bg.first) && !isUnigramStopWords(bg.second)) {
+        TBigramPool::iterator it = m_bifreq_lt.find(bg);
+        if (it != m_bifreq_lt.end()) {
+            freq = (it->second).getFreq();
+        }
+        it = m_bifreq_st.find(bg);
+        if (it != m_bifreq_st.end()) {
+            freq += (it->second).getFreq() / focus_memory_ratio;
         }
     }
 
@@ -315,46 +309,74 @@ CBigramHistory::biFreq(TBigram& bg)
 void
 CBigramHistory::decUniFreq(TUnigram& ug)
 {
-    TUnigramPool::iterator it = m_unifreq.find(ug);
-    if (it != m_unifreq.end()) {
-        if (it->second > 1)
-            --(it->second);
+    TUnigramPool::iterator it = m_unifreq_lt.find(ug);
+    if (it != m_unifreq_lt.end()) {
+        CHistoryInfo &hi = it->second;
+        if (hi.getFreq() > 1)
+            hi.decFreq();
         else
-            m_unifreq.erase(it);
+            m_unifreq_lt.erase(it);
     }
 }
 
 bool
 CBigramHistory::seenBefore(uint32_t wid)
 {
-    return(wid != DCWID && m_stopWords.find(wid) == m_stopWords.end() &&
-           m_unifreq.find(wid) != m_unifreq.end());
+    return(!isUnigramStopWords(wid) &&
+           m_unifreq_st.find(wid) != m_unifreq_st.end() &&
+           m_unifreq_lt.find(wid) != m_unifreq_lt.end());
 }
 
 void
 CBigramHistory::decBiFreq(TBigram& bg)
 {
-    TBigramPool::iterator it = m_bifreq.find(bg);
-    if (it != m_bifreq.end()) {
-        if (it->second > 1)
-            --(it->second);
+    TBigramPool::iterator it = m_bifreq_lt.find(bg);
+    if (it != m_bifreq_lt.end()) {
+        CHistoryInfo &hi = it->second;
+        if (hi.getFreq() > 1)
+            hi.decFreq();
         else
-            m_bifreq.erase(it);
+            m_bifreq_lt.erase(it);
     }
 }
 
 void
 CBigramHistory::incUniFreq(TUnigram& ug)
 {
-    ++m_unifreq[ug];
+    m_unifreq_st[ug].incFreq();
     //printf("Remebering uniFreq[%d]-->%d\n", ug, m_unifreq[ug]);
 }
 
 void
 CBigramHistory::incBiFreq(TBigram& bg)
 {
-    ++m_bifreq[bg];
+    m_bifreq_st[bg].incFreq();
     //printf("Remebering biFreq[%d,%d]-->%d\n", bg.first, bg.second, m_bifreq[bg]);
+}
+
+//age freqs to long-term maps
+void CBigramHistory::ageFreqs()
+{
+    TUnigramPool::iterator uit, uitn = m_unifreq_st.begin();
+    TUnigramPool::iterator uite = m_unifreq_st.end();
+    for (uit = uitn, uitn++; uit != uite; uit = uitn, uitn++) {
+        CHistoryInfo &hi = uit->second;
+        if (hi.olderBy(short_term_time)) {
+            m_unifreq_lt[uit->first].addFreq(hi.getFreq());
+            printf("Aging uiFreq[%d:%d] to long-term map.\n", uit->first, hi.getLastTouchTime());
+            m_unifreq_st.erase(uit);
+        }
+    }
+    
+    TBigramPool::iterator bit, bitn = m_bifreq_st.begin();
+    TBigramPool::iterator bite = m_bifreq_st.end();
+    for (bit = bitn, bitn++; bit != bite; bit = bitn, bitn++) {
+        CHistoryInfo &hi = bit->second;
+        if (hi.olderBy(short_term_time)) {
+            m_bifreq_lt[bit->first].addFreq(hi.getFreq());
+            m_bifreq_st.erase(bit);
+        }
+    }
 }
 
 // so far, it's very expensive to erase a word from bigram pairs, need to design
@@ -370,27 +392,40 @@ CBigramHistory::incBiFreq(TBigram& bg)
 //   4. remove the unigrams and bigrams of each character, and the entire word
 //
 void
-CBigramHistory::forget(uint32_t wid)
+CBigramHistory::forgetUgInUgPool(uint32_t wid, TUnigramPool& ugp)
 {
-    TUnigramPool::iterator uni_it = m_unifreq.find(wid);
-    if (uni_it != m_unifreq.end())
-        m_unifreq.erase(uni_it);
-
-    TBigramPool::iterator it = m_bifreq.begin();
-    TBigramPool::iterator ite = m_bifreq.end();
+    TUnigramPool::iterator uni_it = ugp.find(wid);
+    if (uni_it != ugp.end())
+        ugp.erase(uni_it);
+}
+    
+void
+CBigramHistory::forgetUgInBiPool(uint32_t wid, TBigramPool& bip)
+{
+    TBigramPool::iterator it = bip.begin();
+    TBigramPool::iterator ite = bip.end();
 
     while (it != ite) {
         TBigram bigram = it->first;
 
         if (bigram.first == wid || bigram.second == wid)
-            m_bifreq.erase(it++);
+            bip.erase(it++);
         else
             ++it;
     }
 }
+    
+void
+CBigramHistory::forget(uint32_t wid)
+{
+    forgetUgInUgPool(wid, m_unifreq_st);
+    forgetUgInUgPool(wid, m_unifreq_lt);
+    forgetUgInBiPool(wid, m_bifreq_st);
+    forgetUgInBiPool(wid, m_bifreq_lt);
+}
 
 void
-CBigramHistory::forget(uint32_t *its_wid, uint32_t *ite_wid)
+CBigramHistory::forgetBiInBiPool(uint32_t *its_wid, uint32_t *ite_wid, TBigramPool& bip)
 {
     for (; its_wid < ite_wid; ++its_wid) {
         TBigram bigram(*its_wid, DCWID);
@@ -398,10 +433,17 @@ CBigramHistory::forget(uint32_t *its_wid, uint32_t *ite_wid)
         if (its_wid + 1 != ite_wid)
             bigram.second = *(its_wid + 1);
 
-        TBigramPool::iterator it = m_bifreq.find(bigram);
-        if (it != m_bifreq.end())
-            m_bifreq.erase(it);
+        TBigramPool::iterator it = bip.find(bigram);
+        if (it != bip.end())
+            bip.erase(it);
     }
+}
+
+void
+CBigramHistory::forget(uint32_t *its_wid, uint32_t *ite_wid)
+{
+    forgetBiInBiPool(its_wid, ite_wid, m_bifreq_st);
+    forgetBiInBiPool(its_wid, ite_wid, m_bifreq_lt);
 }
 
 void
@@ -417,6 +459,12 @@ CBigramHistory::initStopWords()
 
     m_stopWords.insert(0);     //unknown world
     m_stopWords.insert(DCWID); //seperator word id used by history memory interanlly
+}
+
+bool
+CBigramHistory::isUnigramStopWords(uint32_t wid)
+{
+    return (wid == 0 || wid == DCWID);
 }
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

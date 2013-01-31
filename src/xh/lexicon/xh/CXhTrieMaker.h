@@ -37,6 +37,10 @@ protected:
     insertTransfer(CTreeNode* pnode, unsigned s);
 
 private:
+    void
+    findAllRealSubNodes(CTreeNode *pnode,
+                        unsigned &syl,
+                        const CTreeNodeSet& nodes);
     CTreeNode*
     addCombinedTransfers(CTreeNode *pnode,
                         unsigned s,

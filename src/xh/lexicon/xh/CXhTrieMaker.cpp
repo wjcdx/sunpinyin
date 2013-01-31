@@ -139,6 +139,23 @@ CXhTrieMaker::insertTransfer(CTreeNode* pnode, unsigned s)
     return itt->second;
 }
 
+void
+CXhTrieMaker::findAllRealSubNodes(CTreeNode *pnode,
+                                       unsigned &syl,
+                                       const CTreeNodeSet& nodes)
+{
+    CTreeNodeSet::const_iterator it = nodes.begin();
+    CTreeNodeSet::const_iterator ite = nodes.end();
+    for (; it != ite; ++it) {
+        CTreeNode *sub = (*it);
+        if (sub->m_bPesudo) {
+            findAllRealSubNodes(pnode, syl, sub->m_cmbNodes);
+        } else {
+            pnode->m_Trans[syl++] = sub;
+        }
+    }
+}
+
 CTreeNode*
 CXhTrieMaker::addCombinedTransfers(CTreeNode *pnode,
                                        unsigned s,
@@ -155,12 +172,20 @@ CXhTrieMaker::addCombinedTransfers(CTreeNode *pnode,
         p->m_bPesudo = true;
         m_StateMap[&p->m_cmbNodes] = p;
 
+        unsigned syl = 256;
+        findAllRealSubNodes(p, syl, nodes);
+/*      
         CTreeNodeSet::const_iterator it = nodes.begin();
         CTreeNodeSet::const_iterator ite = nodes.end();
-        unsigned syl = 256;
         for (; it != ite; ++it) {
-            p->m_Trans[syl++] = (*it);
+            CTreeNode *sub = (*it);
+            if (sub->m_bPesudo) {
+
+            } else {
+                p->m_Trans[syl++] = sub;
+            }
         }
+        */
     }
 
     pnode->m_Trans[s] = p;
@@ -204,7 +229,7 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
         if (itStateMap != m_StateMap.end()) {
             p = itStateMap->second;
         } else {
-            cout << "combTrans: " << (char)s << " : " << nodes.size() << endl;
+            //cout << "combTrans: " << (char)s << " : " << nodes.size() << endl;
             p = addCombinedTransfers(pnode, s, nodes);
         }
 
