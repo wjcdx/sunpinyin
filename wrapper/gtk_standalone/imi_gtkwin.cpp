@@ -13,6 +13,7 @@ const char *CGTKWinHandler::cnpunc_image_file_name = "images/cnpunc.png";
 const char *CGTKWinHandler::enpunc_image_file_name = "images/enpunc.png";
 const char *CGTKWinHandler::fullwidth_image_file_name = "images/fullwidth.png";
 const char *CGTKWinHandler::halfwidth_image_file_name = "images/halfwidth.png";
+const char *CGTKWinHandler::tuichu_image_file_name = "images/tuichu.png";
 
 GtkWidget *CGTKWinHandler::hanzi_image = NULL;
 GtkWidget *CGTKWinHandler::eng_image = NULL;
@@ -20,6 +21,7 @@ GtkWidget *CGTKWinHandler::cnpunc_image = NULL;
 GtkWidget *CGTKWinHandler::enpunc_image = NULL;
 GtkWidget *CGTKWinHandler::fullwidth_image = NULL;
 GtkWidget *CGTKWinHandler::halfwidth_image = NULL;
+GtkWidget *CGTKWinHandler::tuichu_image = NULL;
 
 
 static gint
@@ -92,6 +94,7 @@ CGTKWinHandler::~CGTKWinHandler()
     g_object_unref(enpunc_image);
     g_object_unref(fullwidth_image);
     g_object_unref(halfwidth_image);
+    g_object_unref(tuichu_image);
 }
 
 void
@@ -104,6 +107,7 @@ CGTKWinHandler::load_images()
         enpunc_image = gtk_image_new_from_file(enpunc_image_file_name);
         fullwidth_image = gtk_image_new_from_file(fullwidth_image_file_name);
         halfwidth_image = gtk_image_new_from_file(halfwidth_image_file_name);
+        tuichu_image = gtk_image_new_from_file(tuichu_image_file_name);
     }
     g_object_ref(hanzi_image);
     g_object_ref(eng_image);
@@ -111,6 +115,7 @@ CGTKWinHandler::load_images()
     g_object_ref(enpunc_image);
     g_object_ref(fullwidth_image);
     g_object_ref(halfwidth_image);
+    g_object_ref(tuichu_image);
 }
 
 
@@ -207,7 +212,7 @@ CGTKWinHandler::createWindows()
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(button_click_cn_en), mp_view);
 
     m_pCloseButton = button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), hanzi_image);
+    gtk_container_add(GTK_CONTAINER(button), tuichu_image);
     gtk_box_pack_end(GTK_BOX(box1), button, FALSE, FALSE, 2);
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(button_click_close), mp_view);
 

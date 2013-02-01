@@ -45,6 +45,7 @@ protected:
     static const char *enpunc_image_file_name;
     static const char *fullwidth_image_file_name;
     static const char *halfwidth_image_file_name;
+    static const char *tuichu_image_file_name;
     /*@}*/
 
     /*@{*/
@@ -54,6 +55,7 @@ protected:
     static GtkWidget *enpunc_image;
     static GtkWidget *fullwidth_image;
     static GtkWidget *halfwidth_image;
+    static GtkWidget *tuichu_image;
     /*@}*/
 
 protected:
