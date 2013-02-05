@@ -109,7 +109,13 @@ CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
                 }
             }
         }
-		//fr.m_latticeStates.size();
+#if 0
+		printf("fr[%d].m_latticeStates.size: %d\n", idx, (int)fr.m_latticeStates.size());
+		for (CLatticeStates::iterator it = fr.m_latticeStates.begin();
+				it != fr.m_latticeStates.end(); ++it) {
+			it->print("ltst: ");
+		}
+#endif	
     }
 	return affectCandidates;
 }
@@ -143,7 +149,7 @@ CLatticeManager::_transferBetween(unsigned start, unsigned end,
         // for 1-length lattice states, replace ending_word_id (comma)
         // with none_word_id (recognized by CThreadSlm)
     	unsigned _wid = wid;
-        if (wid == ENDING_WORD_ID && it->m_pBackTraceNode && it->m_pBackTraceNode->m_frIdx == 0)
+        if (wid == ENDING_WORD_ID)
             _wid = NONE_WORD_ID;
 
         node.m_pBackTraceNode = &(*it);
@@ -162,12 +168,24 @@ CLatticeManager::_transferBetween(unsigned start, unsigned end,
         if (CIMIContext::m_pHistory) {
             unsigned history[2] = { m_pModel->lastWordId(it->m_slmState), _wid };
             double hpr = CIMIContext::m_pHistory->pr(history, history + 2);
-            ts = weight_s * ts + weight_h * hpr;
+
+			//double ts0 = ts;
+			ts = weight_s * ts + weight_h * hpr;
+			/* if (history[0] == 1274 || history[1] == 1274) {
+				printf("\t\t");
+			}
+			printf("ts[%d,%d]: %f * %f + %f * %f = %f\n", history[0], history[1],
+				weight_s, ts0, weight_h, hpr, ts);	*/
         }
 
-        node.m_score = it->m_score * efic * TSentenceScore(ts);
+		/* it->print("it: ");
+		{
+			char buf[1024];
+			efic.toString(buf);
+			printf("efic: %s\n", buf);
+		} */
+		node.m_score = it->m_score * efic * TSentenceScore(ts);
         end_fr.m_latticeStates.add(node);
-		//printf("end_fr.m_latticeStates.size: %d\n", (int)end_fr.m_latticeStates.size());
     }
 }
 
@@ -197,6 +215,13 @@ CLatticeManager::backTracePaths(const std::vector<TLatticeState>& tail_states,
             } else {
                 cwstr = end_fr.m_wstr.c_str();
             }
+#if 0
+			{
+				char buf[1024] = { 0 };
+				WCSTOMBS(buf, cwstr, 1024);
+				printf("bt: %d.%d: [%d: %s]\n", end, rank, bs->m_backTraceWordId, buf);
+			}
+#endif
 
             CCandidate candi(start, end, bs->m_pLexiconState, cwstr,
                              bs->m_backTraceWordId);

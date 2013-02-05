@@ -31,7 +31,7 @@ public:
 	}
 
 	CLatticeManager ()
-		: m_pModel(NULL), m_tailIdx(1), m_historyPower(5)
+		: m_pModel(NULL), m_tailIdx(1), m_historyPower(10)
 	{
 		m_lattice.resize(MAX_LATTICE_LENGTH);
 		m_lattice[0].m_latticeStates.add(TLatticeState(-1.0, 0));

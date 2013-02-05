@@ -20,9 +20,11 @@ bool
 CTopLatticeStates::push(const TLatticeState& state)
 {
     bool ret = true;
+    state.print("m_heap A: ");
     if (size() >= m_threshold) {
         if (m_heap[0] < state) return false;
         std::pop_heap(m_heap.begin(), m_heap.end());
+        m_heap.back().print("m_heap R: ");
         m_heap.pop_back();
         ret = false;
     }
@@ -35,6 +37,7 @@ void
 CTopLatticeStates::pop()
 {
     std::pop_heap(m_heap.begin(), m_heap.end());
+    m_heap.back().print("m_heap R: ");
     m_heap.pop_back();
 }
 
