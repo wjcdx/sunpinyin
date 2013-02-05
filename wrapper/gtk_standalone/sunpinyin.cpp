@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
 
     factory.setInputStyle(CSunpinyinSessionFactory::XH_STYLE);
     factory.setLanguage(CSunpinyinSessionFactory::SIMPLIFIED_CHINESE_XH);
+    factory.setCandiWindowSize(5);
 
     // test plugin
     // CIMIPluginManager& manager = AIMIPluginManager::instance();

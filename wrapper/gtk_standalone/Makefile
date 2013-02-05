@@ -5,6 +5,9 @@ all: clean
 go:
 	./sunpinyin -p x 2>/dev/null
 
+go-with-info:
+	./sunpinyin -p x
+
 clean:
 #	rm -f *.o sunpinyin
 	rm -f sunpinyin
