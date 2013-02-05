@@ -220,7 +220,7 @@ protected:
     void decBiFreq(TBigram& bg);
     void incUniFreq(TUnigram& ug);
     void incBiFreq(TBigram& bg);
-    void ageFreqs();
+    void ageFreqs(time_t interval);
 
     void forgetUgInUgPool(uint32_t wid, TUnigramPool& ugp);
     void forgetUgInBiPool(uint32_t wid, TBigramPool& bip);

@@ -107,7 +107,7 @@ CBigramHistory::memorize(uint32_t* its_wid, uint32_t* ite_wid)
         incBiFreq(bigram);
     }
 
-    ageFreqs();
+    ageFreqs(short_term_time);
     return true;
 }
 
@@ -242,6 +242,7 @@ CBigramHistory::loadFromBuffer(void* buf_ptr, size_t sz)
             incUniFreq(bigram.second);
             incBiFreq(bigram);
         }
+        ageFreqs(0);
     }
     return true;
 }
@@ -271,6 +272,11 @@ int
 CBigramHistory::uniFreq(TUnigram& ug)
 {
     int freq = 0;
+    int i = ug;
+    if (i == 1340) {
+        //printf("ug: %d\n", ug);
+    }
+
     if (!isUnigramStopWords(ug)) {
         TUnigramPool::iterator it = m_unifreq_lt.find(ug);
         if (it != m_unifreq_lt.end()) {
@@ -323,8 +329,8 @@ bool
 CBigramHistory::seenBefore(uint32_t wid)
 {
     return(!isUnigramStopWords(wid) &&
-           m_unifreq_st.find(wid) != m_unifreq_st.end() &&
-           m_unifreq_lt.find(wid) != m_unifreq_lt.end());
+           (m_unifreq_st.find(wid) != m_unifreq_st.end() ||
+           m_unifreq_lt.find(wid) != m_unifreq_lt.end()));
 }
 
 void
@@ -355,26 +361,31 @@ CBigramHistory::incBiFreq(TBigram& bg)
 }
 
 //age freqs to long-term maps
-void CBigramHistory::ageFreqs()
+void CBigramHistory::ageFreqs(time_t interval)
 {
-    TUnigramPool::iterator uit, uitn = m_unifreq_st.begin();
-    TUnigramPool::iterator uite = m_unifreq_st.end();
-    for (uit = uitn, uitn++; uit != uite; uit = uitn, uitn++) {
+    TUnigramPool::iterator uit = m_unifreq_st.begin();
+    for (; uit != m_unifreq_st.end();) {
         CHistoryInfo &hi = uit->second;
-        if (hi.olderBy(short_term_time)) {
+        if (hi.olderBy(interval)) {
             m_unifreq_lt[uit->first].addFreq(hi.getFreq());
-            printf("Aging uiFreq[%d:%d] to long-term map.\n", uit->first, hi.getLastTouchTime());
-            m_unifreq_st.erase(uit);
+            printf("Aging uiFreq[%d:%d] to long-term map.\n", uit->first,
+                    hi.getLastTouchTime());
+            m_unifreq_st.erase(uit++);
+        } else {
+            uit++;
         }
     }
     
-    TBigramPool::iterator bit, bitn = m_bifreq_st.begin();
-    TBigramPool::iterator bite = m_bifreq_st.end();
-    for (bit = bitn, bitn++; bit != bite; bit = bitn, bitn++) {
+    TBigramPool::iterator bit = m_bifreq_st.begin();
+    for (; bit != m_bifreq_st.end();) {
         CHistoryInfo &hi = bit->second;
-        if (hi.olderBy(short_term_time)) {
+        if (hi.olderBy(interval)) {
             m_bifreq_lt[bit->first].addFreq(hi.getFreq());
-            m_bifreq_st.erase(bit);
+            printf("Aging biFreq[%d,%d:%d] to long-term map.\n",bit->first.first,
+                    bit->first.second, hi.getLastTouchTime());
+            m_bifreq_st.erase(bit++);
+        } else {
+            bit++;
         }
     }
 }
