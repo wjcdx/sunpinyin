@@ -19,6 +19,12 @@ PathNode::print()
 }
 
 bool
+PathNode::isMostPopularStrokeGe(unsigned n)
+{
+	return m_TNode->m_nMaxStroke >= n;
+}
+
+bool
 PathNode::getChildrenFromPesudoTNode(TTransUnit *pTrans,
 		TThreadNode *psuNode, PathNodeList &children)
 {

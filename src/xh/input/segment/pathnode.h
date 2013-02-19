@@ -53,6 +53,8 @@ public:
 		return node != NULL && (getTransUnit() == node->getTransUnit());
 	}
 
+	bool isMostPopularStrokeGe(unsigned n);
+
 
 	TrieThreadModel::TThreadNode *getTNode() { return m_TNode; }
 

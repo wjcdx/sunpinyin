@@ -24,6 +24,9 @@ TXhSyllableSegment::forward(unsigned i, unsigned j)
 	for (; it != ite; it++) {
 		// just get the longest words, others will be
 		// rebuilded after the front ones are selected.
+		// The 'rebuild' here does research the existing
+		// lexicon states, but not re-forward segments.
+		// re-forwarding costs too much.
 		if (it->m_syls.size() < max)
 			break;
 
@@ -122,8 +125,8 @@ void
 TXhSyllableSegment::_forwardSingleSyllable(TSyllable syllable)
 {
 	if (isdigit(syllable)) {
-		_forwardNumber(syllable);
 		m_FwdStrokeNum = syllable - '0';
+		_forwardNumber(m_FwdStrokeNum);
 	} else {
 		_forwardStroke(syllable);
 		m_FwdStrokeNum = 1;
@@ -133,6 +136,18 @@ TXhSyllableSegment::_forwardSingleSyllable(TSyllable syllable)
 void
 TXhSyllableSegment::_forwardNumber(unsigned n)
 {
+    std::list<TrieBranch>::iterator it = m_TrieBranches.begin();
+
+	fprintf(stdout, "N: %lu\n", m_TrieBranches.size());
+	for (; it != m_TrieBranches.end();) {
+		PathNode *pnode = it->getPath().getNow();
+		if (pnode->isMostPopularStrokeGe(n)) {
+			it++;
+		} else {
+			it = m_TrieBranches.erase(it);
+		}
+	}
+	fprintf(stdout, "N: %lu\n\n", m_TrieBranches.size());
 }
 
 void
