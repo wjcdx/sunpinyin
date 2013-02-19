@@ -8,10 +8,27 @@
 class CIMIXhView : public CIMIClassicView
 {
 public:
-    CIMIXhView() {}
+    enum OperateMode {
+        XHVOM_INPUT,
+        XHVOM_SELECT
+    };
+
+    CIMIXhView()
+        : m_OpMode(XHVOM_INPUT)
+    {}
+
     virtual ~CIMIXhView() {}
 
     virtual bool onKeyEvent(const CKeyEvent&);
+
+    void setOpMode(OperateMode om) { m_OpMode = om; }
+    OperateMode getOpMode() { return m_OpMode; }
+
+    bool isKeyValueSelectNumber(unsigned keyvalue);
+    unsigned getSelectionNumber(unsigned keyvalue);
+
+private:
+    OperateMode m_OpMode;
 };
 
 #endif

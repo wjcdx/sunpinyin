@@ -8,6 +8,33 @@
 #include "ime-core/helper/CFullCharManager.h"
 
 bool
+CIMIXhView::isKeyValueSelectNumber(unsigned keyvalue)
+{
+	if (m_OpMode == XHVOM_INPUT) {
+		if (((keyvalue >= '6' && keyvalue <= '9') || keyvalue == '0')
+            && (m_candiWindowSize >= 5
+                || keyvalue < ('6' + m_candiWindowSize)))
+			return true;
+	} else {
+		if ((keyvalue >= '0' && keyvalue <= '9')
+            && (m_candiWindowSize >= 10
+                || keyvalue < ('1' + m_candiWindowSize)))
+			return true;
+	}
+	return false;
+}
+
+unsigned
+CIMIXhView::getSelectionNumber(unsigned keyvalue)
+{
+	if (m_OpMode == XHVOM_SELECT) {
+		if (keyvalue >= '1' && keyvalue <= '5')
+			return keyvalue - '1';
+	}
+	return (keyvalue == '0' ? 4 : keyvalue - '6');
+}
+
+bool
 CIMIXhView::onKeyEvent(const CKeyEvent& key)
 {
     unsigned changeMasks = 0;
@@ -16,6 +43,7 @@ CIMIXhView::onKeyEvent(const CKeyEvent& key)
     unsigned keyvalue = key.value;
     unsigned modifiers = key.modifiers;
 
+	bool isKeyStroke = false;
 #ifdef DEBUG
     printf("Xh View got a key (0x%x-0x%x-0x%x)...\n",
            keycode, keyvalue, modifiers);
@@ -79,27 +107,32 @@ CIMIXhView::onKeyEvent(const CKeyEvent& key)
     } else if ((modifiers &
                 (IM_CTRL_MASK | IM_ALT_MASK | IM_SUPER_MASK |
                  IM_RELEASE_MASK)) == 0) {
-        if (((keyvalue >= '6' && keyvalue <= '9') || keyvalue == '0')
-            && (m_candiWindowSize >= 5
-                || keyvalue < ('6' + m_candiWindowSize))) {
+        if (isKeyValueSelectNumber(keyvalue)) {
             // try to make selection
             if (!m_pIC->isEmpty()) {
                 changeMasks |= KEYEVENT_USED;
-                unsigned sel = (keyvalue == '0' ? 4 : keyvalue - '6');
+                unsigned sel = getSelectionNumber(keyvalue);
                 makeSelection(sel, changeMasks);
             } else if (m_smartPunct) {
                 m_pIC->omitNextPunct();
             }
+
+			// using the same keys between selections
+			isKeyStroke = true;
             goto PROCESSED;
         }
 
         if (keyvalue >= '1' && keyvalue <= '5') {
             changeMasks |= KEYEVENT_USED;
             _insert(keyvalue, changeMasks);
+			
+			isKeyStroke = true;
         } else if (keyvalue > 0x60 && keyvalue < 0x7b) {
             /* islower(keyvalue) */
             changeMasks |= KEYEVENT_USED;
             _insert(keyvalue, changeMasks);
+
+			isKeyStroke = true;
         } else if (keyvalue > 0x20 && keyvalue < 0x7f) {
             /* isprint(keyvalue) && !isspace(keyvalue) */
             changeMasks |= KEYEVENT_USED;
@@ -110,11 +143,15 @@ CIMIXhView::onKeyEvent(const CKeyEvent& key)
             } else {
                 _insert(keyvalue, changeMasks);
             }
+
+			isKeyStroke = true;
         } else if (keycode == IM_VK_BACK_SPACE || keycode == IM_VK_DELETE) {
             if (!m_pIC->isEmpty()) {
                 changeMasks |= KEYEVENT_USED;
                 _erase(keycode == IM_VK_BACK_SPACE, changeMasks);
             }
+
+			isKeyStroke = true;
         } else if (keycode == IM_VK_SPACE) {
             if (!m_pIC->isEmpty()) {
                 changeMasks |= KEYEVENT_USED;
@@ -166,6 +203,12 @@ PROCESSED:;
     m_pHotkeyProfile->rememberLastKey(key);
 
 RETURN:;
+
+	if (isKeyStroke) {
+		setOpMode(XHVOM_INPUT);
+	} else {
+		setOpMode(XHVOM_SELECT);
+	}
 
 #ifdef DEBUG
     printf("   |-->(Mask=0x%x)\n", changeMasks);
