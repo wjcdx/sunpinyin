@@ -31,7 +31,7 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
     CLexiconStates::iterator it = CLatticeManager::getLatticeFrame(i).m_lexiconStates.begin();
     CLexiconStates::iterator ite = CLatticeManager::getLatticeFrame(i).m_lexiconStates.end();
     for (; it != ite; ++it) {
-        TPyLexiconState &lxst = *(TPyLexiconState *)(&(*it));
+        TPyLexiconState &lxst = *(TPyLexiconState *)((*it));
         bool added_from_sysdict = false;
 
         if (lxst.m_pNode) {
@@ -40,15 +40,15 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
             pn = CInputTrieSource::m_pTrie->transfer(lxst.m_pNode, syllable);
             if (pn) {
                 added_from_sysdict = true;
-                TPyLexiconState new_lxst = TPyLexiconState(lxst.m_start,
+                TPyLexiconState *new_lxst = new TPyLexiconState(lxst.m_start,
                                                        pn,
                                                        lxst.m_syls,
                                                        lxst.m_seg_path,
                                                        fuzzy);
-                new_lxst.m_syls.push_back(syllable);
-                new_lxst.m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
+                new_lxst->m_syls.push_back(syllable);
+                new_lxst->m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
                                                   (this->m_inner_fuzzy ? 1 : 0);
-                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
+                new_lxst->m_seg_path.push_back(this->m_start + this->m_len);
                 fr.m_lexiconStates.push_back(new_lxst);
             }
         }
@@ -62,15 +62,15 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
             if (!words.empty() || !added_from_sysdict) {
                 // even if the words is empty we'll add a fake lexicon
                 // here. This helps _saveUserDict detect new words.
-                TPyLexiconState new_lxst = TPyLexiconState(lxst.m_start,
+                TPyLexiconState *new_lxst = new TPyLexiconState(lxst.m_start,
                                                        words,
                                                        lxst.m_syls,
                                                        lxst.m_seg_path,
                                                        fuzzy);
-                new_lxst.m_syls.push_back(syllable);
-                new_lxst.m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
+                new_lxst->m_syls.push_back(syllable);
+                new_lxst->m_num_of_inner_fuzzies = lxst.m_num_of_inner_fuzzies +
                                                   (this->m_inner_fuzzy ? 1 : 0);
-                new_lxst.m_seg_path.push_back(this->m_start + this->m_len);
+                new_lxst->m_seg_path.push_back(this->m_start + this->m_len);
                 fr.m_lexiconStates.push_back(new_lxst);
             }
         }
@@ -84,8 +84,8 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
         std::vector<unsigned> seg_path;
         seg_path.push_back(this->m_start);
         seg_path.push_back(this->m_start + this->m_len);
-        TPyLexiconState new_lxst = TPyLexiconState(i, pn, syls, seg_path, fuzzy);
-        new_lxst.m_num_of_inner_fuzzies = this->m_inner_fuzzy ? 1 : 0;
+        TPyLexiconState *new_lxst = new TPyLexiconState(i, pn, syls, seg_path, fuzzy);
+        new_lxst->m_num_of_inner_fuzzies = this->m_inner_fuzzy ? 1 : 0;
         fr.m_lexiconStates.push_back(new_lxst);
     }
 }

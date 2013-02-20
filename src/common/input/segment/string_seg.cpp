@@ -26,7 +26,7 @@ _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
     else
         fr.m_wstr.push_back(ch);
 
-    fr.m_lexiconStates.push_back(TLexiconState(i, wid));
+    fr.m_lexiconStates.push_back(new TLexiconState(i, wid));
 }
 
 static void
@@ -52,7 +52,7 @@ _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
     else
         fr.m_wstr.push_back(ch);
 
-    fr.m_lexiconStates.push_back(TLexiconState(i, wid));
+    fr.m_lexiconStates.push_back(new TLexiconState(i, wid));
 }
 
 void
@@ -70,7 +70,7 @@ TStringSegment::forward(unsigned i, unsigned j)
         CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
 		fr.m_type = CLatticeFrame::SYMBOL;
         fr.m_wstr.assign(strbuf.begin(), strbuf.end());
-        fr.m_lexiconStates.push_back(TLexiconState(i, 0));
+        fr.m_lexiconStates.push_back(new TLexiconState(i, 0));
     }
 }
 

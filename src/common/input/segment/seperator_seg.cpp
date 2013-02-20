@@ -12,7 +12,7 @@ TSeperatorSegment::forward(unsigned i, unsigned j)
     CLexiconStates::iterator it = fr.m_lexiconStates.begin();
     CLexiconStates::iterator ite = fr.m_lexiconStates.end();
     for (; it != ite; ++it) {
-        it->m_seg_path.back() = j;
+        (*it)->m_seg_path.back() = j;
     }
 }
 

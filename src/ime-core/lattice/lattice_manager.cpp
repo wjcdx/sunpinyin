@@ -66,7 +66,7 @@ CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
         CLexiconStates::iterator ite = fr.m_lexiconStates.end();
         for (; it != ite; ++it) {
             unsigned word_num = 0;
-            TLexiconState &lxst = *it;
+            TLexiconState &lxst = (*(*it));
             const TWordIdInfo *words = lxst.getWords(word_num);
 
             if (!word_num)

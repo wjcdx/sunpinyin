@@ -57,14 +57,7 @@ public:
 	bool isNotBestWord() const
 	{ return (m_bwType == CLatticeFrame::NO_BESTWORD); }
 
-    void clear(){
-        m_type = UNUSED;
-        m_bwType = NO_BESTWORD;
-        m_lexiconStates.clear();
-        m_latticeStates.clear();
-        m_wstr.clear();
-        m_bestWords.clear();
-    }
+    void clear();
 
     void print(std::string prefix);
 

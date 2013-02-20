@@ -7,5 +7,5 @@ TTailSegment::forward(unsigned i, unsigned j)
     CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
     fr.m_type = CLatticeFrame::TAIL;
 
-    fr.m_lexiconStates.push_back(TLexiconState(i, ENDING_WORD_ID));
+    fr.m_lexiconStates.push_back(new TLexiconState(i, ENDING_WORD_ID));
 }

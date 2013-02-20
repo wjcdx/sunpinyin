@@ -256,7 +256,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
         CLexiconStates::iterator it = fr.m_lexiconStates.begin();
         CLexiconStates::iterator ite = fr.m_lexiconStates.end();
         for (; it != ite; ++it) {
-            TLexiconState & lxst = *it;
+            TLexiconState &lxst = (*(*it));
 
             if (lxst.m_start != m_candiStarts)
                 continue;

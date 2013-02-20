@@ -22,7 +22,7 @@ struct TLexiconState {
 public:
     virtual const TWordIdInfo *getWords(unsigned &num);
 	virtual const double getWeight() {
-		return (m_bFuzzy ? 0.5 : 1);
+		return 1;
 	}
     virtual void print(std::string prefix) const;
     virtual int getLength() { return m_syls.size(); }
@@ -47,12 +47,10 @@ public:
         m_seg_path.push_back(start);
         m_seg_path.push_back(start + 1); 
     }
+	virtual ~TLexiconState() {}
 	
 public:
-	unsigned m_start                 : 16;
-    unsigned m_num_of_inner_fuzzies  : 14; 
-    bool m_bFuzzy                : 1;
-    bool m_bPinyin               : 1;
+	unsigned m_start;
 
 	const TThreadNode *m_pNode;
 
@@ -68,7 +66,7 @@ public:
  * starting position. Later, when Fuzzy PinYin are added,
  * more than one state may comes from one starting bone.
  */
-typedef std::vector<TLexiconState>    CLexiconStates;
+typedef std::vector<TLexiconState *>    CLexiconStates;
 
 #endif
 
