@@ -28,12 +28,13 @@ bool
 PathNode::getChildrenFromPesudoTNode(TTransUnit *pTrans,
 		TThreadNode *psuNode, PathNodeList &children)
 {
+	//the children of a pesudo node is not pesudo nodes
 	unsigned int sz = psuNode->m_nTransfer;
 	TTransUnit *ptrans = (TTransUnit *)psuNode->getTrans();
 	for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit;
 		TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(psuNode, u);
-		children.push_back(PathNode(pTrans, pch));
+		children.push_back(PathNode(pTrans, pch, m_Level + 1));
 	}
 	return true;
 }
@@ -57,14 +58,14 @@ PathNode::getChildren(PathNodeList &children, TSyllable syllable)
 				if (pch->m_bPesudo) {
 					getChildrenFromPesudoTNode(&ptrans[i], pch, children);
 				} else {
-					children.push_back(PathNode(&ptrans[i], pch));
+					children.push_back(PathNode(&ptrans[i], pch, m_Level + 1));
 				}
 				break;
 			}
 		} else {
 			if (CXhData::isStroke(u)) {
 				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
-				children.push_back(PathNode(&ptrans[i], pch));
+				children.push_back(PathNode(&ptrans[i], pch, m_Level + 1));
 			}
 		}
     }

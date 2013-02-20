@@ -25,18 +25,20 @@ public:
 	TrieThreadModel::TTransUnit *m_Trans;
 	TrieThreadModel::TThreadNode *m_TNode;
 	PathNodeFlag flag;
+	unsigned m_Level;
 	
 	PathNode()
-		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE)
+		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE), m_Level(0)
 	{}
 	PathNode(PathNodeFlag f)
-		: m_Trans(NULL), m_TNode(NULL), flag(f)
+		: m_Trans(NULL), m_TNode(NULL), flag(f), m_Level(0)
 	{}
 	
 	PathNode(TrieThreadModel::TTransUnit *trans,
 			TrieThreadModel::TThreadNode *node,
+			unsigned level = 0,
 			PathNodeFlag f = FUTURE)
-		: m_Trans(trans), m_TNode(node), flag(f)
+		: m_Trans(trans), m_TNode(node), flag(f), m_Level(level)
 	{}
 
 	bool operator==(PathNode &node) {
@@ -52,6 +54,10 @@ public:
 	bool isTransSameAs(PathNode *node) {
 		return node != NULL && (getTransUnit() == node->getTransUnit());
 	}
+
+	unsigned getLevel() { return m_Level; }
+	void setLevel(unsigned n) { m_Level = n; }
+
 
 	bool isMostPopularStrokeGe(unsigned n);
 

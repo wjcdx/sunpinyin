@@ -46,7 +46,7 @@ void
 TXhSyllableSegment::prepare(const TThreadNode *pTNode)
 {
 	m_TrieBranches.clear();
-	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), PathNode::JUSTNOW);
+	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), 0, PathNode::JUSTNOW);
 	TrieBranch branch;
 	branch.setNewAdded(false);
 	branch.m_Path.add(node);
@@ -76,10 +76,13 @@ void TXhSyllableSegment::_forwardFromLastSegment(CLatticeFrame &jfr,
 
 		for (; bit != bite; bit++) {
 
+			PathNode *pnow = bit->getPath().getNow();
+
 			TXhLexiconState *new_lxst = new TXhLexiconState(lxst.m_start,
-												   bit->getPath().getNow()->getTNode(),
+												   pnow->getTNode(),
 												   lxst.m_syls,
 												   lxst.m_seg_path);
+			new_lxst->setClass(pnow->getLevel());
 			new_lxst->m_syls.push_back(m_syllables[0]);
 			new_lxst->m_seg_path.push_back(m_start + m_len);
 			jfr.m_lexiconStates.push_back(new_lxst);
@@ -103,14 +106,19 @@ void TXhSyllableSegment::_forwardFromRoot(unsigned i, CLatticeFrame &jfr)
 		BranchList::iterator bite = m_TrieBranches.end();
 
 		for (; bit != bite; bit++) {
+
 			CSyllables syls;
 			syls.push_back(m_syllables[0]);
 			std::vector<unsigned> seg_path;
 			seg_path.push_back(m_start);
 			seg_path.push_back(m_start + m_len);
+
+			PathNode *pnow = bit->getPath().getNow();
+
 			TXhLexiconState *new_lxst = new TXhLexiconState(i, 
-									bit->getPath().getNow()->getTNode(),
+									pnow->getTNode(),
 									syls, seg_path);
+			new_lxst->setClass(pnow->getLevel());
 			jfr.m_lexiconStates.push_back(new_lxst);
 #if 1
 			{
