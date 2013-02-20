@@ -10,6 +10,7 @@ public:
         TTreeWordId m_id;
         double m_cost;
         bool m_bSeen;
+		unsigned m_nStrokeNumber;
 
         TTreeWordInfo(TTreeWordId id = 0, double cost = 0.0, bool seen = false)
             : m_id(id), m_cost(cost), m_bSeen(seen){

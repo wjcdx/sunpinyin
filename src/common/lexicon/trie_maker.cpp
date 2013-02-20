@@ -270,6 +270,7 @@ CTrieMaker::insertPair(const char* ustr, TTreeWordId wid)
     for (; it != ite; ++it)
         pnode = insertTransfer(pnode, *it);
 
+    wid.setStrokeNumber(units.size());
     insertWordId(pnode->m_WordIdSet, wid);
     return true;
 }

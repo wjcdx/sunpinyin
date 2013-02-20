@@ -27,10 +27,12 @@ public:
         CTrans m_Trans;
 		unsigned m_nMaxStroke;
 		bool m_bOwnWord;
+		unsigned m_nStrokeNumber;
 
 public:
 		CTreeNode()
-			: m_bExpanded(false), m_bPesudo(false), m_nMaxStroke(0), m_bOwnWord(false)
+			: m_bExpanded(false), m_bPesudo(false), m_nMaxStroke(0), m_bOwnWord(false),
+			  m_nStrokeNumber(0)
 		{
 			m_AllNodes.push_back(this);
 		}

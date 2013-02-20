@@ -3,9 +3,6 @@
 
 #include <set>
 
-//for WORD_ID_WIDTH
-#include "../thread/TThreadNode.h"
-
 namespace TrieTreeModel {
     union TTreeWordId {
         unsigned int m_all;
@@ -14,9 +11,14 @@ namespace TrieTreeModel {
             unsigned m_bHide    : 1;
             unsigned m_cost     : 5;
             unsigned m_csLevel  : 2;
-            unsigned m_id       : WORD_ID_WIDTH;
+			// 18bits should be enough for word id
+            //unsigned m_id       : WORD_ID_WIDTH;
+            unsigned m_id       : 18;
+            unsigned m_nStkNum  : 6;
         #else
-            unsigned m_id       : WORD_ID_WIDTH;
+            unsigned m_nStkNum  : 6;
+            unsigned m_id       : 18;
+            //unsigned m_id       : WORD_ID_WIDTH;
             unsigned m_csLevel  : 2;
             unsigned m_cost     : 5;
             unsigned m_bHide    : 1;
@@ -39,13 +41,22 @@ public:
         }
 
         bool operator<(const TTreeWordId& b) const
-        { return anony.m_id < b.anony.m_id; }
+        {
+			if (anony.m_nStkNum == b.anony.m_nStkNum) {
+				return anony.m_id < b.anony.m_id;
+			} else {
+				return anony.m_nStkNum < b.anony.m_nStkNum;
+			}
+		}
 
         bool operator==(const TTreeWordId& b) const
         { return anony.m_id == b.anony.m_id; }
 
         operator unsigned int() const
         { return anony.m_id; }
+
+		void setStrokeNumber(unsigned num) { anony.m_nStkNum = num; }
+		unsigned getStrokeNumber() const { return anony.m_nStkNum; }
     };
 
 	typedef std::set<TTreeWordId> CTreeWordSet;

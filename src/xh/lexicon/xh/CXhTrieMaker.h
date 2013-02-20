@@ -47,6 +47,10 @@ private:
                         const CTreeNodeSet& nodes);
     void
     linkWordsTogether(CTreeNode *pnode);
+
+    void
+    clearUpWordIds(CTreeNode *pnode, bool skipPattern);
+
     void
     threadNonCompletedXh();
 };
