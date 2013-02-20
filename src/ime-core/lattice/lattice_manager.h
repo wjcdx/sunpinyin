@@ -37,6 +37,8 @@ public:
 		m_lattice[0].m_latticeStates.add(TLatticeState(-1.0, 0));
 	}
 
+	virtual ~CLatticeManager() {}
+
     void printLattice();
 	void clear();
 	void clearFrom(unsigned idx);

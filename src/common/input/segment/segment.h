@@ -8,6 +8,7 @@ struct TSegment {
 	{ SYLLABLE, SYLLABLE_SEP, INVALID, STRING };
 
 	TSegment () {}
+	virtual ~TSegment () {}
 	TSegment (unsigned syllable,
 			  unsigned start,
 			  unsigned length)
