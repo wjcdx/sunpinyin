@@ -63,13 +63,77 @@ PathNode::getChildren(PathNodeList &children, TSyllable syllable)
 				break;
 			}
 		} else {
-			if (CXhData::isStroke(u)) {
+			if (CXhData::isCharComp(u)) {
 				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
 				children.push_back(PathNode(&ptrans[i], pch, m_Level + 1));
 			}
 		}
     }
 	return true;
+}
+
+bool
+PathNode::findFirstSubNodeInPartial(TSyllable syllable, PathList &paths)
+{
+	PathNodeList children;
+	if (!getChildren(children, syllable)) {
+		return false;
+	}
+
+	PathNodeList::iterator nit = children.begin();
+	PathNodeList::iterator nite = children.end();
+	for (; nit != nite; nit++) {
+
+		if (CXhData::isBoundary(nit->getTransUnit()))
+			continue;
+
+		if ((*nit).transFrom(syllable)) {
+
+			(*nit).flag = PathNode::JUSTNOW;
+			
+			Path path;
+			path.add(*nit);
+			paths.push_back(path);
+
+		} else {
+			
+			bool suc = false;
+			PathList subPaths;
+			suc = (*nit).findFirstSubNodeInPartial(syllable, subPaths);
+			if (!suc)
+				continue;
+
+			PathList::iterator pit = subPaths.begin();
+			PathList::iterator pite = subPaths.end();
+			for (; pit != pite; pit++) {
+				(*pit).push_front(*nit);
+				paths.push_back(*pit);
+			}
+
+		}
+	}
+
+	return !paths.empty();
+}
+
+bool
+PathNode::tryNextPartial(TSyllable syllable, PathList &paths)
+{
+	PathNodeList children;
+	if (!getChildren(children, syllable)) {
+		return false;
+	}
+
+	PathNodeList::iterator nit = children.begin();
+	PathNodeList::iterator nite = children.end();
+	for (; nit != nite; nit++) {
+		if (CXhData::isBoundary(nit->getTransUnit())) {
+			nit->findFirstSubNodeInPartial(syllable, paths);
+		} else {
+			nit->tryNextPartial(syllable, paths);
+		}
+	}
+	return !paths.empty();
 }
 
 bool
@@ -100,16 +164,18 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 #endif
 
 		if ((*nit).transFrom(syllable)) {
+
 			(*nit).flag = PathNode::JUSTNOW;
 			
 			Path path;
 			path.add(*nit);
 			paths.push_back(path);
+
 		} else {
 			
 			bool suc = false;
 			PathList subPaths;
-			suc = (*nit).findNextSubNode(syllable, subPaths);
+			suc = (*nit).tryNextPartial(syllable, subPaths);
 			if (!suc)
 				continue;
 
@@ -140,15 +206,14 @@ PathNode::findAllSubNode(TSyllable syllable, int num, PathList &paths, Path &pat
 			continue;
 		}
 
-		bool has = (*nit).getTNode()->hasItsOwnWord();
-		if (has) {
-			Path p(path);
-			p.add(*nit);
-			p.addPseudoHead();
-			if (p.checkNumInPath(syllable, num)) {
-				p.setFullForwarded(true);
-				paths.push_back(p);
-			}
+		if (CXhData::isBoundary(nit->getTransUnit()))
+			continue;
+
+		Path p(path);
+		p.add(*nit);
+		p.addPseudoHead();
+		if (p.checkNumInPath(syllable, num)) {
+			paths.push_back(p);
 		}
 
 		Path subPath(path);

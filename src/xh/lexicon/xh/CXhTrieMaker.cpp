@@ -61,7 +61,7 @@ CXhTrieMaker::parseLine(char* buf,
         if (*t)
             *t++ = 0;
         while ((*p >= '0' && *p <= '9') || (*p == '\'') 
-                || (*p == 'P') || (*p == 'S'))
+                || (*p == 'P') || (*p == 'S') || (*p == 'B'))
             ++p;
         if ((p > s) && ((*p == 0) || (*p == ':'))) {
             int cost = 0;
@@ -175,24 +175,14 @@ CXhTrieMaker::addCombinedTransfers(CTreeNode *pnode,
 
         unsigned syl = 256;
         findAllRealSubNodes(p, syl, nodes);
-/*      
-        CTreeNodeSet::const_iterator it = nodes.begin();
-        CTreeNodeSet::const_iterator ite = nodes.end();
-        for (; it != ite; ++it) {
-            CTreeNode *sub = (*it);
-            if (sub->m_bPesudo) {
-
-            } else {
-                p->m_Trans[syl++] = sub;
-            }
-        }
-        */
     }
 
     pnode->m_Trans[s] = p;
     return p;
 }
 
+// setup transfers from previous char-strokes
+// to next char-pattern
 void
 CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
 {
@@ -202,12 +192,14 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
     CTrans::iterator it = pnode->m_Trans.begin();
     CTrans::iterator ite = pnode->m_Trans.end();
 
+    // find all pattern transfers
     std::map<unsigned, CTreeNodeSet> combTrans;
     for (; it != ite; it++) {
         CTreeNode *sub = it->second;
         linkWordsTogether(sub);
 
-        if (CXhData::isStroke(it->first)) {
+        if (CXhData::isCharComp(it->first)) {
+            // it's a stroke or partial boundary
             CTrans::iterator sit = sub->m_Trans.begin();
             CTrans::iterator site = sub->m_Trans.end();
             for (; sit != site; sit++) {
@@ -216,6 +208,7 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
                 }
             }
         } else {
+            // it's a pattern node
             combTrans[it->first].insert(sub);
         }
     }
@@ -239,7 +232,7 @@ CXhTrieMaker::linkWordsTogether(CTreeNode *pnode)
 }
 
 void
-CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
+CXhTrieMaker::clearUpWordIdsWithTooMuchStrokes(CTreeNode *pnode)
 {
     printf("node no: %d:\n", pnode->m_nStrokeNumber);
 
@@ -247,7 +240,7 @@ CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
     CTreeWordSet::iterator wite = pnode->m_WordIdSet.end();
     int n = 5;
     for (; wit != wite;) {
-        // word id set is sorted, so the first 10 have least
+        // word id set is sorted, so the first n have least
         // strokes.
         if (wit->getStrokeNumber() > pnode->m_nStrokeNumber
                 && n-- < 0) {
@@ -258,6 +251,24 @@ CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
         }
     }
     printf("summary: %d removed.\n", -n + 1);
+}
+
+void
+CXhTrieMaker::clearUpAllWordIds(CTreeNode *pnode)
+{
+    CTreeWordSet::iterator wit = pnode->m_WordIdSet.begin();
+    CTreeWordSet::iterator wite = pnode->m_WordIdSet.end();
+    for (; wit != wite;) {
+        printf("remove word %d which has %d strokes.\n", wit->anony.m_id, wit->getStrokeNumber());
+        pnode->m_WordIdSet.erase(wit++);
+    }
+}
+
+// clear up chars with much more strokes in pnode's wordset
+void
+CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
+{
+    //clearUpWordIdsWithTooMuchStrokes(pnode);
 
     CTrans::iterator tit = pnode->m_Trans.begin();
     CTrans::iterator tite = pnode->m_Trans.end();
@@ -267,6 +278,9 @@ CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
 
         if (CXhData::isPattern(syl) && skipPattern) {
             continue;
+        } else if (CXhData::isBoundary(syl)) {
+            clearUpAllWordIds(sub);
+            clearUpWordIds(sub, true);
         } else {
             clearUpWordIds(sub, true);
         }

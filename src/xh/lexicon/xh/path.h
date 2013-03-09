@@ -13,18 +13,7 @@ public:
 
 	void
 	buildTrieInfo(CTreeNode *pnode, bool add);
-	int
-	getRepeaterStatus(int count);
-
-	void
-	forwardCheckPoint();
-
-	int
-	getSameRepNumber(CheckPoint &cp);
-
-	void
-	iterateRepeaters();
-
+	
 	void
 	findCheckPoints(TransVecIt it, TransVecIt ite);
 

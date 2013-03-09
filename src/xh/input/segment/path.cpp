@@ -153,19 +153,6 @@ Path::printNextMap()
 bool
 Path::forward(TSyllable syllable, int num, PathList &paths)
 {
-	if (m_bFullForwarded) {
-		if (num > 1) {
-			return checkNumInPath(syllable, num);
-		}
-
-		PathNode *node = next(syllable);
-		if (!node) {
-			return false;
-		}
-		setNow(node);
-		return true;
-	}
-
 	bool forwarded = false;
 	if (num > 1) {
 		Path path;
@@ -175,95 +162,6 @@ Path::forward(TSyllable syllable, int num, PathList &paths)
 	}
 
 	return forwarded;
-}
-
-/**
- * return value:
- * 0: go on iterate;
- * 1: iterate end succeeded;
- * -1: iterate end failed;
- */
-int
-Path::getRepeaterStatus(int count, CheckPointList &cphooks)
-{
-	int len = cpset.size();
-
-	if (len < count) {
-		return -1;
-	}
-
-	CheckPointList::iterator it, itn = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-
-	if (len == 1 && count == 1) {
-		cphooks.push_back(*it);
-		return 1;
-	}
-
-	for (it = itn, itn++; itn != ite; it = itn, itn++) {
-		if (next(it->m_PNode) == itn->m_Start) {
-			//label the most forwarded stroke
-			cphooks.push_back(*itn);
-		} else {
-			cphooks.clear();
-		}
-
-		/*
-		 * a_a_a
-		 * size: num of 'a'
-		 * count: number of '_';
-		 */
-		if ((int)cphooks.size() + 1 >= count)
-			return 1;
-	}
-	return 0;
-}
-
-void
-Path::forwardCheckPoint()
-{
-	CheckPointList::iterator it = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (; it != ite; it++) {
-		(*it).m_PNode = next((*it).m_PNode);
-	}
-}
-
-int
-Path::getSameRepNumber(CheckPoint &cp)
-{
-	int c = 0;
-	PathNode *n1 = cp.m_PNode;
-
-	CheckPointList::iterator it = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (; it != ite; it++) {
-		if (*it == cp)
-			continue;
-		if (n1 != NULL && n1->isTransSameAs((*it).m_PNode)) {
-			c++;
-		}
-	}
-	return c;
-}
-
-void
-Path::iterateRepeaters(int count)
-{
-	if (cpset.size() <= 1)
-		return;
-	
-	forwardCheckPoint();
-
-	CheckPointList::iterator it = cpset.begin();
-	for (; it != cpset.end(); ) {
-		int c = getSameRepNumber(*it);
-		if (c+1 < count) {
-			it = cpset.erase(it);
-		} else {
-			it++;
-		}
-	}
 }
 
 void
@@ -284,10 +182,6 @@ void
 Path::labelPath(CheckPointList &cphooks)
 {
 	assert(!cphooks.empty());
-	/*
-	if (cphooks.empty())
-		return;
-	*/
 
 	CheckPoint &cp = cphooks.back();
 	cp.m_PNode->setFlag(PathNode::JUSTNOW);
@@ -297,38 +191,11 @@ Path::labelPath(CheckPointList &cphooks)
 bool
 Path::checkNumInPath(TSyllable syllable, int num)
 {
-	int stat = 0;
-
 	findCheckPoints(syllable);
 	if ((int)cpset.size() < num)
 		return false;
 
-	while (true) {
-		CheckPointList cphooks;
-		stat = getRepeaterStatus(num, cphooks);
-		if (stat == 1) {
-			labelPath(cphooks);
-			return true;
-		} else if (stat == -1) {
-			return false;
-		}
-		iterateRepeaters(num);
-	}
-	return false;
-}
-
-bool
-Path::checkNumInPaths(TSyllable syllable, int num, PathList &paths)
-{
-	PathList::iterator it = paths.begin();
-	for (; it != paths.end();) {
-		(*it).addPseudoHead();
-		if (!(*it).checkNumInPath(syllable, num)) {
-			it = paths.erase(it);
-		} else {
-			it++;
-		}
-	}
-	return !paths.empty();
+	labelPath(cpset);
+	return true;
 }
 

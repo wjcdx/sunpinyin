@@ -46,13 +46,16 @@ void
 TXhSyllableSegment::prepare(const TThreadNode *pTNode)
 {
 	m_TrieBranches.clear();
-	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), 0, PathNode::JUSTNOW);
+	
 	TrieBranch branch;
 	branch.setNewAdded(false);
+	
+	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), 0, PathNode::JUSTNOW);
 	branch.m_Path.add(node);
+
 	m_TrieBranches.push_back(branch);
+
 	m_FwdStrokeNum = 1;
-	m_bNumMet = false;
 }
 
 void TXhSyllableSegment::_forwardFromTNode(const TThreadNode *pTNode)

@@ -48,6 +48,7 @@ dconv-dbg:
 
 dconv:
 	./dconv dict.utf8.xh.oc dict.utf8.py dict.utf8.xh
+	sed -i '/XXX/d' dict.utf8.xh
 
 .PHONY: dconv
 

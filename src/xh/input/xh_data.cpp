@@ -62,6 +62,7 @@ CXhData::xhDataMaps[] = {
 	XhKeyMapPair('n', "S28"),
 	XhKeyMapPair('n', "S29"),
 	XhKeyMapPair('n', "S30"),
+	XhKeyMapPair('B', "B01"),
 	XhKeyMapPair(0, ""),
 };
 
@@ -75,6 +76,24 @@ CXhData::isPattern(unsigned ch)
 		return true;
 	}
 	return false;
+}
+
+bool
+CXhData::isBoundary(unsigned ch)
+{
+	return (ch == 'B');
+}
+
+bool
+CXhData::isSplitter(unsigned ch)
+{
+	return (isBoundary(ch) || isPattern(ch));
+}
+
+bool
+CXhData::isCharComp(unsigned ch)
+{
+	return (isBoundary(ch) || isStroke(ch));
 }
 
 bool

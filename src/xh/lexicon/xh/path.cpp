@@ -17,6 +17,9 @@
 #include "xh/input/xh_data.h"
 #include "path.h"
 
+// build the most popular stroke number in partial 
+// from pnode to the most down-level node
+// note 1: consider partial boundary as a normal stroke
 void
 Path::buildTrieInfo(CTreeNode *pnode, bool add)
 {
@@ -38,15 +41,25 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 			unsigned syl = it->first;
             CTreeNode *sub = it->second;
 
-			if (CXhData::isPattern(syl)) {
+			if (CXhData::isSplitter(syl)) {
 
             	p.buildTrieInfo(sub, true);
         		m = getMostPopularPartialNum();
 
+				// most-pop stroke do not across the partial
+				// but words do.
+				if (add && CXhData::isBoundary(syl)) {
+					CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
+					CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
+					for (; wit != wite; wit++) {
+						pnode->m_WordIdSet.insert(*wit);
+					}
+				}
+
 			} else {
 
 				p = *this;
-				p.add(it->first);
+				p.add(syl);
 				p.buildTrieInfo(sub, true);
 
 				if (add) {
@@ -65,74 +78,6 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 	
         pnode->m_nMaxStroke = max;
     }
-}
-
-int
-Path::getRepeaterStatus(int count)
-{
-	int sz = cpset.size();
-
-	if (sz <= count) {
-		return -1;
-	}
-
-	CheckPointList::iterator it, itn = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-
-    int max = count = 1;
-	for (it = itn, itn++; itn != ite; it = itn, itn++) {
-        unsigned nxt = (*(it->m_Now+1));
-		if (nxt == *(itn->m_Start)) {
-            count++;
-		} else {
-			count = 1;
-		}
-        max = count > max ? count : max;
-	}
-	return max;
-}
-
-void
-Path::forwardCheckPoint()
-{
-	CheckPointList::iterator it = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (; it != ite; it++) {
-		(*it).m_Now++;
-	}
-}
-
-int
-Path::getSameRepNumber(CheckPoint &cp)
-{
-	int c = 0;
-
-	CheckPointList::iterator it = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (; it != ite; it++) {
-		if (*it == cp) {
-			c++;
-		}
-	}
-	return c;
-}
-
-void
-Path::iterateRepeaters()
-{
-	if (cpset.size() <= 1)
-		return;
-	
-	forwardCheckPoint();
-
-	CheckPointList::iterator it, itn = cpset.begin();
-	CheckPointList::iterator ite = cpset.end();
-	for (it = itn, itn++; it != ite; it = itn, itn++) {
-		int c = getSameRepNumber(*it);
-		if (c <= 1) {
-			cpset.erase(it);
-		}
-	}
 }
 
 void
@@ -155,14 +100,14 @@ Path::getMostPopularPartialNum()
     int max = 0;
     TransVec searched;
 
-    TransVec::iterator it = trans.begin();
-    TransVec::iterator ite = trans.end();
+    TransVecIt it = trans.begin();
+    TransVecIt ite = trans.end();
     for (; it != ite; it++) {
         int num = 0;
-        TransVecIt sit;
-        TransVecIt site = searched.end();
 
-        sit = std::find(searched.begin(), site, *it);
+		// check if the stroke is searched or not
+        TransVecIt site = searched.end();
+        TransVecIt sit = std::find(searched.begin(), site, *it);
         if (sit != site) {
             continue;
         } else {
@@ -170,14 +115,8 @@ Path::getMostPopularPartialNum()
         }
 
         findCheckPoints(it, ite);
+		num = cpset.size();
 
-        while (true) {
-            int n = getRepeaterStatus(num);
-            if (n < 0)
-                break;
-            num = n > num ? n : num;
-            iterateRepeaters();
-        }
         max = num > max ? num : max;
     }
     return max;

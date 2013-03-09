@@ -20,7 +20,7 @@ public:
 	TXhSyllableSegment (unsigned syllable,
               unsigned start, unsigned length)
         : TSyllableSegment(syllable, start, length),
-		m_FwdStrokeNum(1), m_bNumMet(false)
+		m_FwdStrokeNum(1) 
     {
 	}
 	
@@ -54,7 +54,6 @@ private:
 
 protected:
 	unsigned m_FwdStrokeNum;
-	bool m_bNumMet;
 	BranchList m_TrieBranches;
 };
 

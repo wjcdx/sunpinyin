@@ -49,8 +49,12 @@ private:
     linkWordsTogether(CTreeNode *pnode);
 
     void
+    clearUpWordIdsWithTooMuchStrokes(CTreeNode *pnode);
+    void
+    clearUpAllWordIds(CTreeNode *pnode);
+    void
     clearUpWordIds(CTreeNode *pnode, bool skipPattern);
-
+    
     void
     threadNonCompletedXh();
 };

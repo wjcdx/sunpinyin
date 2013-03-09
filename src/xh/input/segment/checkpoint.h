@@ -7,6 +7,7 @@ class CheckPoint {
 public:
 	PathNode *m_Start;
 	PathNode *m_PNode;
+
 	CheckPoint(PathNode *node) {
 		m_Start = m_PNode = node;
 	}

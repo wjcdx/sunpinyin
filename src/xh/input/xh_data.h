@@ -24,6 +24,9 @@ public:
 
 	static bool isPattern(unsigned ch);
 	static bool isStroke(unsigned ch);
+	static bool isBoundary(unsigned ch);
+	static bool isSplitter(unsigned ch);
+	static bool isCharComp(unsigned ch);
 
 	static XhKeyMapPair &findPair(std::string name);
 	static XhKeyMapPair &findPair(int key);

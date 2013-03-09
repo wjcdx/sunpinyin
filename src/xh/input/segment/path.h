@@ -56,13 +56,8 @@ public:
 	bool checkNumInPath(TSyllable syllable, int num);
 
 private:
-	int getRepeaterStatus(int count, CheckPointList &cphooks);
-	void forwardCheckPoint();
-	int getSameRepNumber(CheckPoint &cp);
-	void iterateRepeaters(int count);
 	void findCheckPoints(TSyllable syllable);
 	void labelPath(CheckPointList &cphooks);
-	bool checkNumInPaths(TSyllable syllable, int num, PathList &paths);
 
 private:
 	PathNodeList m_Nodes;
