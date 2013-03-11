@@ -69,7 +69,7 @@ PathNode::getChildren(PathNodeList &children, TSyllable syllable)
 			}
 		}
     }
-	return true;
+	return !children.empty();
 }
 
 bool
@@ -147,22 +147,8 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 	PathNodeList::iterator nit = children.begin();
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
-#if 0
-		{
-			TThreadNode *now = (*nit).getTNode();
-			unsigned int sz = now->m_nWordId;
-			const TWordIdInfo *pwids = now->getWordIdPtr();
-			for (unsigned int i = 0; i < sz; ++i) {
-				unsigned int id = pwids[i].m_id;
-				if (id == 765) {
-					CInputTrieSource::m_pTrie->print(now);
-					break;
-				}
-			}
-		}
-		CInputTrieSource::m_pTrie->print((*nit).getTNode());
-#endif
 
+		// pattern syllables go here
 		if ((*nit).transFrom(syllable)) {
 
 			(*nit).flag = PathNode::JUSTNOW;
@@ -175,7 +161,13 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			
 			bool suc = false;
 			PathList subPaths;
-			suc = (*nit).tryNextPartial(syllable, subPaths);
+
+			if (CXhData::isBoundary(nit->getTransUnit())) {
+				suc = nit->findFirstSubNodeInPartial(syllable, paths);
+			} else {
+				suc = nit->tryNextPartial(syllable, subPaths);
+			}
+
 			if (!suc)
 				continue;
 
