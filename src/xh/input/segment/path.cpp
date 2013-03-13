@@ -15,7 +15,6 @@ Path::operator=(const Path &rhs) {
 	for (; it != ite; it++) {
 		add(const_cast<PathNode &>(*it));
 	}
-	m_bFullForwarded = rhs.m_bFullForwarded;
 	return *this;
 }
 

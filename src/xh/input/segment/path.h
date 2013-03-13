@@ -10,7 +10,7 @@
 class Path {
 public:
 	Path()
-		: m_Now(NULL), m_bFullForwarded(false)
+		: m_Now(NULL)
 	{}
 
 	Path(const Path &rhs) {
@@ -23,9 +23,6 @@ public:
 
 	PathNode *getNow() { return m_Now; }
 	void setNow(PathNode *node) { m_Now = node; }
-
-	bool getFullForwarded() { return m_bFullForwarded; }
-	void setFullForwarded(bool fwd) { m_bFullForwarded = fwd; }
 
 	void addPseudoHead();
 	
@@ -63,7 +60,6 @@ private:
 	PathNodeList m_Nodes;
 	std::map<PathNode *, PathNode *> m_NextMap;
 	PathNode *m_Now;
-	bool m_bFullForwarded;
 
 	CheckPointList cpset;
 };
@@ -91,7 +87,6 @@ public:
 		for (; it != ite; it++) {
 			m_Path.add(*it);
 		}
-		m_Path.setFullForwarded(path.getFullForwarded());
 	}
 };
 
