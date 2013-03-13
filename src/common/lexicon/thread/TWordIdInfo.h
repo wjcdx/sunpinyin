@@ -11,9 +11,13 @@ namespace TrieThreadModel {
 		unsigned m_bSeen    : 1;
 		unsigned m_cost     : 5;
 		unsigned m_csLevel  : 2;
-		unsigned m_id       : WORD_ID_WIDTH;
+		//unsigned m_id       : WORD_ID_WIDTH;
+		unsigned m_id       : 18;
+		unsigned m_nStkNum  : 6;
 #else
-		unsigned m_id       : WORD_ID_WIDTH;
+		unsigned m_nStkNum  : 6;
+		unsigned m_id       : 18;
+		//unsigned m_id       : WORD_ID_WIDTH;
 		unsigned m_csLevel  : 2;
 		unsigned m_cost     : 5;
 		unsigned m_bSeen    : 1;

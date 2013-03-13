@@ -60,11 +60,15 @@ class OtherEndian<TWordIdInfo>
         unsigned m_bSeen    : 1;
         unsigned m_cost     : 5;
         unsigned m_csLevel  : 2;
-        unsigned m_id       : WORD_ID_WIDTH;
+        //unsigned m_id       : WORD_ID_WIDTH;
+        unsigned m_id       : 18;
+        unsigned m_nStkNum  : 6;
     };
 
     struct TWordIdInfo_LE {
-        unsigned m_id       : WORD_ID_WIDTH;
+        unsigned m_nStkNum  : 6;
+        unsigned m_id       : 18;
+        //unsigned m_id       : WORD_ID_WIDTH;
         unsigned m_csLevel  : 2;
         unsigned m_cost     : 5;
         unsigned m_bSeen    : 1;
@@ -75,6 +79,7 @@ public:
 
     static TargetType create(const TWordIdInfo& from){
         TargetType to;
+        to.m_nStkNum = from.m_nStkNum;
         to.m_id = from.m_id;
         to.m_csLevel = from.m_csLevel;
         to.m_bSeen = from.m_bSeen;

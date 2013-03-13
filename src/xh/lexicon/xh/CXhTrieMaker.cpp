@@ -389,6 +389,8 @@ CXhTrieMaker::write(FILE *fp, CWordEvaluator* psrt, bool revert_endian)
             wi.m_csLevel = itv->m_id.anony.m_csLevel;
             wi.m_bSeen = ((itv->m_bSeen) ? (1) : (0));
             wi.m_cost = itv->m_id.anony.m_cost;
+            wi.m_nStkNum = itv->m_id.anony.m_nStkNum > 31
+                ? 31 : itv->m_id.anony.m_nStkNum;
             suc = f.write(wi);
         }
     }

@@ -35,7 +35,7 @@ CLatticeManager::clearFrom(unsigned idx)
 		m_lattice[i].clear();
 }
 
-static double exp2_tbl[32] = {
+double CLatticeManager::exp2_tbl[32] = {
     exp2(-0), exp2(-1), exp2(-2), exp2(-3), exp2(-4), exp2(-5), exp2(-6), exp2(-7),
     exp2(-8), exp2(-9), exp2(-10), exp2(-11), exp2(-12), exp2(-13), exp2(-14),
     exp2(-15), exp2(-16), exp2(-17), exp2(-18), exp2(-19), exp2(-20), exp2(-21),
@@ -75,6 +75,9 @@ CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
             if (lxst.m_start == info.m_candiStarts && idx > info.m_candiEnds)
                 affectCandidates = true;
 
+			// depth of trie node in the trie tree
+			unsigned cls = lxst.getClass();
+
             // only selected the word with higher unigram probablities, and
             // narrow the search deepth and lower the initial score for fuzzy
             // syllables
@@ -87,9 +90,12 @@ CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
 
             while (count < sz && i < sz && (words[i].m_bSeen || count < 2)) {
                 if (info.m_csLevel >= words[i].m_csLevel) {
-                    // printf("cost %d\n", words[i].m_cost);
-                    _transferBetween(lxst.m_start, idx, &lxst, words[i].m_id,
-                                     ic * exp2_tbl[words[i].m_cost]);
+					//printf("id: %d, level: %2d, history cost %d, stknum %d\n",
+					//		words[i].m_id, cls, words[i].m_cost,words[i].m_nStkNum);
+					// word with more strokes got less score
+                    _transferBetween(lxst.m_start, idx, &lxst, words[i].m_id, 
+							exp2_tbl[words[i].m_cost] *
+							exp2_tbl[getClass(words[i].m_nStkNum, cls)]);
                     ++count;
                 }
                 i++;
@@ -100,10 +106,12 @@ CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
                 while (i < (int) word_num) {
                     if (info.m_csLevel >= words[i].m_csLevel
                         && CIMIContext::m_pHistory->seenBefore(words[i].m_id)) {
-                        // printf("history cost %d\n", words[i].m_cost);
-                        _transferBetween(lxst.m_start, idx, &lxst,
-                                         words[i].m_id,
-                                         ic * exp2_tbl[words[i].m_cost]);
+                        //printf("id: %d, level: %2d, history cost %d, stknum %d\n",
+						//		words[i].m_id, cls, words[i].m_cost,words[i].m_nStkNum);
+						// word with more strokes got less score
+                        _transferBetween(lxst.m_start, idx, &lxst, words[i].m_id,
+							exp2_tbl[words[i].m_cost] *
+							exp2_tbl[getClass(words[i].m_nStkNum, cls)]);
                     }
                     i++;
                 }

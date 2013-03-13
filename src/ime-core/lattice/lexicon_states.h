@@ -24,6 +24,11 @@ public:
 	virtual const double getWeight() {
 		return 1;
 	}
+
+	virtual const unsigned getClass() {
+		return 0;
+	}
+
     virtual void print(std::string prefix) const;
     virtual int getLength() { return m_syls.size(); }
 

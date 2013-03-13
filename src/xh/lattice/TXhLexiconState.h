@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <math.h>
 #include "portability.h"
 #include "ime-core/lattice/lexicon_states.h"
 
@@ -24,11 +25,13 @@ struct TXhLexiconState : TLexiconState {
 
     const TWordIdInfo *getWords(unsigned &num);
 	const double getWeight() {
-		double w = 1 - 0.2 * m_nClass;
-		printf("class: %d, weight: %f\n", m_nClass, w);
-		return w > 0 ? w : 0.1;
+		return 1;
 	}
+
 	void setClass(unsigned n) { m_nClass = n; }
+	const unsigned getClass() {
+		return m_nClass;
+	}
 
     void print(std::string prefix) const;
 

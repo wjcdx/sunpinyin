@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include "common/lexicon/trie.h"
 #include "ime-core/helper/CFullCharManager.h"
 #include "TXhLexiconState.h"
 #include "CXhLatticeManager.h"
