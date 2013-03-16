@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <map>
-#include <math.h>
 #include "portability.h"
 #include "ime-core/lattice/lexicon_states.h"
 

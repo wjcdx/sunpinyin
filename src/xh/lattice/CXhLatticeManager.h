@@ -7,7 +7,6 @@
 class CXhLatticeManager : public CLatticeManager {
 public:
 	void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
-	bool buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info);
 };
 
 #endif
