@@ -96,6 +96,8 @@ PathNode::findFirstSubNodeInPartial(TSyllable syllable, PathList &paths)
 			paths.push_back(path);
 
 		} else {
+			if (CXhData::isFirstStroke(syllable) && this->isFirstInPartial())
+				continue;
 			
 			bool suc = false;
 			PathList subPaths;
@@ -128,6 +130,7 @@ PathNode::tryNextPartial(TSyllable syllable, PathList &paths)
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 		if (CXhData::isBoundary(nit->getTransUnit())) {
+			nit->setFirstInPartial(true);
 			nit->findFirstSubNodeInPartial(syllable, paths);
 		} else {
 			nit->tryNextPartial(syllable, paths);
@@ -163,6 +166,7 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 			PathList subPaths;
 
 			if (CXhData::isBoundary(nit->getTransUnit())) {
+				nit->setFirstInPartial(true);
 				suc = nit->findFirstSubNodeInPartial(syllable, paths);
 			} else {
 				suc = nit->tryNextPartial(syllable, subPaths);

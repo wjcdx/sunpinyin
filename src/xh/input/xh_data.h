@@ -8,12 +8,15 @@ using namespace TrieThreadModel;
 struct XhKeyMapPair {
 public:
 	XhKeyMapPair() : key(0) {}
-	XhKeyMapPair(int key, std::string name): key(key), name(name) {}
+	XhKeyMapPair(int key, std::string name, bool first = false)
+		: key(key), name(name), first(first) {}
 	int getKey() {return key;}
 	std::string getName() {return name;}
+	bool isFirst() { return first; }
 private:
 	int key;
 	std::string name;
+	bool first;
 };
 
 class CXhData {
@@ -27,6 +30,7 @@ public:
 	static bool isBoundary(unsigned ch);
 	static bool isSplitter(unsigned ch);
 	static bool isCharComp(unsigned ch);
+	static bool isFirstStroke(unsigned ch);
 
 	static XhKeyMapPair &findPair(std::string name);
 	static XhKeyMapPair &findPair(int key);

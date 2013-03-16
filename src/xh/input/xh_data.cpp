@@ -78,11 +78,11 @@ CXhData::xhDataMaps[] = {
 	XhKeyMapPair('x', "P305"),
 	XhKeyMapPair('x', "P309"),
 
-	XhKeyMapPair('g', "S01"),
-	XhKeyMapPair('h', "S03"),
-	XhKeyMapPair('t', "S04"),
+	XhKeyMapPair('g', "S01", true),
+	XhKeyMapPair('h', "S03", true),
+	XhKeyMapPair('t', "S04", true),
 	XhKeyMapPair('y', "S05"),
-	XhKeyMapPair('u', "S06"),
+	XhKeyMapPair('u', "S06", true),
 	XhKeyMapPair('k', "S08"),
 	XhKeyMapPair('l', "S20"),
 	XhKeyMapPair('b', "S02"),
@@ -116,7 +116,7 @@ bool
 CXhData::isPattern(unsigned ch)
 {
 	//assert(ch >= 'a' && ch <= 'z');
-	XhKeyMapPair p = findPair(ch);
+	XhKeyMapPair &p = findPair(ch);
 	if (!p.getName().empty()
 		&& p.getName().at(0) == 'P') {
 		return true;
@@ -145,12 +145,19 @@ CXhData::isCharComp(unsigned ch)
 bool
 CXhData::isStroke(unsigned ch)
 {
-	XhKeyMapPair p = findPair(ch);
+	XhKeyMapPair &p = findPair(ch);
 	if (!p.getName().empty()
 		&& p.getName().at(0) == 'S') {
 		return true;
 	}
 	return false;
+}
+
+bool
+CXhData::isFirstStroke(unsigned ch)
+{
+	XhKeyMapPair &p = findPair(ch);
+	return p.isFirst();
 }
 
 XhKeyMapPair &
