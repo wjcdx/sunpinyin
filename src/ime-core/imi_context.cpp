@@ -264,9 +264,6 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
             int len = lxst.getLength();
             if (0 == len) len = 1;
 
-            if (len > 1)
-                continue;
-
             found = true;
             unsigned word_num;
             const TWordIdInfo *words = lxst.getWords(word_num);
