@@ -61,7 +61,7 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
     ibus_prop_list_append(m_prop_list, m_punct_prop);
     ibus_prop_list_append(m_prop_list, m_setup_prop);
 
-    //update_config();
+    update_config();
 }
 
 SunPinyinEngine::~SunPinyinEngine()

@@ -86,7 +86,7 @@ private:
         m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_XH, XINGHUA,
                                    XH_STYLE)] =
             new CSunpinyinProfile <AXhSimplifiedChinesePolicy,
-                                   AXhSchemePolicy, AXhStylePolicy> ();
+                                   AXhSchemePolicy, AClassicStylePolicy> ();
     }
 
     ~CSunpinyinSessionFactory (){
