@@ -42,7 +42,7 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
     update_user_data_dir();
     update_punct_mappings();
 
-    factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 5));
+    factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 10));
 
     m_pv = factory.createSession();
     if (!m_pv)
