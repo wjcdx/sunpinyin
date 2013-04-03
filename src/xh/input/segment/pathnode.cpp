@@ -84,8 +84,14 @@ PathNode::findFirstSubNodeInPartial(TSyllable syllable, PathList &paths)
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 
+		// there should be at least one stroke
+		// inputed in a partial.
 		if (CXhData::isBoundary(nit->getTransUnit()))
 			continue;
+
+		if (this->isInLastPartial()) {
+			nit->setInLastPartial(true);
+		}
 
 		if ((*nit).transFrom(syllable)) {
 
@@ -130,7 +136,13 @@ PathNode::tryNextPartial(TSyllable syllable, PathList &paths)
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
 		if (CXhData::isBoundary(nit->getTransUnit())) {
+
 			nit->setFirstInPartial(true);
+
+			if (CXhData::isLastBoundary(nit->getTransUnit())) {
+				nit->setInLastPartial(true);
+			}
+
 			nit->findFirstSubNodeInPartial(syllable, paths);
 		} else {
 			nit->tryNextPartial(syllable, paths);
@@ -150,37 +162,65 @@ PathNode::findNextSubNode(TSyllable syllable, PathList &paths)
 	PathNodeList::iterator nit = children.begin();
 	PathNodeList::iterator nite = children.end();
 	for (; nit != nite; nit++) {
+		
+		bool suc = false;
+		PathList subPaths;
 
 		// pattern syllables go here
-		if ((*nit).transFrom(syllable)) {
+		if (nit->transFrom(syllable)) {
 
-			(*nit).flag = PathNode::JUSTNOW;
-			
-			Path path;
-			path.add(*nit);
-			paths.push_back(path);
+			if (CXhData::isPattern(nit->getTransUnit())) {
+
+				(*nit).flag = PathNode::JUSTNOW;
+				
+				Path path;
+				path.add(*nit);
+				paths.push_back(path);
+
+			} else if (this->isInLastPartial()) {
+
+				(*nit).flag = PathNode::JUSTNOW;
+				nit->setInLastPartial(true);
+				
+				Path path;
+				path.add(*nit);
+				paths.push_back(path);
+
+			} else {
+				// only the last partial has multi-keyes.
+				suc = nit->tryNextPartial(syllable, subPaths);
+			}
 
 		} else {
-			
-			bool suc = false;
-			PathList subPaths;
+			// syllable must be the next
+			// stroke in last partial.
+			if (this->isInLastPartial()) {
+				continue;
+			}
 
 			if (CXhData::isBoundary(nit->getTransUnit())) {
+
 				nit->setFirstInPartial(true);
-				suc = nit->findFirstSubNodeInPartial(syllable, paths);
+				if (CXhData::isLastBoundary(nit->getTransUnit())) {
+					nit->setInLastPartial(true);
+				}
+
+				suc = nit->findFirstSubNodeInPartial(syllable, subPaths);
+
 			} else {
 				suc = nit->tryNextPartial(syllable, subPaths);
 			}
 
-			if (!suc)
-				continue;
+		}
 
-			PathList::iterator pit = subPaths.begin();
-			PathList::iterator pite = subPaths.end();
-			for (; pit != pite; pit++) {
-				(*pit).push_front(*nit);
-				paths.push_back(*pit);
-			}
+		if (!suc)
+			continue;
+
+		PathList::iterator pit = subPaths.begin();
+		PathList::iterator pite = subPaths.end();
+		for (; pit != pite; pit++) {
+			(*pit).push_front(*nit);
+			paths.push_back(*pit);
 		}
 	}
 	return !paths.empty();

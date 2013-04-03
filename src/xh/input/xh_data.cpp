@@ -108,6 +108,7 @@ CXhData::xhDataMaps[] = {
 	XhKeyMapPair('s', "S29"),
 	XhKeyMapPair('s', "S30"),
 
+	XhKeyMapPair('L', "B00"),
 	XhKeyMapPair('B', "B01"),
 	XhKeyMapPair(0, ""),
 };
@@ -127,7 +128,13 @@ CXhData::isPattern(unsigned ch)
 bool
 CXhData::isBoundary(unsigned ch)
 {
-	return (ch == 'B');
+	return (ch == 'B' || ch == 'L');
+}
+
+bool
+CXhData::isLastBoundary(unsigned ch)
+{
+	return (ch == 'L');
 }
 
 bool

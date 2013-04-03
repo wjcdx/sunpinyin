@@ -27,12 +27,15 @@ public:
 	PathNodeFlag flag;
 	unsigned m_Level;
 	bool m_FirstInPartial;
+	bool m_InLastPartial;
 	
 	PathNode()
-		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE), m_Level(0), m_FirstInPartial(false)
+		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE), m_Level(0),
+			m_FirstInPartial(false), m_InLastPartial(false)
 	{}
 	PathNode(PathNodeFlag f)
-		: m_Trans(NULL), m_TNode(NULL), flag(f), m_Level(0), m_FirstInPartial(false)
+		: m_Trans(NULL), m_TNode(NULL), flag(f), m_Level(0),
+			m_FirstInPartial(false), m_InLastPartial(false)
 	{}
 	
 	PathNode(TrieThreadModel::TTransUnit *trans,
@@ -40,7 +43,8 @@ public:
 			unsigned level = 0,
 			bool first = false,
 			PathNodeFlag f = FUTURE)
-		: m_Trans(trans), m_TNode(node), flag(f), m_Level(level), m_FirstInPartial(first)
+		: m_Trans(trans), m_TNode(node), flag(f), m_Level(level),
+			m_FirstInPartial(first), m_InLastPartial(false)
 	{}
 
 	bool operator==(PathNode &node) {
@@ -62,6 +66,9 @@ public:
 
 	bool isFirstInPartial() { return m_FirstInPartial; }
 	void setFirstInPartial(bool first) { m_FirstInPartial = first; }
+
+	bool isInLastPartial() { return m_InLastPartial; }
+	void setInLastPartial(bool in) { m_InLastPartial = in; }
 
 
 	bool isMostPopularStrokeGe(unsigned n);
