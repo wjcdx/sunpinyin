@@ -306,7 +306,7 @@ CXhTrieMaker::clearUpForeignWordIds(CTreeNode *pnode)
 void
 CXhTrieMaker::clearUpSinglePartialWordIds(CTreeNode *pnode, int stkno, bool ptnmet, bool bdrmet)
 {
-    if (stkno > 3)
+    if (stkno > 2)
         return;
 
     CTrans::iterator tit = pnode->m_Trans.begin();
