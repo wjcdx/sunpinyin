@@ -288,6 +288,60 @@ CXhTrieMaker::clearUpWordIds(CTreeNode *pnode, bool skipPattern)
 }
 
 void
+CXhTrieMaker::clearUpForeignWordIds(CTreeNode *pnode)
+{
+    CTreeWordSet::iterator wit = pnode->m_WordIdSet.begin();
+    CTreeWordSet::iterator wite = pnode->m_WordIdSet.end();
+    for (; wit != wite;) {
+        if (wit->isForeign()) {
+            printf("remove foreign word %d which has %d strokes.\n",
+                    wit->anony.m_id, wit->getStrokeNumber());
+            pnode->m_WordIdSet.erase(wit++);
+        } else {
+            wit++;
+        }
+    }
+}
+
+void
+CXhTrieMaker::clearUpSinglePartialWordIds(CTreeNode *pnode, int stkno, bool ptnmet, bool bdrmet)
+{
+    if (stkno > 3)
+        return;
+
+    CTrans::iterator tit = pnode->m_Trans.begin();
+    CTrans::iterator tite = pnode->m_Trans.end();
+    
+    for (; tit != tite; tit++) {
+        unsigned syl = tit->first;
+        CTreeNode *sub = tit->second;
+
+        if (CXhData::isPattern(syl)) {
+
+            if (ptnmet) {
+                continue;
+            }
+            clearUpSinglePartialWordIds(sub, stkno, true, bdrmet);
+
+        } else if (CXhData::isBoundary(syl)) {
+
+            if (bdrmet) {
+                continue;
+            }
+            clearUpSinglePartialWordIds(sub, stkno, ptnmet, true);
+
+        } else {
+
+            if (sub->m_bOwnWord == 1)
+                clearUpForeignWordIds(sub);
+
+            int stkno_nxt = stkno + 1;
+            clearUpSinglePartialWordIds(sub, stkno_nxt, ptnmet, bdrmet);
+        }
+    }
+}
+
+void
 CXhTrieMaker::threadNonCompletedXh()
 {
     cout << "CXhTrieMaker::threadNonCompletedXh" << endl;
@@ -298,6 +352,9 @@ CXhTrieMaker::threadNonCompletedXh()
 
     clearUpWordIds(m_pRootNode, false);
     cout << "clearUpWordIds done!" << endl;
+
+    clearUpSinglePartialWordIds(m_pRootNode, 1, false, false);
+    cout << "clearUpSinglePartialWordIds done!" << endl;
 
     linkWordsTogether(m_pRootNode);
     cout << "linkWordsTogether done!" << endl;

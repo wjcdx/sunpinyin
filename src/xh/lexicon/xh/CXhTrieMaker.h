@@ -54,6 +54,11 @@ private:
     clearUpAllWordIds(CTreeNode *pnode);
     void
     clearUpWordIds(CTreeNode *pnode, bool skipPattern);
+
+    void
+    clearUpForeignWordIds(CTreeNode *pnode);
+    void
+    clearUpSinglePartialWordIds(CTreeNode *pnode, int stkno, bool ptnmet, bool bdrmet);
     
     void
     threadNonCompletedXh();

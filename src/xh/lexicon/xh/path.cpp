@@ -52,7 +52,9 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 					CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
 					CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
 					for (; wit != wite; wit++) {
-						pnode->m_WordIdSet.insert(*wit);
+						TTreeWordId wid = (*wit);
+						wid.setForeign();
+						pnode->m_WordIdSet.insert(wid);
 					}
 				}
 
@@ -66,7 +68,9 @@ Path::buildTrieInfo(CTreeNode *pnode, bool add)
 					CTreeWordSet::iterator wit = sub->m_WordIdSet.begin();
 					CTreeWordSet::iterator wite = sub->m_WordIdSet.end();
 					for (; wit != wite; wit++) {
-						pnode->m_WordIdSet.insert(*wit);
+						TTreeWordId wid = (*wit);
+						wid.setForeign();
+						pnode->m_WordIdSet.insert(wid);
 					}
 				}
 
