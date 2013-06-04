@@ -107,7 +107,7 @@ CXhData::xhDataMaps[] = {
 	XhKeyMapPair('s', "S28"),
 	XhKeyMapPair('s', "S29"),
 	XhKeyMapPair('s', "S30"),
-	XhKeyMapPair('b', "S31"),
+	XhKeyMapPair('b', "S31", true),
 
 	XhKeyMapPair('L', "B00"),
 	XhKeyMapPair('B', "B01"),
