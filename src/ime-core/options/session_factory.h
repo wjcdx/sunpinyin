@@ -1,6 +1,7 @@
 #ifndef SUNPY_SESSION_FACTORY_H
 #define SUNPY_SESSION_FACTORY_H
 
+#include <stdlib.h>
 #include "ime-core/utils.h"
 #include "profile_class.h"
 #include "lang_policy_cn.h"
@@ -10,6 +11,9 @@
 #include "scheme_policy_xh.h"
 #include "style_policy_classic.h"
 #include "style_policy_xh.h"
+
+//#define trace() printf("%s(%d): %s\n", __FILE__, __LINE__, __func__)
+#define trace() system("echo abc >> /tmp/ibus")
 
 class CSunpinyinSessionFactory : private CNonCopyable
 {
@@ -47,22 +51,86 @@ public:
     void setCandiWindowSize(unsigned size) { m_candiWindowSize = size; }
 
     CIMIView* createSession(){
+#if 0
+        unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
+        
+		std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
+        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
+		for (; vit != vite; vit++) {
+			if (vit->second == key) {
+				return vit->first;
+			}
+		}
+
+		CIMIView *pview = createView();
+        return pview;
+#else
+		CIMIView *pv = nextView(NULL);
+		return nextView(pv);
+#endif
+    }
+
+	CIMIView *createXinhuaView() {
+		m_Scheme = XINGHUA;
+		m_inputStyle = XH_STYLE;
+		m_lang = SIMPLIFIED_CHINESE_XH;
+		m_candiWindowSize = 10;
+		return createView();
+	}
+
+	CIMIView *createQuanpinView() {
+		m_Scheme = QUANPIN;
+		m_inputStyle = CLASSIC_STYLE;
+		m_lang = SIMPLIFIED_CHINESE_PY;
+		m_candiWindowSize = 10;
+		return createView();
+	}
+
+	CIMIView *createView() {
+trace();
         unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
         ISunpinyinProfile *profile = _getProfile(key);
         if (!profile)
             return NULL;
 
-        CIMIView *pview = profile->createProfile();
+        CIMIView *pview = profile->createView();
         if (!pview)
             return NULL;
 
         pview->setHotkeyProfile(&m_hotkeyProfile);
         pview->setCandiWindowSize(m_candiWindowSize);
+		m_views[pview] = key;
         return pview;
-    }
+	}
+
+	CIMIView *nextView(CIMIView *now) {
+trace();
+        std::map <CIMIView *, unsigned>::iterator vitb = m_views.begin();
+        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
+        std::map <CIMIView *, unsigned>::iterator vit = m_views.find(now);
+
+		if (now == NULL) {
+			if (vitb != vite)
+				return vitb->first;
+			else
+				return NULL;
+		}
+
+		if (vit != vite) {
+			if (++vit != vite) {
+				return vit->first;
+			}
+		}
+		return vitb->first;
+	}
 
     void destroySession(CIMIView* pview){
-        unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
+		unsigned key = 0;
+        std::map <CIMIView *, unsigned>::iterator vit = m_views.find(pview);
+		if (vit == m_views.end()) {
+			return;
+		}
+		key = vit->second;
         ISunpinyinProfile *profile = _getProfile(key);
         if (!profile)
             return;
@@ -71,9 +139,9 @@ public:
 
 private:
     CSunpinyinSessionFactory ()
-        : m_Scheme(QUANPIN), m_inputStyle(CLASSIC_STYLE),
-          m_lang(SIMPLIFIED_CHINESE_PY),
-          m_candiWindowSize(10){
+        : m_Scheme(XINGHUA), m_inputStyle(XH_STYLE),
+          m_lang(SIMPLIFIED_CHINESE_XH),
+          m_candiWindowSize(10) {
         m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_PY, QUANPIN,
                                    CLASSIC_STYLE)] =
             new CSunpinyinProfile <APySimplifiedChinesePolicy,
@@ -87,9 +155,17 @@ private:
                                    XH_STYLE)] =
             new CSunpinyinProfile <AXhSimplifiedChinesePolicy,
                                    AXhSchemePolicy, AClassicStylePolicy> ();
+		createQuanpinView();
+		createXinhuaView();
     }
 
     ~CSunpinyinSessionFactory (){
+        std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
+        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
+		for (; vit != vite; vit++) {
+			destroySession(vit->first);
+		}
+
         std::map <unsigned, ISunpinyinProfile*>::iterator it = m_profiles.begin();
         std::map <unsigned, ISunpinyinProfile*>::iterator ite = m_profiles.end();
 
@@ -119,6 +195,8 @@ private:
     ELanguage m_lang;
     unsigned m_candiWindowSize;
     CHotkeyProfile m_hotkeyProfile;
+
+	std::map<CIMIView *, unsigned> m_views;
 };
 
 #endif

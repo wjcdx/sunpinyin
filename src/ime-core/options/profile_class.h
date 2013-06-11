@@ -14,8 +14,7 @@ public:
                            m_inputStylePolicy(InputStylePolicy::instance())
     {}
 
-    /* profile by itself is a profile, so we are creating a session here? */
-    virtual CIMIView* createProfile(){
+    virtual CIMIView* createView(){
         if (!m_langPolicy.loadResources())
             return NULL;
 

@@ -26,12 +26,10 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
 {
     CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
-    CSunpinyinSessionFactory::EScheme pinyin_scheme = CSunpinyinSessionFactory::XINGHUA;
-    //    m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
+    CSunpinyinSessionFactory::EScheme pinyin_scheme =
+        m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
     
     factory.setPinyinScheme(pinyin_scheme);
-    factory.setInputStyle(CSunpinyinSessionFactory::XH_STYLE);
-    factory.setLanguage(CSunpinyinSessionFactory::SIMPLIFIED_CHINESE_XH);
     if (pinyin_scheme == CSunpinyinSessionFactory::QUANPIN) {
         update_fuzzy_pinyins();
         update_correction_pinyins();
@@ -97,13 +95,29 @@ SunPinyinEngine::process_key_event (guint key_val,
 {
     CKeyEvent key = translate_key(key_val, key_code, modifiers);
 
+    ibus::log << "process_key_event\n";
+    ibus::log.flush();
+
     if (!m_pv->getStatusAttrValue(CIBusWinHandler::STATUS_ID_CN)) {
         // we are in English input mode
         if (!m_hotkey_profile->isModeSwitchKey(key)) {
             m_hotkey_profile->rememberLastKey(key);
             return FALSE;
+        } else {
+            ibus::log << "EN: switch to CN, old m_pv: ";
+            ibus::log.flush();
+
+            CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
+            ibus::log << m_pv;
+            m_pv = factory.nextView(m_pv);
+            ibus::log << " new m_pv: " << m_pv << "\n";
+            m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_CN, true);
+            return TRUE;
         }
     } else if (m_hotkey_profile->isModeSwitchKey(key)) {
+        ibus::log << "CN: switch to EN.\n";
+        ibus::log.flush();
+        
         m_pv->onKeyEvent(CKeyEvent(IM_VK_ENTER, 0, 0));
         m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_CN, false);
         return TRUE;

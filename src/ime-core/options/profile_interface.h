@@ -4,7 +4,7 @@
 #include "ime-core/view/imi_view.h"
 
 struct ISunpinyinProfile {
-    virtual CIMIView* createProfile() = 0;
+    virtual CIMIView* createView() = 0;
     virtual void destroyProfile(CIMIView *) = 0;
     virtual ~ISunpinyinProfile () {};
 };
