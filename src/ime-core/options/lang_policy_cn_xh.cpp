@@ -51,8 +51,7 @@ CXhSimplifiedChinesePolicy::loadResources()
 CIMIContext *
 CXhSimplifiedChinesePolicy::createContext()
 {
-	CLatticeManager *pLatticeMgr = new CXhLatticeManager();
-    CIMIContext* pic = new CIMIContext(pLatticeMgr);
+    CIMIContext* pic = new CIMIContext();
     
 	pic->setCoreData(&m_coreData);
     pic->setCharsetLevel(m_csLevel);

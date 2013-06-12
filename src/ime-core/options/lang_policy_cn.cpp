@@ -58,8 +58,7 @@ CSimplifiedChinesePolicy::loadResources()
 CIMIContext *
 CSimplifiedChinesePolicy::createContext()
 {
-	CLatticeManager *pLatticeMgr = new CPyLatticeManager();
-    CIMIContext* pic = new CIMIContext(pLatticeMgr);
+    CIMIContext* pic = new CIMIContext();
     
 	pic->setCoreData(&m_coreData);
     pic->setCharsetLevel(m_csLevel);

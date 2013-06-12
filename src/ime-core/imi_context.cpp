@@ -11,14 +11,14 @@
 #include "TCandiPair.h"
 #include "helper/CInputTrieSource.h"
 
-CICHistory* CIMIContext::m_pHistory;
+CICHistory* CIMIContext::m_pHistory = NULL;
 
-CIMIContext::CIMIContext(CLatticeManager *pLatticeMgr)
+CIMIContext::CIMIContext()
     : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0), m_csLevel(0),
-      m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0),
-      m_pLatticeMgr(pLatticeMgr)
+      m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0)
 {
     setMaxBest(m_maxBest);
+    m_pLatticeMgr = new CLatticeManager();
 }
 
 void
