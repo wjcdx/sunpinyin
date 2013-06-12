@@ -17,15 +17,16 @@ CIMIContext::CIMIContext()
     : m_nBest(0), m_maxBest(1), m_maxTailCandidateNum(0), m_csLevel(0),
       m_bDynaCandiOrder(true), m_candiStarts(0), m_candiEnds(0)
 {
-    setMaxBest(m_maxBest);
     m_pLatticeMgr = new CLatticeManager();
+    setMaxBest(m_maxBest);
 }
 
 void
 CIMIContext::setCoreData(CIMIData *pCoreData)
 {
+    m_pInputTrieSrc->setTrie(pCoreData->getTrie());
     m_pLatticeMgr->setLangModel(pCoreData->getSlm());
-    CInputTrieSource::m_pTrie = pCoreData->getTrie();
+    m_pLatticeMgr->setInputTrieSource(m_pInputTrieSrc);
 }
 
 void
@@ -273,7 +274,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
                     continue;
 
                 cp.m_candi.m_wordId = words[i].m_id;
-                cp.m_candi.m_cwstr = CInputTrieSource::getWstr(cp.m_candi.m_wordId);
+                cp.m_candi.m_cwstr = m_pInputTrieSrc->getWstr(cp.m_candi.m_wordId);
                 cp.m_candi.m_pLexiconState = &lxst;
                 if (!cp.m_candi.m_cwstr)
                     continue;
@@ -308,7 +309,7 @@ CIMIContext::getCandidates(unsigned frIdx, CCandidates& result)
                     continue;
 
                 cp.m_candi.m_wordId = ltst.m_backTraceWordId;
-                cp.m_candi.m_cwstr = CInputTrieSource::getWstr(cp.m_candi.m_wordId);
+                cp.m_candi.m_cwstr = m_pInputTrieSrc->getWstr(cp.m_candi.m_wordId);
                 cp.m_candi.m_pLexiconState = ltst.m_pLexiconState;
                 if (!cp.m_candi.m_cwstr)
                     continue;
@@ -415,7 +416,7 @@ CIMIContext::memorize()
 void
 CIMIContext::_saveUserDict()
 {
-    if (!CInputTrieSource::m_pUserDict)
+    if (!m_pInputTrieSrc->getUserDict())
         return;
 
     CSyllables syls;
@@ -454,7 +455,7 @@ CIMIContext::_saveUserDict()
     if (has_user_selected && syls.size() > 1) {
         wstring phrase;
         getSelectedSentence (phrase, 0, e_pos);
-        CInputTrieSource::m_pUserDict->addWord (syls, phrase);
+        m_pInputTrieSrc->getUserDict()->addWord (syls, phrase);
     }
 }
 
@@ -497,7 +498,7 @@ CIMIContext::deleteCandidateByWID(unsigned wid)
 {
     if (wid > INI_USRDEF_WID) {
         m_pHistory->forget(wid);
-        CInputTrieSource::m_pUserDict->removeWord(wid);
+        m_pInputTrieSrc->getUserDict()->removeWord(wid);
         _buildLattice(m_pSegmentor->getSegments());
     }
 }

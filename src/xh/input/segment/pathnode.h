@@ -3,6 +3,7 @@
 
 #include "common/lexicon/thread/TrieThreadModel.h"
 #include "pinyin/input/syllable.h"
+#include "ime-core/helper/CInputTrieSource.h"
 #include <list>
 
 class PathNode;
@@ -28,6 +29,7 @@ public:
 	unsigned m_Level;
 	bool m_FirstInPartial;
 	bool m_InLastPartial;
+	CInputTrieSource* m_pInputTrieSrc;
 	
 	PathNode()
 		: m_Trans(NULL), m_TNode(NULL), flag(FUTURE), m_Level(0),
@@ -69,6 +71,8 @@ public:
 
 	bool isInLastPartial() { return m_InLastPartial; }
 	void setInLastPartial(bool in) { m_InLastPartial = in; }
+
+	void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
 
 
 	bool isMostPopularStrokeGe(unsigned n);

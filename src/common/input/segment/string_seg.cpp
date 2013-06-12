@@ -1,11 +1,10 @@
 #include "string_seg.h"
 #include "ime-core/lattice/lattice_manager.h"
 #include "ime-core/helper/CFullCharManager.h"
-#include "ime-core/helper/CInputTrieSource.h"
 #include "ime-core/lattice/lexicon_states.h"
 
-static void
-_forwardPunctChar(unsigned i, unsigned j, unsigned ch)
+void
+TStringSegment::_forwardPunctChar(unsigned i, unsigned j, unsigned ch)
 {
     CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
 
@@ -15,7 +14,7 @@ _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
     if (CFullCharManager::m_pGetFullPunctOp) {
         if (CFullCharManager::m_bFullPunctForwarding && !CFullCharManager::m_bOmitPunct) {
             wstr = (*CFullCharManager::m_pGetFullPunctOp)(ch);
-            wid = CInputTrieSource::m_pTrie->getSymbolId(wstr);
+            wid = m_pInputTrieSrc->getTrie()->getSymbolId(wstr);
         }
     }
 
@@ -29,8 +28,8 @@ _forwardPunctChar(unsigned i, unsigned j, unsigned ch)
     fr.m_lexiconStates.push_back(new TLexiconState(i, wid));
 }
 
-static void
-_forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
+void
+TStringSegment::_forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
 {
     CLatticeFrame &fr = CLatticeManager::getLatticeFrame(j);
 
@@ -39,7 +38,7 @@ _forwardOrdinaryChar(unsigned i, unsigned j, unsigned ch)
 
     if (CFullCharManager::m_pGetFullSymbolOp) {
         wstr = (*CFullCharManager::m_pGetFullSymbolOp)(ch);
-        wid = CInputTrieSource::m_pTrie->getSymbolId(wstr);
+        wid = m_pInputTrieSrc->getTrie()->getSymbolId(wstr);
 
         if (!CFullCharManager::m_bFullSymbolForwarding)
             wstr.clear();

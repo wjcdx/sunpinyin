@@ -55,7 +55,9 @@ CHunpinSegmentor::_encode(const char* buf, int ret)
     CMappedYin::const_iterator iter = syls.begin();
     CMappedYin::const_iterator iter_end = syls.end();
 
-    m_segs.push_back(new TPySyllableSegment(0, 0, 1));
+    TSegment* new_seg = new TPySyllableSegment(0, 0, 1);
+    new_seg->setInputTrieSource(m_pInputTrieSrc);
+    m_segs.push_back(new_seg);
     
     TSegment *s = m_segs.back();
     s->m_len = 2;
@@ -268,7 +270,9 @@ CHunpinSegmentor::_push(unsigned ch)
                                        (*it)->m_start, tmpl);
 
             if (tmpl == (strlen - (*it)->m_start)) {
-                TSegmentVec new_segs(1, new TPySyllableSegment(v, (*it)->m_start, tmpl));
+                TSegment* new_seg = new TPySyllableSegment(v, (*it)->m_start, tmpl);
+                new_seg->setInputTrieSource(m_pInputTrieSrc);
+                TSegmentVec new_segs(1, new_seg);
                 erase_segs(m_segs, m_segs.end() - index, m_segs.end());
                 std::copy(new_segs.rbegin(), new_segs.rend(),
                           back_inserter(m_segs));
@@ -281,15 +285,23 @@ CHunpinSegmentor::_push(unsigned ch)
             if (tmpl == 0) {
                 ret = m_pystr.size() - 1;
                 if (ch == '\'' && m_inputBuf.size() > 1) {
-                    m_segs.push_back(new TSeperatorSegment(ch, ret, 1));
+                    TSegment* new_seg = new TSeperatorSegment(ch, ret, 1);
+                    new_seg->setInputTrieSource(m_pInputTrieSrc);
+                    m_segs.push_back(new_seg);
                 } else if (islower(ch)) {
-                    m_segs.push_back(new TInvalidSegment(ch, ret, 1));
+                    TSegment* new_seg = new TInvalidSegment(ch, ret, 1);
+                    new_seg->setInputTrieSource(m_pInputTrieSrc);
+                    m_segs.push_back(new_seg);
                 } else {
-                    m_segs.push_back(new TStringSegment(ch, ret, 1));
+                    TSegment* new_seg = new TStringSegment(ch, ret, 1);
+                    new_seg->setInputTrieSource(m_pInputTrieSrc);
+                    m_segs.push_back(new_seg);
                 }
             } else {
                 ret = m_pystr.size() - 1;
-                m_segs.push_back(new TPySyllableSegment(v, ret, 1));
+                TSegment* new_seg = new TPySyllableSegment(v, ret, 1);
+                new_seg->setInputTrieSource(m_pInputTrieSrc);
+                m_segs.push_back(new_seg);
             }
         }
     }

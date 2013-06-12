@@ -28,6 +28,8 @@ public:
     void setGetFuzzySyllablesOp(CGetFuzzySyllablesOp<CPinyinData> *op) {
         m_pGetFuzzySyllablesOp = op; }
 
+    virtual void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
+
 private:
     unsigned _push(unsigned ch);
     unsigned _clear(unsigned from);
@@ -47,6 +49,8 @@ private:
     unsigned m_nLastValidPos;
 
     CGetFuzzySyllablesOp<CPinyinData>  *m_pGetFuzzySyllablesOp;
+
+    CInputTrieSource* m_pInputTrieSrc;
 };
 
 #endif /* SUNPY_SHUANGPIN_SEG_H */

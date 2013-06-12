@@ -255,9 +255,13 @@ CShuangpinSegmentor::_encode(const char* buf, char ch, bool isComplete)
         for (; iter != iter_end; ++iter) {
             TSyllable syl = s_shpData.encode(iter->c_str());
             if ((int)syl != 0) {
-                m_segs.push_back(new TSyllableSegment(syl, s.m_start, 1));
+                TSegment* new_seg = new TSyllableSegment(syl, s.m_start, 1);
+                new_seg->setInputTrieSource(m_pInputTrieSrc);
+                m_segs.push_back(new_seg);
             } else {
-                m_segs.push_back(new TStringSegment(ch, s.m_start, 1));
+                TSegment* new_seg = new TStringSegment(ch, s.m_start, 1);
+                new_seg->setInputTrieSource(m_pInputTrieSrc);
+                m_segs.push_back(new_seg);
             }
         }
         return s.m_start;
@@ -275,7 +279,11 @@ CShuangpinSegmentor::_push(unsigned ch)
     const int len = m_pystr.size();
     if (m_hasInvalid) {
         startFrom = len - 1;
-        m_segs.push_back(new TInvalidSegment(ch, startFrom, 1));
+
+        TSegment* new_seg = new TInvalidSegment(ch, startFrom, 1);
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
+        m_segs.push_back(new_seg);
+
         goto RETURN;
     }
 
@@ -286,10 +294,15 @@ CShuangpinSegmentor::_push(unsigned ch)
     if (!isInputPy) {
         startFrom = len - 1;
 
-        if (ch == '\'' && m_inputBuf.size() > 1)
-            m_segs.push_back(new TSeperatorSegment(ch, startFrom, 1));
-        else
-            m_segs.push_back(new TStringSegment(ch, startFrom, 1));
+        if (ch == '\'' && m_inputBuf.size() > 1) {
+            TSegment* new_seg = new TSeperatorSegment(ch, startFrom, 1);
+            new_seg->setInputTrieSource(m_pInputTrieSrc);
+            m_segs.push_back(new_seg);
+        } else {
+            TSegment* new_seg = new TStringSegment(ch, startFrom, 1);
+            new_seg->setInputTrieSource(m_pInputTrieSrc);
+            m_segs.push_back(new_seg);
+        }
         
         m_nAlpha += 1;
         m_nLastValidPos += 1;
@@ -305,7 +318,10 @@ CShuangpinSegmentor::_push(unsigned ch)
         if (startFrom < 0) {
             m_hasInvalid = true;
             startFrom = m_pystr.size() - 1;
-            m_segs.push_back(new TInvalidSegment(ch, startFrom, 1));
+            
+            TSegment* new_seg = new TInvalidSegment(ch, startFrom, 1);
+            new_seg->setInputTrieSource(m_pInputTrieSrc);
+            m_segs.push_back(new_seg);
         }
     }
 

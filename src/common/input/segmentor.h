@@ -4,6 +4,7 @@
 #include "portability.h"
 #include "pinyin/input/syllable.h"
 #include "segment/segment.h"
+#include "ime-core/helper/CInputTrieSource.h"
 #include <vector>
 
 struct ISegmentor {
@@ -21,6 +22,7 @@ struct ISegmentor {
     virtual void     notify_best_segpath(std::vector<unsigned>& seg_path) {}
 
     virtual unsigned updatedFrom() = 0;
+    virtual void setInputTrieSource(CInputTrieSource* src) = 0;
 };
 
 #endif

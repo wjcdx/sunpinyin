@@ -392,6 +392,7 @@ CQuanpinSegmentor::_push(unsigned ch)
         } else {
             new_seg = new TStringSegment(ch, ret, 1);
         }
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
         m_segs.push_back(new_seg);
 
     } else if (l == 1) { // possible a new segment
@@ -417,7 +418,9 @@ CQuanpinSegmentor::_push(unsigned ch)
 
         // push the new 1-length segment
         ret = m_pystr.size() - 1;
-        m_segs.push_back(new TPySyllableSegment(v, ret, 1));
+        TSegment* new_seg = new TPySyllableSegment(v, ret, 1);
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
+        m_segs.push_back(new_seg);
     } else if (l == (unsigned) m_segs.back()->m_len + 1) {
         // current segment is extensible, e.g., [xia] + n -> [xian]
         TSegment *last_seg = m_segs.back();
@@ -427,7 +430,9 @@ CQuanpinSegmentor::_push(unsigned ch)
     } else {  // other cases
         TSegment *last_seg = m_segs.back();
         int i = 0, isum = last_seg->m_len + 1, lsum = l;
-        TSegmentVec new_segs(1, new TPySyllableSegment(v, m_pystr.size() - l, l));
+        TSegment* new_seg = new TPySyllableSegment(v, m_pystr.size() - l, l);
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
+        TSegmentVec new_segs(1, new_seg);
 
         // e.g., [zh] [o] [n] + g -> [zhonG],
         if (isum < lsum) {
@@ -440,7 +445,11 @@ CQuanpinSegmentor::_push(unsigned ch)
                 v = m_pytrie.match_longest(
                     m_pystr.rbegin() + lsum, m_pystr.rend(), l);
                 TSegment *last_seg = new_segs.back();
-                new_segs.push_back(new TPySyllableSegment(v, last_seg->m_start - l, l));
+                
+                TSegment* new_seg = new TPySyllableSegment(v, last_seg->m_start - l, l);
+                new_seg->setInputTrieSource(m_pInputTrieSrc);
+                new_segs.push_back(new_seg);
+
                 _addFuzzySyllables(new_segs.back());
                 lsum += l;
             } else {

@@ -12,7 +12,7 @@ struct GlobalLatticeInfo;
 
 class CLatticeManager {
 public:
-	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom) {}
+	virtual void buildLexiconStates(TSegmentVec &segments, unsigned rebuildFrom);
 	virtual bool buildLatticeStates(unsigned rebuildFrom, GlobalLatticeInfo &info);
 	bool backTracePaths(const std::vector<TLatticeState>& tail_states,
 								 int rank, TPath& path, TPath& segmentPath);
@@ -53,6 +53,7 @@ public:
     { return m_historyPower; }
 
 	void setLangModel(CThreadSlm *pModel) { m_pModel = pModel; }
+	void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
 
 private:
 	unsigned getClass(unsigned strokes, unsigned cls) {
@@ -66,6 +67,7 @@ public:
 
 protected:
     CThreadSlm* m_pModel;
+    CInputTrieSource* m_pInputTrieSrc;
     unsigned m_tailIdx;
     unsigned m_historyPower;
 };

@@ -23,6 +23,9 @@ public:
             return NULL;
 
         CIMIContext *pic = m_langPolicy.createContext();
+
+		pseg->setInputTrieSource(pic->getInputTrieSource());
+
         CIMIView* pview = m_inputStylePolicy.createView();
         pview->attachIC(pic);
         pview->setSegmentor(pseg);

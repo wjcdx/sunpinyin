@@ -2,6 +2,7 @@
 #define SUNPY_SEGMENT_H
 
 #include <vector>
+#include "ime-core/helper/CInputTrieSource.h"
 
 struct TSegment {
 	enum ESegmentType
@@ -25,11 +26,15 @@ struct TSegment {
 		return false;
 	}
 
+	void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
+
 	// if segment is a STRING type, m_syllables may contain the string buffer without the '\0'
 	std::vector<unsigned>           m_syllables;
 	unsigned m_start        : 16;
 	unsigned m_len          : 8;
 	unsigned m_type         : 7;
+
+	CInputTrieSource* m_pInputTrieSrc;
 
 public:
 	virtual void forward(unsigned i, unsigned j) {};

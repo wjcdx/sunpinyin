@@ -60,11 +60,13 @@ CSimplifiedChinesePolicy::createContext()
 {
     CIMIContext* pic = new CIMIContext();
     
+	CInputTrieSource* ipt = new CInputTrieSource();
+	ipt->setUserDict(&m_userDict);
+	pic->setInputTrieSource(ipt);
+
 	pic->setCoreData(&m_coreData);
     pic->setCharsetLevel(m_csLevel);
 	pic->setHistoryMemory(&m_historyCache);
-	
-	CInputTrieSource::setUserDict(&m_userDict);
 
 	CFullCharManager::setFullSymbolForwarding(m_bEnableFullSymbol);
 	CFullCharManager::setGetFullSymbolOp(&m_getFullSymbolOp);

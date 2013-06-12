@@ -43,6 +43,32 @@ double CLatticeManager::exp2_tbl[32] = {
     exp2(-29), exp2(-30), exp2(-31)
 };
 
+void
+CLatticeManager::buildLexiconStates(TSegmentVec &segments,
+                           unsigned rebuildFrom)
+{
+    TSegmentVec::iterator it = segments.begin();
+    TSegmentVec::iterator ite = segments.end();
+
+    unsigned i, j = 0;
+    for (; it != ite; ++it) {
+        i = (*it)->m_start;
+        j = i + (*it)->m_len;
+
+        if (i < rebuildFrom - 1)
+            continue;
+
+        if (j >= getLatticesCapacity())
+            break;
+
+        (*it)->forward(i, j); 
+        CFullCharManager::m_bOmitPunct = false;
+    }   
+
+    TTailSegment::forward(j, j + 1); 
+    m_tailIdx = j + 1;
+}
+
 bool
 CLatticeManager::buildLatticeStates(unsigned idx, GlobalLatticeInfo &info)
 {
@@ -219,7 +245,7 @@ CLatticeManager::backTracePaths(const std::vector<TLatticeState>& tail_states,
         if (!(end_fr.m_bwType & CLatticeFrame::USER_SELECTED)) {
             const TWCHAR* cwstr = NULL;
             if (end_fr.m_wstr.empty()) {
-                cwstr = CInputTrieSource::getWstr(bs->m_backTraceWordId);
+                cwstr = m_pInputTrieSrc->getWstr(bs->m_backTraceWordId);
             } else {
                 cwstr = end_fr.m_wstr.c_str();
             }

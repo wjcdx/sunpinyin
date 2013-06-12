@@ -51,6 +51,7 @@ TXhSyllableSegment::prepare(const TThreadNode *pTNode)
 	branch.setNewAdded(false);
 	
 	PathNode node(NULL, const_cast<TThreadNode *>(pTNode), 0, PathNode::JUSTNOW);
+	node.setInputTrieSource(m_pInputTrieSrc);
 	branch.m_Path.add(node);
 
 	m_TrieBranches.push_back(branch);
@@ -92,7 +93,7 @@ void TXhSyllableSegment::_forwardFromLastSegment(CLatticeFrame &jfr,
 #if 1
 			{
 				TThreadNode *now = bit->getPath().getNow()->getTNode();
-				CInputTrieSource::m_pTrie->print(now);
+				m_pInputTrieSrc->getTrie()->print(now);
 			}
 #endif
 		}
@@ -102,7 +103,7 @@ void TXhSyllableSegment::_forwardFromLastSegment(CLatticeFrame &jfr,
 void TXhSyllableSegment::_forwardFromRoot(unsigned i, CLatticeFrame &jfr)
 {
 	_forwardFromTNode((TrieThreadModel::TThreadNode*)
-			CInputTrieSource::m_pTrie->getRootNode());
+			m_pInputTrieSrc->getTrie()->getRootNode());
 
 	if (!m_TrieBranches.empty()) {
 		BranchList::iterator bit = m_TrieBranches.begin();
@@ -126,7 +127,7 @@ void TXhSyllableSegment::_forwardFromRoot(unsigned i, CLatticeFrame &jfr)
 #if 1
 			{
 				TThreadNode *now = bit->getPath().getNow()->getTNode();
-				CInputTrieSource::m_pTrie->print(now);
+				m_pInputTrieSrc->getTrie()->print(now);
 			}
 #endif
 		}
@@ -197,7 +198,7 @@ TXhSyllableSegment::_forwardBranch(TrieBranch &branch,
 		for (unsigned int i = 0; i < sz; ++i) {
 			unsigned int id = pwids[i].m_id;
 			//if (id == 765) {
-				CInputTrieSource::m_pTrie->print(now);
+				m_pInputTrieSrc->getTrie()->print(now);
 				//break;
 			//}
 		}

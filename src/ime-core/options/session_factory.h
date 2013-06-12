@@ -51,7 +51,7 @@ public:
     void setCandiWindowSize(unsigned size) { m_candiWindowSize = size; }
 
     CIMIView* createSession(){
-#if 0
+#if 1
         unsigned key = _policiesToKey(m_lang, m_Scheme, m_inputStyle);
         
 		std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
@@ -135,6 +135,7 @@ trace();
         if (!profile)
             return;
         profile->destroyProfile(pview);
+		m_views.erase(vit);
     }
 
 private:
@@ -155,14 +156,13 @@ private:
                                    XH_STYLE)] =
             new CSunpinyinProfile <AXhSimplifiedChinesePolicy,
                                    AXhSchemePolicy, AClassicStylePolicy> ();
-		createQuanpinView();
 		createXinhuaView();
+		createQuanpinView();
     }
 
     ~CSunpinyinSessionFactory (){
-        std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
-        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
-		for (; vit != vite; vit++) {
+        std::map <CIMIView *, unsigned>::iterator vit;
+		for (vit = m_views.begin(); vit != m_views.end(); vit = m_views.begin()) {
 			destroySession(vit->first);
 		}
 

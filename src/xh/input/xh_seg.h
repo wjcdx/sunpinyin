@@ -30,6 +30,7 @@ public:
     virtual unsigned clear(unsigned from = 0);
 
     virtual unsigned updatedFrom() { return m_updatedFrom; }
+    virtual void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
 
     bool load(const char * trieFileName);
 
@@ -46,6 +47,8 @@ private:
     TSegmentVec m_segs;
 
     unsigned m_updatedFrom;
+
+    CInputTrieSource* m_pInputTrieSrc;
 };
 
 #endif /* SUNPY_PINYIN_SEG_H */

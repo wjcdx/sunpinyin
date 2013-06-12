@@ -94,6 +94,8 @@ public:
 
     bool load(const char * pyTrieFileName);
 
+    virtual void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
+
     void setGetFuzzySyllablesOp(CGetFuzzySyllablesOp<CPinyinData> *op) {
         m_pGetFuzzySyllablesOp = op; }
     void setGetCorrectionPairOp(CGetCorrectionPairOp *op) {
@@ -121,6 +123,8 @@ private:
     TSegmentVec m_merged_segs;
 
     unsigned m_updatedFrom;
+
+    CInputTrieSource* m_pInputTrieSrc;
 };
 
 #endif /* SUNPY_PINYIN_SEG_H */

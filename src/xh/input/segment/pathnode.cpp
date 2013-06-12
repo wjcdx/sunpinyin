@@ -2,7 +2,6 @@
 #include "pathnode.h" 
 #include "path.h" 
 #include "checkpoint.h" 
-#include "ime-core/helper/CInputTrieSource.h" 
 #include "common/lexicon/trie.h"
 #include "xh/input/xh_data.h"
 
@@ -33,8 +32,10 @@ PathNode::getChildrenFromPesudoTNode(TTransUnit *pTrans,
 	TTransUnit *ptrans = (TTransUnit *)psuNode->getTrans();
 	for (unsigned int i = 0; i < sz; ++i) {
         unsigned u = ptrans[i].m_Unit;
-		TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(psuNode, u);
-		children.push_back(PathNode(pTrans, pch, m_Level + 1));
+		TThreadNode *pch = (TThreadNode *)m_pInputTrieSrc->getTrie()->transfer(psuNode, u);
+		PathNode node(pTrans, pch, m_Level + 1);
+		node.setInputTrieSource(m_pInputTrieSrc);
+		children.push_back(node);
 	}
 	return true;
 }
@@ -54,18 +55,23 @@ PathNode::getChildren(PathNodeList &children, TSyllable syllable)
         unsigned u = ptrans[i].m_Unit;
 		if (pattern) {
 			if (u == syllable) {
-				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
+				TThreadNode *pch = (TThreadNode *)m_pInputTrieSrc->getTrie()->transfer(m_TNode, u);
 				if (pch->m_bPesudo) {
 					getChildrenFromPesudoTNode(&ptrans[i], pch, children);
 				} else {
-					children.push_back(PathNode(&ptrans[i], pch, m_Level + 1));
+					PathNode node(&ptrans[i], pch, m_Level + 1);
+					node.setInputTrieSource(m_pInputTrieSrc);
+					children.push_back(node);
 				}
 				break;
 			}
 		} else {
 			if (CXhData::isCharComp(u)) {
-				TThreadNode *pch = (TThreadNode *)CInputTrieSource::m_pTrie->transfer(m_TNode, u);
-				children.push_back(PathNode(&ptrans[i], pch, m_Level + 1));
+				TThreadNode *pch = (TThreadNode *)m_pInputTrieSrc->getTrie()->transfer(m_TNode, u);
+
+				PathNode node(&ptrans[i], pch, m_Level + 1);
+				node.setInputTrieSource(m_pInputTrieSrc);
+				children.push_back(node);
 			}
 		}
     }

@@ -1,6 +1,5 @@
 #include "ime-core/lattice/lattice.h"
 #include "ime-core/lattice/lattice_manager.h"
-#include "ime-core/helper/CInputTrieSource.h"
 #include "common/input/segment/syllable_seg.h"
 #include "common/lexicon/thread/TrieThreadModel.h"
 #include "pinyin/lattice/TPyLexiconState.h"
@@ -37,7 +36,7 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
         if (lxst.m_pNode) {
             // try to match a word from lattice i to lattice j
             // and if match, we'll count it as a new lexicon on lattice j
-            pn = CInputTrieSource::m_pTrie->transfer(lxst.m_pNode, syllable);
+            pn = m_pInputTrieSrc->getTrie()->transfer(lxst.m_pNode, syllable);
             if (pn) {
                 added_from_sysdict = true;
                 TPyLexiconState *new_lxst = new TPyLexiconState(lxst.m_start,
@@ -53,12 +52,12 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
             }
         }
 
-        if (CInputTrieSource::m_pUserDict && lxst.m_syls.size() < MAX_USRDEF_WORD_LEN) {
+        if (m_pInputTrieSrc->getUserDict() && lxst.m_syls.size() < MAX_USRDEF_WORD_LEN) {
             // try to match a word from user dict
             CSyllables syls = lxst.m_syls;
             syls.push_back(syllable);
             std::vector<TWordIdInfo> words;
-			CInputTrieSource::m_pUserDict->getWords(syls, words);
+			m_pInputTrieSrc->getUserDict()->getWords(syls, words);
             if (!words.empty() || !added_from_sysdict) {
                 // even if the words is empty we'll add a fake lexicon
                 // here. This helps _saveUserDict detect new words.
@@ -77,7 +76,7 @@ TPySyllableSegment::_forwardSingleSyllable(unsigned i,
     }
 
     // last, create a lexicon for single character with only one syllable
-    pn = CInputTrieSource::m_pTrie->transfer(syllable);
+    pn = m_pInputTrieSrc->getTrie()->transfer(syllable);
     if (pn) {
         CSyllables syls;
         syls.push_back(syllable);

@@ -165,7 +165,10 @@ CXhSegmentor::_push(unsigned ch)
     } else if (m_trie.isPattern(ch)) {
 
         ret = m_inputstr.size() - 1;
-        m_segs.push_back(new TXhSyllableSegment(ch, ret, 1));
+
+        TSegment* new_seg = new TXhSyllableSegment(ch, ret, 1);
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
+        m_segs.push_back(new_seg);
 
     } else {
 
@@ -176,6 +179,7 @@ CXhSegmentor::_push(unsigned ch)
         } else {
             new_seg = new TStringSegment(ch, ret, 1);
         }
+        new_seg->setInputTrieSource(m_pInputTrieSrc);
         m_segs.push_back(new_seg);
     }
 

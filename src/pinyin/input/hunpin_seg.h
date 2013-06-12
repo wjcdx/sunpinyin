@@ -46,6 +46,8 @@ public:
 
     bool load(const char * pyTrieFileName);
 
+    virtual void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
+
     void setGetFuzzySyllablesOp(CGetFuzzySyllablesOp<CPinyinData> *op) {
         m_pGetFuzzySyllablesOp = op; }
 
@@ -75,6 +77,8 @@ private:
 
     unsigned m_updatedFrom;
     static CShuangpinData s_shpData;
+
+    CInputTrieSource* m_pInputTrieSrc;
 };
 
 #endif /* SUNPY_PINYIN_SEG_H */

@@ -163,6 +163,9 @@ public:
         m_pLatticeMgr->printLattice();
     }
 
+    void setInputTrieSource(CInputTrieSource* src) { m_pInputTrieSrc = src; }
+    CInputTrieSource* getInputTrieSource() { return m_pInputTrieSrc; }
+
 public:
     static CICHistory* m_pHistory;
 
@@ -196,6 +199,7 @@ protected:
     unsigned m_candiEnds;
 
     CLatticeManager* m_pLatticeMgr;
+    CInputTrieSource* m_pInputTrieSrc;
 }; // CIMIContext
 
 #endif

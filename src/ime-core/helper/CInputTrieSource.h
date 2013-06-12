@@ -6,14 +6,17 @@
 
 class CInputTrieSource {
 public:
-    static void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
-    static CUserDict* getUserDict() { return m_pUserDict; }
+    void setUserDict(CUserDict *pUserDict) { m_pUserDict = pUserDict; }
+    CUserDict* getUserDict() { return m_pUserDict; }
+
+	void setTrie(CTrie* pTrie) { m_pTrie = pTrie; }
+	CTrie* getTrie() { return m_pTrie; }
 	
-	static const TWCHAR * getWstr(unsigned wid);
+	const TWCHAR * getWstr(unsigned wid);
 
 public:
-	static CTrie* m_pTrie;
-    static CUserDict* m_pUserDict;
+	CTrie* m_pTrie;
+    CUserDict* m_pUserDict;
 };
 
 #endif
