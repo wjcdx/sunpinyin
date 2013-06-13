@@ -26,6 +26,9 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
 {
     CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
+    factory.createXinghuaView();
+    factory.createQuanpinView();
+
     CSunpinyinSessionFactory::EScheme pinyin_scheme =
         m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
     
@@ -47,10 +50,10 @@ SunPinyinEngine::SunPinyinEngine(IBusEngine *engine)
         return;
 
     m_hotkey_profile = new CHotkeyProfile();
-    m_pv->setHotkeyProfile(m_hotkey_profile);
+    factory.initSession(m_hotkey_profile);
 
     m_wh = new CIBusWinHandler(this);
-    m_pv->attachWinHandler(m_wh);
+    factory.initSession(m_wh);
 
     m_prop_list = ibus_prop_list_new();
 
@@ -96,6 +99,9 @@ SunPinyinEngine::process_key_event (guint key_val,
     CKeyEvent key = translate_key(key_val, key_code, modifiers);
 
     ibus::log << "process_key_event\n";
+    ibus::log.flush();
+    ibus::log.flush();
+    ibus::log.flush();
     ibus::log.flush();
 
     if (!m_pv->getStatusAttrValue(CIBusWinHandler::STATUS_ID_CN)) {
@@ -299,6 +305,8 @@ SunPinyinEngine::update_lookup_table()
 bool
 SunPinyinEngine::is_valid() const
 {
+    ibus::log << "SunPinyinEngine::is_valid:: " << m_pv << endl;
+    ibus::log.flush();
     return m_pv != NULL;
 }
 

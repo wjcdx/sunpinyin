@@ -81,7 +81,6 @@ int main(int argc, char* argv[])
         return -1;
     }
     
-    /*
     if (py_scheme == 'q' && do_auto_correction) {
         AQuanpinSchemePolicy::instance().setAutoCorrecting(true);
         AQuanpinSchemePolicy::instance().setAutoCorrectionPairs(auto_correction_pairs);
@@ -91,7 +90,6 @@ int main(int argc, char* argv[])
     AQuanpinSchemePolicy::instance().setFuzzyPinyinPairs(fuzzy_pairs, false);
     AQuanpinSchemePolicy::instance().setFuzzySegmentation(true);
     AQuanpinSchemePolicy::instance().setInnerFuzzySegmentation(true);
-    */
 
     factory.setInputStyle(CSunpinyinSessionFactory::XH_STYLE);
     factory.setLanguage(CSunpinyinSessionFactory::SIMPLIFIED_CHINESE_XH);

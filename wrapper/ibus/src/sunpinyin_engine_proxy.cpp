@@ -35,6 +35,7 @@
 
 #include "sunpinyin_engine_proxy.h"
 #include "sunpinyin_engine.h"
+#include "debug.h"
 
 #define IBUS_SUNPINYIN_ENGINE(obj) \
     (G_TYPE_CHECK_INSTANCE_CAST ((obj), IBUS_TYPE_SUNPINYIN_ENGINE, IBusSunPinyinEngine))
@@ -81,6 +82,8 @@ ibus_sunpinyin_engine_process_key_event(IBusEngine *engine,
                                         guint keycode,
                                         guint modifiers)
 {
+    ibus::log << "ibus_sunpinyin_engine_process_key_event\n";
+    ibus::log.flush();
     if (GET_PY_ENGINE(engine)->is_valid()) {
         return GET_PY_ENGINE(engine)->process_key_event(keyval, keycode, modifiers) ?
             TRUE : FALSE;

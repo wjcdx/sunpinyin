@@ -70,7 +70,7 @@ public:
 #endif
     }
 
-	CIMIView *createXinhuaView() {
+	CIMIView *createXinghuaView() {
 		m_Scheme = XINGHUA;
 		m_inputStyle = XH_STYLE;
 		m_lang = SIMPLIFIED_CHINESE_XH;
@@ -138,10 +138,32 @@ trace();
 		m_views.erase(vit);
     }
 
+	void initSession(CHotkeyProfile *prof)
+	{
+        std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
+        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
+
+		for (; vit != vite; vit++) {
+			CIMIView *pv = vit->first;
+			pv->setHotkeyProfile(prof);
+		}
+	}
+
+	void initSession(CIMIWinHandler *wh)
+	{
+        std::map <CIMIView *, unsigned>::iterator vit = m_views.begin();
+        std::map <CIMIView *, unsigned>::iterator vite = m_views.end();
+
+		for (; vit != vite; vit++) {
+			CIMIView *pv = vit->first;
+			pv->attachWinHandler(wh);
+		}
+	}
+
 private:
     CSunpinyinSessionFactory ()
-        : m_Scheme(XINGHUA), m_inputStyle(XH_STYLE),
-          m_lang(SIMPLIFIED_CHINESE_XH),
+        : m_Scheme(QUANPIN), m_inputStyle(CLASSIC_STYLE),
+          m_lang(SIMPLIFIED_CHINESE_PY),
           m_candiWindowSize(10) {
         m_profiles [_policiesToKey(SIMPLIFIED_CHINESE_PY, QUANPIN,
                                    CLASSIC_STYLE)] =
@@ -156,8 +178,6 @@ private:
                                    XH_STYLE)] =
             new CSunpinyinProfile <AXhSimplifiedChinesePolicy,
                                    AXhSchemePolicy, AClassicStylePolicy> ();
-		createXinhuaView();
-		createQuanpinView();
     }
 
     ~CSunpinyinSessionFactory (){
