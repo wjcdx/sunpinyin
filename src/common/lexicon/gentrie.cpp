@@ -1,6 +1,6 @@
 #include <locale.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <portability.h>
 
 #include "trie.h"
 #include "trie_factory.h"

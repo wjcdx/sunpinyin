@@ -7,6 +7,12 @@
 #include <string>
 #include <cstring>
 
+#ifdef HAVE_CONFIG_H
+
+#include <config.h>
+
+#endif
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #ifdef __cplusplus
@@ -31,7 +37,17 @@
 #endif // !HOST_OS_GNUC_2
 
 #ifndef HAVE_LOG2
-inline double log2(double x) { return log(x) / M_LN2; }
+
+/* Natural log of 2 */
+#define _M_LN2  0.693147180559945309417
+#define M_LN2   _M_LN2
+
+double log2(double x) { return log(x) / M_LN2; }
+
+#else
+
+double log2(double);
+
 #endif
 
 #if defined(sun) // Solaris/HP-UX 's iconv is const char**
@@ -291,6 +307,15 @@ inline long distance(Iterator pos1, Iterator pos2){
 #if !defined (HAVE_STRNDUP)
 extern "C" char *strndup(const char *s, size_t n);
 #endif //HAVE_STRNDUP
+
+#ifndef HAVE_SSIZE_T
+typedef int _ssize_t;
+typedef _ssize_t ssize_t;
+#endif
+
+#ifndef HAVE_GETOPT_H
+#include "port/getopt.h"
+#endif
 
 #endif
 

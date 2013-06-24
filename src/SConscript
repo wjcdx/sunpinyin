@@ -1,57 +1,57 @@
 import os
 Import('env')
 
-env.Program('dict/mmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
-                      'slm/mmseg/mmseg.o'])
+env.Program('dict/mmseg', ['portability.cpp', 'slm/sim_dict.cpp', 'slm/sim_sen.cpp',
+                      'slm/mmseg/mmseg.cpp'])
 
-env.Program('dict/slmseg', ['portability.o', 'slm/sim_dict.o', 'slm/sim_sen.o',
-                      'slm/slm.o', 'slm/slmseg/slmseg.o'])
+env.Program('dict/slmseg', ['portability.cpp', 'slm/sim_dict.cpp', 'slm/sim_sen.cpp',
+                      'slm/slm.cpp', 'slm/slmseg/slmseg.cpp'])
 
-env.Program('dict/ids2ngram', ['portability.o', 'slm/ids2ngram/ids2ngram.o'])
+env.Program('dict/ids2ngram', ['portability.cpp', 'slm/ids2ngram/ids2ngram.cpp'])
 
-env.Program('dict/idngram_merge', ['portability.o', 'slm/ids2ngram/idngram_merge.o'])
+env.Program('dict/idngram_merge', ['portability.cpp', 'slm/ids2ngram/idngram_merge.cpp'])
 
-env.Program('dict/slmbuild', ['portability.o', 'slm/sim_slmbuilder.o',
-                         'slm/slmbuild/slmbuild.o'])
+env.Program('dict/slmbuild', ['portability.cpp', 'slm/sim_slmbuilder.cpp',
+                         'slm/slmbuild/slmbuild.cpp'])
 
-env.Program('dict/slmprune', ['portability.o', 'slm/sim_slm.o',
-                         'slm/slmprune/slmprune.o'])
+env.Program('dict/slmprune', ['portability.cpp', 'slm/sim_slm.cpp',
+                         'slm/slmprune/slmprune.cpp'])
 
-env.Program('dict/slminfo', ['portability.o', 'slm/slminfo/slminfo.o'])
+env.Program('dict/slminfo', ['portability.cpp', 'slm/slminfo/slminfo.cpp'])
 
-env.Program('dict/slmthread', ['portability.o', 'slm/sim_slm.o',
-                          'slm/thread/ValueCompress.o', 'slm/thread/slmthread.o'])
+env.Program('dict/slmthread', ['portability.cpp', 'slm/sim_slm.cpp',
+                          'slm/thread/ValueCompress.cpp', 'slm/thread/slmthread.cpp'])
 
-env.Program('dict/tslmendian', ['slm/tslmendian/slm_file.o',
-                           'slm/tslmendian/slm_endian.o',
-                           'slm/tslmendian/writer.o'])
+env.Program('dict/tslmendian', ['slm/tslmendian/slm_file.cpp',
+                           'slm/tslmendian/slm_endian.cpp',
+                           'slm/tslmendian/writer.cpp'])
 
-env.Program('dict/tslminfo', ['portability.o', 'slm/slm.o', 'slm/tslminfo/tslminfo.o'])
+env.Program('dict/tslminfo', ['portability.cpp', 'slm/slm.cpp', 'slm/tslminfo/tslminfo.cpp'])
 
-env.Program('dict/tslmpack', ['portability.o', 'slm/slm.o',
-                     	 'slm/thread/ValueCompress.o', 'slm/tslmpack/slmpack.o',
-                     	 'slm/tslmpack/arpa_conv.o', 'slm/tslmpack/arpa_slm.o'])
+env.Program('dict/tslmpack', ['portability.cpp', 'slm/slm.cpp',
+                     	 'slm/thread/ValueCompress.cpp', 'slm/tslmpack/slmpack.cpp',
+                     	 'slm/tslmpack/arpa_conv.cpp', 'slm/tslmpack/arpa_slm.cpp'])
 
-env.Program('dict/genpyt', ['portability.o', 'slm/slm.o', 'slm/tslmendian/writer.o',
-                   	   'common/lexicon/trie_writer.o', 'common/lexicon/gentrie.o',
-                   	   'common/lexicon/trie_factory.o', 'common/lexicon/maker_factory.o',
-                   	   'common/lexicon/trie.o', 'common/lexicon/trie_maker.o',
-                   	   'common/lexicon/CUnitData.o',
-                   	   'common/lexicon/tree/PNodeSet.o',
-                   	   'common/lexicon/CUnigramSorter.o',
-                       'xh/lexicon/xh/path.o',
-                       'xh/lexicon/xh/CXhTrieMaker.o',
-                       'xh/input/xh_data.o',
-                       'pinyin/lexicon/pytrie_maker.o',
-                   	   'pinyin/input/pinyin_data.o'])
+env.Program('dict/genpyt', ['portability.cpp', 'slm/slm.cpp', 'slm/tslmendian/writer.cpp',
+                   	   'common/lexicon/trie_writer.cpp', 'common/lexicon/gentrie.cpp',
+                   	   'common/lexicon/trie_factory.cpp', 'common/lexicon/maker_factory.cpp',
+                   	   'common/lexicon/trie.cpp', 'common/lexicon/trie_maker.cpp',
+                   	   'common/lexicon/CUnitData.cpp',
+                   	   'common/lexicon/tree/PNodeSet.cpp',
+                   	   'common/lexicon/CUnigramSorter.cpp',
+                       'xh/lexicon/xh/path.cpp',
+                       'xh/lexicon/xh/CXhTrieMaker.cpp',
+                       'xh/input/xh_data.cpp',
+                       'pinyin/lexicon/pytrie_maker.cpp',
+                   	   'pinyin/input/pinyin_data.cpp'])
 
-env.Program('dict/dconv', ['portability.o',
-                       'xh/lexicon/DictConv.o'])
+env.Program('dict/dconv', ['portability.cpp',
+                       'xh/lexicon/DictConv.cpp'])
 
-env.Program('dict/getwordfreq', ['portability.o', 'slm/slm.o',
-                            'slm/getwordfreq/getwordfreq.o'])
+env.Program('dict/getwordfreq', ['portability.cpp', 'slm/slm.cpp',
+                            'slm/getwordfreq/getwordfreq.cpp'])
 
-env.Program('dict/testvc', ['slm/thread/ValueCompress.o', 'slm/thread/test_vc.o'])
+env.Program('dict/testvc', ['slm/thread/ValueCompress.cpp', 'slm/thread/test_vc.cpp'])
 
 env.Substfile('sunpinyin-dictgen.mk.in', SUBST_DICT = {
     '@MAKE@': env['MAKE'],

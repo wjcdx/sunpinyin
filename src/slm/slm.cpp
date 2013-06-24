@@ -1,4 +1,4 @@
-#include <unistd.h>
+#include <portability.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,18 +17,19 @@
 bool
 CThreadSlm::load(const char* fname, bool MMap)
 {
-    int fd = open(fname, O_RDONLY);
-    if (fd == -1) {
+    FILE *fp = fopen(fname, "r");
+    if (fp == NULL) {
         fprintf(stderr, "open %s: %s\n", fname, strerror(errno));
         return false;
     }
 
-    m_bufSize = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
+    m_bufSize = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_SET);
 
     m_bMMap = MMap;
     if (m_bMMap) {
 #ifdef HAVE_SYS_MMAN_H
+        int fd = fileno(fp);
         void* p = mmap(NULL, m_bufSize, PROT_READ, MAP_SHARED, fd, 0);
         if (p == MAP_FAILED) {
             close(fd);
@@ -42,33 +43,43 @@ CThreadSlm::load(const char* fname, bool MMap)
                                     (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1),
                                    B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
         if (area < 0) {
-            close(fd);
+            fclose(fp);
             return false;
         }
         m_buf = p;
 
         for (ssize_t len = m_bufSize; len > 0; ) {
-            ssize_t n = read(fd, p, len);
+            ssize_t n = fread(p, len, 1, fp);
             if (n < 0) break;
             p += n;
             len -= n;
         }
 #else // Other OS
-        #error "No implementation for mmap()"
+        //#error "No implementation for mmap()"
+        if ((m_buf = new char[m_bufSize]) == NULL) {
+            fclose(fp);
+            return false;
+        }
+        if (fread(m_buf, m_bufSize, 1, fp) != m_bufSize) {
+            perror("read lm");
+            delete [] m_buf; m_buf = NULL;
+            fclose(fp);
+            return false;
+        }
 #endif // HAVE_SYS_MMAN_H
     } else {
         if ((m_buf = new char[m_bufSize]) == NULL) {
-            close(fd);
+            fclose(fp);
             return false;
         }
-        if (read(fd, m_buf, m_bufSize) != m_bufSize) {
+        if (fread(m_buf, m_bufSize, 1, fp) != m_bufSize) {
             perror("read lm");
             delete [] m_buf; m_buf = NULL;
-            close(fd);
+            fclose(fp);
             return false;
         }
     }
-    close(fd);
+    fclose(fp);
 
     m_N = *(unsigned*)m_buf;
     m_UseLogPr = *(((unsigned*)m_buf) + 1);
@@ -104,7 +115,8 @@ CThreadSlm::free()
 #elif defined(BEOS_OS)
             delete_area(area_for(m_buf));
 #else // Other OS
-            #error "No implementation for munmap()"
+            //#error "No implementation for munmap()"
+            delete [] m_buf;
 #endif // HAVE_SYS_MMAN_H
         } else {
             delete [] m_buf;

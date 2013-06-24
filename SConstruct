@@ -280,7 +280,7 @@ def allinc():
         for root, dirs, files in os.walk('src'):
             inc.append(root)
         return inc
-    return ['src']
+    return ['../', 'src']
 
 def GetOS():
     return platform.uname()[0]
@@ -471,6 +471,7 @@ def DoConfigure():
     conf.CheckCHeader('sys/types.h')
     conf.CheckCHeader('unistd.h')
     conf.CheckCHeader('wchar.h')
+    conf.CheckType('ssize_t')
 
     # add essential package requirements
     conf.Define('PACKAGE', '"sunpinyin"')
@@ -487,8 +488,8 @@ def DoConfigure():
     if GetOS() != 'Darwin':
         env.ParseConfig('pkg-config sqlite3 --libs --cflags')
 
-if not GetOption('clean') and not GetOption('help'):
-    DoConfigure()
+#if not GetOption('clean') and not GetOption('help'):
+#    DoConfigure()
 
 #
 #==============================compile==============================
@@ -499,7 +500,7 @@ env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
 env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
             'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
 
-SConscript(['src/SConscript', 'man/SConscript', 'doc/SConscript'], exports='env')
+SConscript(['src/SConscript'], exports='env')
 
 env.Substfile('sunpinyin-2.0.pc.in', SUBST_DICT={
         '@PREFIX@': env['PREFIX'],

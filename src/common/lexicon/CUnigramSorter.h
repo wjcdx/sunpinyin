@@ -6,6 +6,7 @@
 
 class CUnigramSorter : public CWordEvaluator {
 public:
+	virtual ~CUnigramSorter() {}
     virtual double
     getCost(unsigned int wid);
 

@@ -39,7 +39,7 @@
 #ifndef SUNPY_USERDICT_H
 #define SUNPY_USERDICT_H
 
-#include <sqlite3.h>
+//#include <sqlite3.h>
 #include "portability.h"
 #include "pinyin/input/syllable.h"
 #include "common/lexicon/trie.h"
@@ -48,7 +48,7 @@
 class CUserDict
 {
 public:
-    CUserDict () : m_fname(NULL), m_db(NULL) {}
+    CUserDict () : m_fname(NULL)/*, m_db(NULL)*/ {}
 
     ~CUserDict () { free(); }
 
@@ -76,7 +76,7 @@ private:
     bool _createIndexes();
 
     char                       *m_fname;
-    sqlite3                    *m_db;
+//    sqlite3                    *m_db;
     std::map<unsigned, wstring> m_dict;
 };
 

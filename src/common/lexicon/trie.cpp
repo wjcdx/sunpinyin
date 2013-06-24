@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <portability.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <deque>
 
 #include "trie.h"
@@ -79,22 +79,23 @@ CTrie::load(const char *fname)
     free();
 
     bool suc = false;
-    int fd = open(fname, O_RDONLY);
-    if (fd == -1) return false;
+    FILE *fp = fopen(fname, "r");
+    if (fp == NULL) return false;
 
-    m_Size = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
+    m_Size = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_SET);
 
 #ifdef HAVE_SYS_MMAN_H
+    int fd = fileno(fp);
     suc =
         (m_mem =
              (char*)mmap(NULL, m_Size, PROT_READ, MAP_SHARED, fd,
                          0)) != MAP_FAILED;
 #else
     suc = (m_mem = new char [m_Size]) != NULL;
-    suc = suc && (read(fd, m_mem, m_Size) > 0);
+    suc = suc && (fread(m_mem, m_Size, 1, fp) > 0);
 #endif
-    close(fd);
+    fclose(fp);
 
     suc = suc && ((m_words = new TWCHAR*[getWordCount()]) != NULL);
 
