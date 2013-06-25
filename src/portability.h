@@ -17,10 +17,19 @@
 #include <unistd.h>
 #ifdef __cplusplus
 #include <algorithm>
+#include <functional>
 #else
 #include <sys/ddi.h>
 #endif //__cpluscplus
 #endif //ifdef HAVE_UNISTD_H
+
+#ifdef POSIX
+#include <arpa/inet.h>
+#endif
+
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 
 #ifndef HOST_OS_GNUC_2
     #if defined(DEBUG) && !defined(NDEBUG)
@@ -41,10 +50,6 @@
 /* Natural log of 2 */
 #define _M_LN2  0.693147180559945309417
 #define M_LN2   _M_LN2
-
-double log2(double x) { return log(x) / M_LN2; }
-
-#else
 
 double log2(double);
 
@@ -315,6 +320,18 @@ typedef _ssize_t ssize_t;
 
 #ifndef HAVE_GETOPT_H
 #include "port/getopt.h"
+#endif
+
+#ifdef WIN32
+
+#define snprintf _snprintf
+
+#endif
+
+#ifndef HAVE_EXP2
+
+double exp2(double);
+
 #endif
 
 #endif

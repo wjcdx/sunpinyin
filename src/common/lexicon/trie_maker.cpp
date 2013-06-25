@@ -18,6 +18,8 @@
 #include "trie_maker.h"
 #include "trie_writer.h"
 
+#include "portability.h"
+
 using namespace TrieTreeModel;
 using namespace TrieThreadModel;
 

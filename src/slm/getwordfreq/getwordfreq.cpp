@@ -42,12 +42,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <vector>
 #include <iostream>
 
+#include "portability.h"
 #include "../slm.h"
 
 using namespace std;

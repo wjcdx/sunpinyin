@@ -47,6 +47,22 @@
 
 #include <stdlib.h>
 
+#ifndef HAVE_LOG2
+
+double log2(double x) { return log(x) / M_LN2; }
+
+#endif
+
+#ifndef HAVE_EXP2
+
+double exp2(double)
+{
+        return 1.0;
+}
+
+#endif
+
+
 TLongExpFloat::TLongExpFloat(double d)
 {
     if (d != 0.0 && d != -0.0) {
@@ -276,7 +292,8 @@ strndup(const char *s, size_t n)
         return NULL;
 
 #ifdef __cplusplus
-    nMost = std::min(strlen(s) + 1, n + 1);
+    //nMost = std::min(strlen(s) + 1, n + 1);
+    nMost = min(strlen(s) + 1, n + 1);
 #else
     nMost = min(strlen(s) + 1, n + 1);
 #endif

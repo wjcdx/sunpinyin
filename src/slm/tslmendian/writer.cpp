@@ -1,7 +1,7 @@
-#include <arpa/inet.h>
 #include <cassert>
 #include <cstring>
 
+#include "portability.h"
 #include "writer.h"
 
 int

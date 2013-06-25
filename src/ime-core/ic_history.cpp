@@ -42,12 +42,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <unistd.h>
 #include <cassert>
-#include <arpa/inet.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <algorithm>
+
+#include "portability.h"
 #include "ic_history.h"
 
 const uint32_t CICHistory::DCWID = (uint32_t)-1;
@@ -183,22 +183,23 @@ CBigramHistory::loadFromFile(const char *fname)
     m_history_path = fname;
 
     bool suc = false;
-    int fd = open(fname, O_CREAT, 0600);
-    if (fd == -1) {
+    FILE *fp = fopen(fname, "r+");
+    if (fp == NULL) {
         suc = loadFromBuffer(NULL, 0);
         return suc;
     }
 
-    struct stat info;
-    fstat(fd, &info);
-    void* buf = malloc(info.st_size);
+    int size = 0;
+    size = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_SET);
+    void* buf = malloc(size);
 
     if (buf) {
-        read(fd, buf, info.st_size);
-        suc = loadFromBuffer(buf, info.st_size);
+        fread(buf, size, 1, fp);
+        suc = loadFromBuffer(buf, size);
         free(buf);
     }
-    close(fd);
+    fclose(fp);
     return suc;
 }
 

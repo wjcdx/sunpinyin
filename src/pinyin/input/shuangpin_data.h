@@ -9,7 +9,8 @@
 
 enum EShuangpinType {
     MS2003,
-    ABC,
+    //ABC,
+    ZNABC,
     ZIRANMA,
     PINYINJIAJIA,
     ZIGUANG,

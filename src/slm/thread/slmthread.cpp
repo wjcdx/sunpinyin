@@ -44,13 +44,13 @@
 #endif
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <vector>
 #include <map>
 #include <math.h>
 
+#include "portability.h"
 #include "../sim_slm.h"
 #include "../slm.h"
 

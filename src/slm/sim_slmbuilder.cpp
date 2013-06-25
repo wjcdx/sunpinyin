@@ -431,6 +431,7 @@ CalcNodeBow(CSlmBuilder* builder,
             chIterator cht,
             int bUseLogPr)
 {
+#if 0
     if (chh == cht) return 1.0;
     double sumnext = 0.0, sum = 0.0;
     for (; chh < cht; ++chh) {
@@ -454,11 +455,14 @@ CalcNodeBow(CSlmBuilder* builder,
             sum,
             bow,
             lvl);
-        for (int i = 1; i <= lvl; ++i)
+        for (int i = 1; i <= lvl; ++i) {
             printf("%d ", words[i]);
+        }
         return bow;
     }
     return (1.0 - sumnext) / (1.0 - sum);
+#endif
+    return 1.0;
 }
 
 void

@@ -1,4 +1,8 @@
 #include "lattice.h"
+#include "portability.h"
+
+#include <algorithm>
+#include <functional>
 
 void
 CLatticeFrame::clear()

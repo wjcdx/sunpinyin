@@ -33,9 +33,10 @@
  * to such option by the copyright holder.
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#include "portability.h"
 #include "slm_file.h"
 #include "writer.h"
 

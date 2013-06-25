@@ -6,7 +6,7 @@ version="2.0.4"
 abi_major = 3
 abi_minor = 0
 
-cflags = '-g -Wall -pg -DDEBUG'
+cflags = '-g -Wall -pg -DDEBUG -DWIN32'
 
 slmsource = [
     'src/slm/ids2ngram/ids2ngram.cpp',
@@ -299,7 +299,7 @@ def CreateEnvironment():
         tar = 'gtar'
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')
     env = Environment(ENV = os.environ, CFLAGS = cflags, CXXFLAGS = cflags,
-                      LINKFLAGS='-pg',
+                      LINKFLAGS='-pg Ws2_32.lib',
                       MAKE = make, WGET = wget, TAR = tar,
                       CPPPATH = ['.'] + allinc(),
                       tools = ['default', 'textfile'])
@@ -495,10 +495,10 @@ def DoConfigure():
 #==============================compile==============================
 #
 env.Object(slmsource)
-env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
-env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
-            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
+#env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+#            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
+#env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
+#            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
 
 SConscript(['src/SConscript'], exports='env')
 

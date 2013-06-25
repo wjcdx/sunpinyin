@@ -32,3 +32,6 @@ cscope.*
 .sconsign.dblite
 configure.conf
 
+*.obj
+*.exe
+

@@ -43,9 +43,7 @@
 #include <assert.h>
 #endif
 
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
-#endif
+#include "portability.h"
 
 #include <stdio.h>
 #include <vector>

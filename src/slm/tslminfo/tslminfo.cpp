@@ -43,15 +43,12 @@
 #include <assert.h>
 #endif
 
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
-#endif
+#include "portability.h"
 
 #include <stdio.h>
 #include <string>
 #include <math.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include <vector>
 #include <map>

@@ -4,6 +4,8 @@
 #include "pinyin_data.h"
 #include "pinyin_info.h"
 
+#include "portability.h"
+
 static int
 pytab_entry_compare(const char *s, TPyTabEntry *v)
 {

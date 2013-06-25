@@ -47,17 +47,15 @@
  * - leaf[N-1][] : CThreadSlm::TLeaf * slm.getLevelSize(N)
  */
 
-#include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <numeric>
 #include <algorithm>
 #include <iostream>
 #include <cassert>
 
-
+#include "portability.h"
 #include "slm_file.h"
 #include "writer.h"
 
@@ -247,17 +245,17 @@ CThreadSlmFile::load(const char* fname)
 {
     assert(m_buf == NULL);
 
-    int fd = open(fname, O_RDONLY);
-    ssize_t len = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
+    FILE *fp = fopen(fname, "r");
+    ssize_t len = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_SET);
     m_buf = new char[len];
-    if (read(fd, m_buf, len) != len) {
+    if (fread(m_buf, len, 1, fp) != len) {
         delete [] m_buf;
         m_buf = NULL;
         cerr << "Failed to read from " << fname << endl;
         return false;
     }
-    close(fd);
+    fclose(fp);
 
     char* buf = m_buf;
     bool do_swap = (getEndian() != getHostEndian());

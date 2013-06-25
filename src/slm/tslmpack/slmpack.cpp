@@ -41,12 +41,9 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_ASSERT_H
-#include <assert.h>
-#endif
+#include "portability.h"
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <vector>
