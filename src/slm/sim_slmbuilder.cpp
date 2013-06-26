@@ -431,7 +431,6 @@ CalcNodeBow(CSlmBuilder* builder,
             chIterator cht,
             int bUseLogPr)
 {
-#if 0
     if (chh == cht) return 1.0;
     double sumnext = 0.0, sum = 0.0;
     for (; chh < cht; ++chh) {
@@ -445,7 +444,7 @@ CalcNodeBow(CSlmBuilder* builder,
     }
     assert(sumnext > 0.0 && sumnext < 1.05);
     assert(sum < 1.05 && sum > 0.0);
-    //消除计算误差的影响
+    //eliminate the effect of the calculation error
     if (sumnext >= 1.0 || sum >= 1.0) {
         double bow = ((sumnext > sum) ? sumnext : sum) + 0.0001;
         bow = (bow - sumnext) / (bow - sum);
@@ -461,7 +460,6 @@ CalcNodeBow(CSlmBuilder* builder,
         return bow;
     }
     return (1.0 - sumnext) / (1.0 - sum);
-#endif
     return 1.0;
 }
 

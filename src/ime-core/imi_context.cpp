@@ -122,8 +122,7 @@ CIMIContext::getBestSentenceTails(int rank, unsigned start, unsigned end)
 
     while (tail_word_num > 1) {
         unsigned dec = tail_word_num / (m_maxTailCandidateNum + 1) + 1;
-        //tail_word_num -= std::min(dec, tail_word_num);
-        tail_word_num -= min(dec, tail_word_num);
+        tail_word_num -= std::min(dec, tail_word_num);
         if (tail_word_num <= 1) {
             break;
         }

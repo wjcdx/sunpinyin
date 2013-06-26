@@ -23,14 +23,6 @@
 #endif //__cpluscplus
 #endif //ifdef HAVE_UNISTD_H
 
-#ifdef POSIX
-#include <arpa/inet.h>
-#endif
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
-
 #ifndef HOST_OS_GNUC_2
     #if defined(DEBUG) && !defined(NDEBUG)
         #define DEBUG_print(fmt, ...)   fprintf(stderr, fmt, ...)
@@ -326,12 +318,45 @@ typedef _ssize_t ssize_t;
 
 #define snprintf _snprintf
 
+
+#include <io.h>
+
+#define F_OK    0
+#define R_OK    4
+#define W_OK    2
+#define X_OK    1
+
+#define access  _access
+
+
+#include <direct.h>
+#define mkdir(x, y) _mkdir(x)
+
+
+#define NOMINMAX
+
 #endif
 
 #ifndef HAVE_EXP2
 
 double exp2(double);
 
+#else
+
+#ifndef L
+
+#define L
+
+#endif
+
+#endif
+
+#ifdef POSIX
+#include <arpa/inet.h>
+#endif
+
+#ifdef WIN32
+#include <winsock2.h>
 #endif
 
 #endif

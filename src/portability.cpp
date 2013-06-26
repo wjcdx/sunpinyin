@@ -292,8 +292,7 @@ strndup(const char *s, size_t n)
         return NULL;
 
 #ifdef __cplusplus
-    //nMost = std::min(strlen(s) + 1, n + 1);
-    nMost = min(strlen(s) + 1, n + 1);
+    nMost = std::min(strlen(s) + 1, n + 1);
 #else
     nMost = min(strlen(s) + 1, n + 1);
 #endif

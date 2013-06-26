@@ -84,7 +84,7 @@ imesource = [
     'src/ime-core/imi_data.cpp',
     'src/ime-core/imi_uiobjects.cpp',
     'src/ime-core/ic_history.cpp',
-    'src/ime-core/userdict.cpp',
+#    'src/ime-core/userdict.cpp',
     'src/ime-core/imi_funcobjs.cpp',
     'src/ime-core/view/imi_view.cpp',
     'src/ime-core/view/imi_view_classic.cpp',
@@ -357,7 +357,8 @@ if env['ENABLE_PLUGINS']:
 
 # merge some of critical compile flags
 env.MergeFlags(['-pipe -DHAVE_CONFIG_H',
-                '-DSUNPINYIN_DATA_DIR=\\\'\\"%s\\"\\\'' % datadir])
+               '-DSUNPINYIN_DATA_DIR=\\\'\\"abc\\"\\\''])
+#               '-DSUNPINYIN_DATA_DIR=\\\'\\"%s\\"\\\'' % datadir])
 
 if GetOption('rpath') is not None and GetOS() != 'Darwin':
     env.MergeFlags('-Wl,-R -Wl,%s' % GetOption('rpath'))
@@ -495,10 +496,20 @@ def DoConfigure():
 #==============================compile==============================
 #
 env.Object(slmsource)
-#env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-#            'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
-#env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
-#            'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
+
+print(GetOS());
+#cmd_tmpl = 
+if GetOS() == 'Windows':
+        env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+                    'cd ${SOURCE.dir} && .\quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
+        env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
+                    'cd ${SOURCE.dir} && .\pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
+else:
+        env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+                    'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
+        env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
+                    'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
+
 
 SConscript(['src/SConscript'], exports='env')
 

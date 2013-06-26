@@ -355,7 +355,7 @@ CShuangpinData::_genKeyboardMap(EShuangpinType shyType)
         m_shuangpinPlan->mapfinals = (char*)ms2003_mapfinals;
         m_shuangpinPlan->zeroinitals = ms2003_zeroinitials;
         break;
-    case ABC:
+    case ZNABC:
         m_shuangpinPlan->mapinitials = (char*)abc_mapinitials;
         m_shuangpinPlan->mapfinals = (char*)abc_mapfinals;
         m_shuangpinPlan->zeroinitals = abc_zeroinitials;

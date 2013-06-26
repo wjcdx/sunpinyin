@@ -75,8 +75,7 @@ CPreEditString::string() const
 int
 CPreEditString::charTypeSize() const
 {
-    //return std::min(m_charTypes.size(), m_wstr.size());
-    return min(m_charTypes.size(), m_wstr.size());
+    return std::min(m_charTypes.size(), m_wstr.size());
 }
 
 int
@@ -200,8 +199,7 @@ CCandidateList::candiCharTypeSizeAt(unsigned item) const
     if (item >= m_candiCharTypeVecs.size())
         return 0;
     const CCharTypeVec & ctv = m_candiCharTypeVecs[item];
-    //return std::min((int)ctv.size(), candiSize(item));
-    return min((int)ctv.size(), candiSize(item));
+    return std::min((int)ctv.size(), candiSize(item));
 }
 
 int

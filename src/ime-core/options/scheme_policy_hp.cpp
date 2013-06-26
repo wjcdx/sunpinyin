@@ -6,7 +6,7 @@ CHunpinSchemePolicy::onConfigChanged(const COptionEvent& event)
 {
     if (event.name == SHUANGPIN_TYPE) {
         setShuangpinType((EShuangpinType)event.get_int());
-        //刷新segmentor狀態
+        
         COptionEventBus& event_bus = AOptionEventBus::instance();
         event_bus.publishEvent(COptionEvent(PINYIN_SCHEME, -1));        //第二個參數沒有用
         return true;
