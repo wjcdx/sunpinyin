@@ -6,7 +6,11 @@ version="2.0.4"
 abi_major = 3
 abi_minor = 0
 
-cflags = '-g -Wall -pg -DDEBUG -DWIN32'
+cflags = '-g -Wall -pg -DDEBUG'
+#linkflags = ''
+#if platform.uname()[0] == 'Windows':
+#        cflags += ' -DWIN32'
+#        linkflags += ' Ws2_32.lib'
 
 slmsource = [
     'src/slm/ids2ngram/ids2ngram.cpp',
@@ -297,13 +301,21 @@ def CreateEnvironment():
     elif GetOS() == 'SunOS':
         make = 'gmake'
         tar = 'gtar'
+
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')
     env = Environment(ENV = os.environ, CFLAGS = cflags, CXXFLAGS = cflags,
-                      LINKFLAGS='-pg Ws2_32.lib',
+                      LINKFLAGS = '', 
                       MAKE = make, WGET = wget, TAR = tar,
                       CPPPATH = ['.'] + allinc(),
                       tools = ['default', 'textfile'])
     env.Append(BUILDERS = {'InstallAsSymlink': libln_builder})
+#    if GetOS() == 'Windows':
+#        print(GetOS())
+#        env.Append(CFLAGS = ' -DWIN32', LINKFLAGS = 'Ws2_32.lib')
+#        print env['CFLAGS']
+#        print env['LINKFLAGS']
+#    env['CFLAGS'] += " -DWIN32" if GetOS() == "Windows" else "-DPOSIX"
+#    print env['CFLAGS']
     env['ENDIANNESS'] = "be" if sys.byteorder == "big" else "le"
     return env
 
@@ -357,8 +369,7 @@ if env['ENABLE_PLUGINS']:
 
 # merge some of critical compile flags
 env.MergeFlags(['-pipe -DHAVE_CONFIG_H',
-               '-DSUNPINYIN_DATA_DIR=\\\'\\"abc\\"\\\''])
-#               '-DSUNPINYIN_DATA_DIR=\\\'\\"%s\\"\\\'' % datadir])
+               '-D\\\"SUNPINYIN_DATA_DIR=\\\\\\"\"%s\"\\\\\\"\\\"' % datadir])
 
 if GetOption('rpath') is not None and GetOS() != 'Darwin':
     env.MergeFlags('-Wl,-R -Wl,%s' % GetOption('rpath'))
@@ -497,19 +508,10 @@ def DoConfigure():
 #
 env.Object(slmsource)
 
-print(GetOS());
-#cmd_tmpl = 
-if GetOS() == 'Windows':
-        env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-                    'cd ${SOURCE.dir} && .\quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
-        env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
-                    'cd ${SOURCE.dir} && .\pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
-else:
-        env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
-                    'cd ${SOURCE.dir} && ./quanpin_trie_gen.py > ../src/pinyin/input/quanpin_trie.h')
-        env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
-                    'cd ${SOURCE.dir} && ./pinyin_info_gen.py > ../src/pinyin/input/pinyin_info.h')
-
+env.Command('src/pinyin/input/quanpin_trie.h', 'python/quanpin_trie_gen.py',
+            'python ${SOURCE.dir}/quanpin_trie_gen.py > src/pinyin/input/quanpin_trie.h')
+env.Command('src/pinyin/input/pinyin_info.h', 'python/pinyin_info_gen.py',
+            'python ${SOURCE.dir}/pinyin_info_gen.py > src/pinyin/input/pinyin_info.h')
 
 SConscript(['src/SConscript'], exports='env')
 

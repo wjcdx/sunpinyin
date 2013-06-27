@@ -343,12 +343,6 @@ double exp2(double);
 
 #else
 
-#ifndef L
-
-#define L
-
-#endif
-
 #endif
 
 #ifdef POSIX

@@ -23,8 +23,8 @@ CSimplifiedChinesePolicy::loadResources()
         return m_bLoaded;
 
     bool suc = true;
-    std::string data_dir = "sunpinyin";//m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
-    std::string lm_path = data_dir + "/lm_sc.t3g.py";
+	std::string data_dir = m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
+	std::string lm_path = data_dir + "/lm_sc.t3g.py";
     std::string dict_path = data_dir + "/dict3_sc.bin.py";
 
     suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
@@ -87,29 +87,29 @@ string_pairs
 CSimplifiedChinesePolicy::getDefaultPunctMapping() const
 {
     static const char* punc_map [] = {
-        " ", "„ÄÄ",
-        ",", "Ôºå",
-        ";", "Ôºõ",
-        "!", "ÔºÅ",
-        "?", "Ôºü",
-        ".", "„ÄÇ",
-        ":", "Ôºö",
-        "^", "‚Ä¶‚Ä¶",
-        "\\", "„ÄÅ",
-        "\"", "‚Äú",
-        "\"", "‚Äù",
-        "'", "‚Äò",
-        "'", "‚Äô",
-        "_", "‚Äî‚Äî",
-        "<", "„Ää",
-        ">", "„Äã",
-        "(", "Ôºà",
-        ")", "Ôºâ",
-        "[", "„Äê",
-        "]", "„Äë",
-        "{", "„Äé",
-        "}", "„Äè",
-        "$", "Ôø•",
+    		" ", "°°",
+        ",", "£¨",
+        ";", "£ª",
+        "!", "£°",
+        "?", "£ø",
+        ".", "°£",
+        ":", "£∫",
+        "^", "°≠°≠",
+        "\\", "°¢",
+        "\"", "°∞",
+        "\"", "°±",
+        "'", "°Æ",
+        "'", "°Ø",
+        "_", "°™°™",
+        "<", "°∂",
+        ">", "°∑",
+        "(", "£®",
+        ")", "£©",
+        "[", "°æ",
+        "]", "°ø",
+        "{", "°∫",
+        "}", "°ª",
+        "$", "£§",
         NULL,
     };
 
