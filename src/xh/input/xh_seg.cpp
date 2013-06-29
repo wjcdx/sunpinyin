@@ -20,6 +20,7 @@ CXhSegmentor::~CXhSegmentor ()
 bool
 CXhSegmentor::load(const char * trieFileName)
 {
+    trieFileName;
     //return m_trie.load(trieFileName);
     return true;
 }

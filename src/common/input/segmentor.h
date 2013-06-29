@@ -19,7 +19,7 @@ struct ISegmentor {
     virtual unsigned insertAt(unsigned idx, unsigned ch) = 0;
     virtual unsigned deleteAt(unsigned idx, bool backward = true) = 0;
     virtual unsigned clear(unsigned from = 0) = 0;
-    virtual void     notify_best_segpath(std::vector<unsigned>& seg_path) {}
+    virtual void     notify_best_segpath(std::vector<unsigned>& seg_path) { seg_path; }
 
     virtual unsigned updatedFrom() = 0;
     virtual void setInputTrieSource(CInputTrieSource* src) = 0;

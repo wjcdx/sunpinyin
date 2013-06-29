@@ -6,11 +6,7 @@ version="2.0.4"
 abi_major = 3
 abi_minor = 0
 
-cflags = '-g -Wall -pg -DDEBUG'
-#linkflags = ''
-#if platform.uname()[0] == 'Windows':
-#        cflags += ' -DWIN32'
-#        linkflags += ' Ws2_32.lib'
+cflags = '-Wall -DDEBUG'
 
 slmsource = [
     'src/slm/ids2ngram/ids2ngram.cpp',
@@ -290,9 +286,11 @@ def GetOS():
     return platform.uname()[0]
 
 def CreateEnvironment():
+    global cflags
     make = 'make'
     wget = 'wget'
     tar = 'tar'
+    linkflags = ''
     if GetOS() == 'Darwin':
         wget = 'curl -O'
     elif GetOS() == 'FreeBSD':
@@ -301,21 +299,18 @@ def CreateEnvironment():
     elif GetOS() == 'SunOS':
         make = 'gmake'
         tar = 'gtar'
+    elif GetOS() == 'Windows':
+        cflags += ' -DWIN32 /EHsc'
+        cflags = cflags.replace('Wall', 'W4');
+        linkflags += ' Ws2_32.lib'
 
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')
     env = Environment(ENV = os.environ, CFLAGS = cflags, CXXFLAGS = cflags,
-                      LINKFLAGS = '', 
+                      LINKFLAGS = linkflags,
                       MAKE = make, WGET = wget, TAR = tar,
                       CPPPATH = ['.'] + allinc(),
                       tools = ['default', 'textfile'])
     env.Append(BUILDERS = {'InstallAsSymlink': libln_builder})
-#    if GetOS() == 'Windows':
-#        print(GetOS())
-#        env.Append(CFLAGS = ' -DWIN32', LINKFLAGS = 'Ws2_32.lib')
-#        print env['CFLAGS']
-#        print env['LINKFLAGS']
-#    env['CFLAGS'] += " -DWIN32" if GetOS() == "Windows" else "-DPOSIX"
-#    print env['CFLAGS']
     env['ENDIANNESS'] = "be" if sys.byteorder == "big" else "le"
     return env
 
@@ -368,7 +363,7 @@ if env['ENABLE_PLUGINS']:
     headers += headers_plugin
 
 # merge some of critical compile flags
-env.MergeFlags(['-pipe -DHAVE_CONFIG_H',
+env.MergeFlags(['-DHAVE_CONFIG_H',
                '-D\\\"SUNPINYIN_DATA_DIR=\\\\\\"\"%s\"\\\\\\"\\\"' % datadir])
 
 if GetOption('rpath') is not None and GetOS() != 'Darwin':

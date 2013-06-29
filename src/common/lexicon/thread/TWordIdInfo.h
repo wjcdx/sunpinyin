@@ -26,7 +26,6 @@ namespace TrieThreadModel {
 		TWordIdInfo() { memset(this, 0, sizeof(TWordIdInfo)); }
 
 		TWordIdInfo(unsigned id,
-					unsigned len = 0,
 					unsigned seen = 0,
 					unsigned cost = 0,
 					unsigned cslvl = 0)

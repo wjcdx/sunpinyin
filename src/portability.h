@@ -13,6 +13,27 @@
 
 #endif
 
+#ifndef HAVE_SSIZE_T
+typedef int _ssize_t;
+typedef _ssize_t ssize_t;
+#endif
+
+#ifndef HAVE_GETOPT_H
+#include "port/getopt.h"
+#endif
+
+#ifdef WIN32
+#include "port/win/defs.h"
+#endif
+
+#ifndef HAVE_EXP2
+double exp2(double);
+#endif
+
+#ifdef POSIX
+#include <arpa/inet.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #ifdef __cplusplus
@@ -38,13 +59,10 @@
 #endif // !HOST_OS_GNUC_2
 
 #ifndef HAVE_LOG2
-
 /* Natural log of 2 */
 #define _M_LN2  0.693147180559945309417
 #define M_LN2   _M_LN2
-
 double log2(double);
-
 #endif
 
 #if defined(sun) // Solaris/HP-UX 's iconv is const char**
@@ -304,54 +322,6 @@ inline long distance(Iterator pos1, Iterator pos2){
 #if !defined (HAVE_STRNDUP)
 extern "C" char *strndup(const char *s, size_t n);
 #endif //HAVE_STRNDUP
-
-#ifndef HAVE_SSIZE_T
-typedef int _ssize_t;
-typedef _ssize_t ssize_t;
-#endif
-
-#ifndef HAVE_GETOPT_H
-#include "port/getopt.h"
-#endif
-
-#ifdef WIN32
-
-#define snprintf _snprintf
-
-
-#include <io.h>
-
-#define F_OK    0
-#define R_OK    4
-#define W_OK    2
-#define X_OK    1
-
-#define access  _access
-
-
-#include <direct.h>
-#define mkdir(x, y) _mkdir(x)
-
-
-#define NOMINMAX
-
-#endif
-
-#ifndef HAVE_EXP2
-
-double exp2(double);
-
-#else
-
-#endif
-
-#ifdef POSIX
-#include <arpa/inet.h>
-#endif
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 #endif
 

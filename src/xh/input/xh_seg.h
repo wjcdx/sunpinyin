@@ -16,6 +16,7 @@ public:
     ~CXhSegmentor();
 
     virtual TSegmentVec& getSegments(bool req_aux_segs){
+        req_aux_segs;
         return m_segs;
     }
 

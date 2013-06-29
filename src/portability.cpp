@@ -48,18 +48,14 @@
 #include <stdlib.h>
 
 #ifndef HAVE_LOG2
-
 double log2(double x) { return log(x) / M_LN2; }
-
 #endif
 
 #ifndef HAVE_EXP2
-
 double exp2(double)
 {
         return 1.0;
 }
-
 #endif
 
 
