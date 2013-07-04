@@ -46,7 +46,7 @@ public:
     { return m_type == 0; }
 
     bool isSyllableFrame() const
-    { return(m_type & CATE_SYLLABLE); }
+    { return !!(m_type & CATE_SYLLABLE); }
 
     bool isSyllableSepFrame() const
     { return((m_type & SYLLABLE_SEP) > CATE_SYLLABLE); }

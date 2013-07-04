@@ -43,6 +43,7 @@
 bool
 CUserDict::load(const char  *fname)
 {
+#if 0
     int rc = sqlite3_open(":memory:", &m_db);
 
     if (rc != SQLITE_OK) {
@@ -54,12 +55,15 @@ CUserDict::load(const char  *fname)
     rc = _copyDb(Load);
 
     return _createTable() && _createIndexes();
+#endif
+    return false;
 }
 
 
 void
 CUserDict::free()
 {
+#if 0
     if (m_fname) {
         _copyDb(Save);
         ::free(m_fname);
@@ -70,12 +74,14 @@ CUserDict::free()
         sqlite3_close(m_db);
         m_db = NULL;
     }
+#endif
 }
 
 
 unsigned
 CUserDict::addWord(CSyllables &syllables, const wstring& word)
 {
+#if 0
     assert(m_db != NULL);
     assert(syllables.size() >= 2 && syllables.size() <= MAX_USRDEF_WORD_LEN);
 
@@ -112,12 +118,15 @@ CUserDict::addWord(CSyllables &syllables, const wstring& word)
     sqlite3_finalize(stmt);
     _copyDb(Save);
     return ret;
+#endif
+    return 0;
 }
 
 
 void
 CUserDict::removeWord(unsigned wid)
 {
+#if 0
     assert(m_db != NULL);
     char    *zErr = NULL;
     char sql[256] = "DELETE FROM dict WHERE id=";
@@ -128,6 +137,7 @@ CUserDict::removeWord(unsigned wid)
 
         m_dict.erase(m_dict.find(wid - INI_USRDEF_WID));
     }
+#endif
 }
 
 
@@ -135,6 +145,7 @@ void
 CUserDict::getWords(CSyllables &syllables,
                     std::vector<TWordIdInfo> &result)
 {
+#if 0
     assert(m_db != NULL);
 
     char *sql_str;
@@ -203,12 +214,14 @@ CUserDict::getWords(CSyllables &syllables,
 
     sqlite3_free(sql_str);
     sqlite3_finalize(stmt);
+#endif
 }
 
 
 const TWCHAR*
 CUserDict::operator [](unsigned wid)
 {
+#if 0
     assert(m_db != NULL);
 
     sqlite3_stmt *stmt = NULL;
@@ -246,11 +259,14 @@ CUserDict::operator [](unsigned wid)
 
     sqlite3_finalize(stmt);
     return ret;
+#endif
+    return NULL;
 }
 
 int
 CUserDict::_copyDb(DBCopyDirection direction)
 {
+#if 0
     sqlite3 *disk_db;
     int rc = sqlite3_open(m_fname, &disk_db);
 
@@ -267,11 +283,14 @@ CUserDict::_copyDb(DBCopyDirection direction)
 
     sqlite3_close(disk_db);
     return rc;
+#endif
+    return 0;
 }
 
 bool
 CUserDict::_createTable()
 {
+#if 0
     assert(m_db != NULL);
 
     char *zErr = NULL;
@@ -292,6 +311,7 @@ CUserDict::_createTable()
         }
         return false;
     }
+#endif
 
     return true;
 }
@@ -299,6 +319,7 @@ CUserDict::_createTable()
 bool
 CUserDict::_createIndexes()
 {
+#if 0
     assert(m_db != NULL);
 
     char *zErr = NULL;
@@ -314,6 +335,7 @@ CUserDict::_createIndexes()
         }
         return false;
     }
+#endif
 
     return true;
 }

@@ -84,7 +84,7 @@ imesource = [
     'src/ime-core/imi_data.cpp',
     'src/ime-core/imi_uiobjects.cpp',
     'src/ime-core/ic_history.cpp',
-#    'src/ime-core/userdict.cpp',
+    'src/ime-core/userdict.cpp',
     'src/ime-core/imi_funcobjs.cpp',
     'src/ime-core/view/imi_view.cpp',
     'src/ime-core/view/imi_view_classic.cpp',
