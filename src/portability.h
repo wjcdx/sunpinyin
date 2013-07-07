@@ -323,6 +323,10 @@ inline long distance(Iterator pos1, Iterator pos2){
 extern "C" char *strndup(const char *s, size_t n);
 #endif //HAVE_STRNDUP
 
+#define trace() printf("[trace] %s:%d.\n", __FUNCTION__, __LINE__)
+//#define debug(fmt, args...) printf("[debug] %s:%d:: " fmt, __FUNCTION__, __LINE__, ##args)
+//#define debug(fmt, args...) printf(fmt, ##args)
+
 #endif
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

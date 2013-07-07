@@ -97,6 +97,7 @@ imesource = [
     'src/ime-core/options/scheme_policy_qp.cpp',
     'src/ime-core/options/scheme_policy_sp.cpp',
     'src/ime-core/options/scheme_policy_xh.cpp',
+#    'src/ime-core/options/session_factory.cpp',
     'src/ime-core/options/a.cpp',
     ]
 
@@ -300,8 +301,9 @@ def CreateEnvironment():
         make = 'gmake'
         tar = 'gtar'
     elif GetOS() == 'Windows':
-        cflags += ' -DWIN32 /EHsc'
-        cflags = cflags.replace('Wall', 'W4');
+        cflags += ' -DWIN32 /D "NDEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /D "_SCL_SECURE_NO_WARNINGS" /D "_CRT_SECURE_NO_WARNINGS"'
+        cflags += ' /GS /GL /Gy /Zi /Gm- /Od /sdl /fp:precise /errorReport:prompt /WX- /Zc:wchar_t /Zc:forScope /Gd /Oi /MT /EHsc /nologo'
+        cflags = cflags.replace('Wall', 'W3');
         linkflags += ' Ws2_32.lib'
 
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')

@@ -17,14 +17,18 @@
 bool
 CThreadSlm::load(const char* fname, bool MMap)
 {
-    FILE *fp = fopen(fname, "r");
+
+    FILE *fp = fopen(fname, "rb");
     if (fp == NULL) {
         fprintf(stderr, "open %s: %s\n", fname, strerror(errno));
         return false;
     }
 
-    m_bufSize = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END);
+    m_bufSize = ftell(fp);
     fseek(fp, 0, SEEK_SET);
+
+    printf("len: %d.\n", m_bufSize);
 
     m_bMMap = MMap;
     if (m_bMMap) {
@@ -49,7 +53,7 @@ CThreadSlm::load(const char* fname, bool MMap)
         m_buf = p;
 
         for (ssize_t len = m_bufSize; len > 0; ) {
-            ssize_t n = fread(p, len, 1, fp);
+            ssize_t n = fread(p, 1, len, fp);
             if (n < 0) break;
             p += n;
             len -= n;
@@ -60,7 +64,7 @@ CThreadSlm::load(const char* fname, bool MMap)
             fclose(fp);
             return false;
         }
-        if (fread(m_buf, m_bufSize, 1, fp) != m_bufSize) {
+        if (fread(m_buf, 1, m_bufSize, fp) != m_bufSize) {
             perror("read lm");
             delete [] m_buf; m_buf = NULL;
             fclose(fp);
@@ -72,7 +76,7 @@ CThreadSlm::load(const char* fname, bool MMap)
             fclose(fp);
             return false;
         }
-        if (fread(m_buf, m_bufSize, 1, fp) != m_bufSize) {
+        if (fread(m_buf, 1, m_bufSize, fp) != m_bufSize) {
             perror("read lm");
             delete [] m_buf; m_buf = NULL;
             fclose(fp);

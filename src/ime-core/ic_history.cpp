@@ -183,19 +183,20 @@ CBigramHistory::loadFromFile(const char *fname)
     m_history_path = fname;
 
     bool suc = false;
-    FILE *fp = fopen(fname, "r+");
+    FILE *fp = fopen(fname, "rb+");
     if (fp == NULL) {
         suc = loadFromBuffer(NULL, 0);
         return suc;
     }
 
     int size = 0;
-    size = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END);
+    size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     void* buf = malloc(size);
 
     if (buf) {
-        fread(buf, size, 1, fp);
+        fread(buf, 1, size, fp);
         suc = loadFromBuffer(buf, size);
         free(buf);
     }

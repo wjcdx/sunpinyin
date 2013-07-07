@@ -79,10 +79,11 @@ CTrie::load(const char *fname)
     free();
 
     bool suc = false;
-    FILE *fp = fopen(fname, "r");
+    FILE *fp = fopen(fname, "rb");
     if (fp == NULL) return false;
 
-    m_Size = fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END);
+    m_Size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
 #ifdef HAVE_SYS_MMAN_H
@@ -93,7 +94,7 @@ CTrie::load(const char *fname)
                          0)) != MAP_FAILED;
 #else
     suc = (m_mem = new char [m_Size]) != NULL;
-    suc = suc && (fread(m_mem, m_Size, 1, fp) > 0);
+    suc = suc && (fread(m_mem, 1, m_Size, fp) > 0);
 #endif
     fclose(fp);
 

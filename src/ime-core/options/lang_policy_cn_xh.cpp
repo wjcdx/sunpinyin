@@ -16,12 +16,13 @@ CXhSimplifiedChinesePolicy::loadResources()
         return m_bLoaded;
 
     bool suc = true;
-    std::string data_dir = m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
+    std::string data_dir = "D:/cygwin/usr/share/sunpinyin";//m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
     std::string lm_path = data_dir + "/lm_sc.t3g.xh";
     std::string dict_path = data_dir + "/dict3_sc.bin.xh";
 
     suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
 
+	m_user_data_dir = "D:/cygwin/home/wjcdx/.sunpinyin";
     if (!m_user_data_dir.size()) {
         char path[256];
         const char *home = getenv("HOME");
@@ -38,10 +39,10 @@ CXhSimplifiedChinesePolicy::loadResources()
     free(tmp);
 
     std::string history_path = m_user_data_dir + "/history";
-    suc &= m_historyCache.loadFromFile(history_path.c_str());
+    //suc &= m_historyCache.loadFromFile(history_path.c_str());
 
     std::string user_dict_path = m_user_data_dir + "/userdict";
-    suc &= m_userDict.load(user_dict_path.c_str());
+    //suc &= m_userDict.load(user_dict_path.c_str());
 
     m_bTried = true;
     return m_bLoaded = suc;

@@ -245,11 +245,14 @@ CThreadSlmFile::load(const char* fname)
 {
     assert(m_buf == NULL);
 
-    FILE *fp = fopen(fname, "r");
-    ssize_t len = fseek(fp, 0, SEEK_END);
+    FILE *fp = fopen(fname, "rb");
+    fseek(fp, 0, SEEK_END);
+    ssize_t len = ftell(fp);
+
     fseek(fp, 0, SEEK_SET);
     m_buf = new char[len];
-    if (fread(m_buf, len, 1, fp) != len) {
+    int ll = fread(m_buf, 1, len, fp);
+    if (ll != len) {
         delete [] m_buf;
         m_buf = NULL;
         cerr << "Failed to read from " << fname << endl;
