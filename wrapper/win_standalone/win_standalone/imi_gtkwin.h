@@ -32,8 +32,9 @@ public:
     /*@}*/
 
 protected:
-    //iconv_t             m_iconv;
-
+#ifdef HAVE_ICONV_H
+    iconv_t             m_iconv;
+#endif
     /*@{*/
     //CIMIView           *mp_view;
 

@@ -261,6 +261,21 @@ WCSTOMBS(char* s, const TWCHAR* pwcs, size_t n)
     return(dst - s);
 }
 
+#ifdef WIN32
+void UTF8toANSI(char *ansi, char *utf8)
+{
+    static WCHAR wszBuffer[1024];
+    //convert str to utf16 wide-char
+    UINT nLen = MultiByteToWideChar(CP_UTF8,NULL,utf8,-1,NULL,NULL);
+    nLen = MultiByteToWideChar(CP_UTF8,NULL,utf8,-1,wszBuffer,nLen);
+    wszBuffer[nLen] = 0;
+    //convert str to ansi from utf16
+    nLen = WideCharToMultiByte(CP_ACP,NULL,wszBuffer,-1,NULL,NULL,NULL,NULL);
+    nLen = WideCharToMultiByte(CP_ACP,NULL,wszBuffer,-1,ansi,nLen,NULL,NULL);
+    ansi[nLen] = 0;
+}
+#endif
+
 #endif // HAVE_ICONV_H
 
 /**
@@ -276,21 +291,6 @@ WCSLEN(const TWCHAR* pwcs)
     }
     return sz;
 }
-
-#ifdef WIN32
-void UTF8toANSI(char *ansi, char *utf8)
-{
-    static WCHAR wszBuffer[1024];
-    //convert str to utf16 wide-char
-    UINT nLen = MultiByteToWideChar(CP_UTF8,NULL,utf8,-1,NULL,NULL);
-    nLen = MultiByteToWideChar(CP_UTF8,NULL,utf8,-1,wszBuffer,nLen);
-    wszBuffer[nLen] = 0;
-    //convert str to ansi from utf16
-    nLen = WideCharToMultiByte(CP_ACP,NULL,wszBuffer,-1,NULL,NULL,NULL,NULL);
-    nLen = WideCharToMultiByte(CP_ACP,NULL,wszBuffer,-1,ansi,nLen,NULL,NULL);
-    ansi[nLen] = 0;
-}
-#endif
 
 #if !defined (HAVE_STRNDUP)
 extern "C" char *

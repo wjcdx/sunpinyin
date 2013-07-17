@@ -24,12 +24,16 @@ key_press_cb(CKeyEvent *event, CIMIView *pview)
 CWinHandler::CWinHandler(CString *candidates, CString *preedit)
 	: m_CandidataArea(candidates), m_PreeditArea(preedit)
 {
-    //m_iconv = iconv_open("UTF-8", TWCHAR_ICONV_NAME);
+#ifdef HAVE_ICONV_H
+    m_iconv = iconv_open("UTF-8", TWCHAR_ICONV_NAME);
+#endif
 }
 
 CWinHandler::~CWinHandler()
 {
-    //iconv_close(m_iconv);
+#ifdef HAVE_ICONV_H
+    iconv_close(m_iconv);
+#endif
 }
 
 void
@@ -72,6 +76,16 @@ CWinHandler::updateCandidates(const ICandidateList* pcl)
         cand_str += TWCHAR(' ');
     }
 
+#ifdef HAVE_ICONV_H
+	
+	TIConvSrcPtr src = (TIConvSrcPtr)(cand_str.c_str());
+    size_t srclen = (cand_str.size()+1)*sizeof(TWCHAR);
+    char * dst = m_buf;
+    size_t dstlen = sizeof(m_buf) - 1;
+    iconv(m_iconv, &src, &srclen, &dst, &dstlen);
+
+#else
+
 	char utf8[1024] = { 0 };
 
 	//ucs-4 => utf8
@@ -80,6 +94,8 @@ CWinHandler::updateCandidates(const ICandidateList* pcl)
 	//utf8 => ansi
 	memset(m_buf, 0, sizeof(m_buf));
 	UTF8toANSI(m_buf, utf8);
+
+#endif
 
 	CString tmp(m_buf);
     *m_CandidataArea = tmp;
