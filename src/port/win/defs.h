@@ -1,3 +1,5 @@
+#ifndef __WIN_DEFS_H__
+#define __WIN_DEFS_H__
 
 #define NOMINMAX
 
@@ -18,4 +20,8 @@
 
 #include <direct.h>
 #define mkdir(x, y) _mkdir(x)
+
+void UTF8toANSI(char *ansi, char *utf8);
+
+#endif
 
