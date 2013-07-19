@@ -51,8 +51,8 @@ class CIMIContext
 public:
     CIMIContext ();
     ~CIMIContext () {
-        delete m_pLatticeMgr;
         clear();
+		delete m_pLatticeMgr;
     }
 
     void clear();
