@@ -138,7 +138,7 @@ void Cwin_standaloneDlg::OnEnChangeEdit1()
 		char c = InputString.GetAt(thsLen - 1);
 		keyEvent = new CKeyEvent(c, c, 0);
 	} else {
-		keyEvent = new CKeyEvent(VK_DELETE, VK_DELETE, 0);
+		keyEvent = new CKeyEvent(IM_VK_BACK_SPACE, IM_VK_BACK_SPACE, 0);
 	}
 
 	key_press_cb(keyEvent, pview);

@@ -35,4 +35,5 @@ configure.conf
 *.obj
 *.exe
 *.lib
+*.pdb
 
