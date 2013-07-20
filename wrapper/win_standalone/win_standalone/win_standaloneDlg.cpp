@@ -150,7 +150,7 @@ BOOL Cwin_standaloneDlg::PreTranslateMessage(MSG* pMsg)
 
 		int chr = char(pMsg->wParam);
 		//chars are all in upper case before translate
-		if (chr >= 'A' || chr <= 'Z') {
+		if (chr >= 'A' && chr <= 'Z') {
 			chr += 'a' - 'A';
 		}
 

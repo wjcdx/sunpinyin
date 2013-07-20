@@ -65,10 +65,12 @@ CWinHandler::updateStatus(int key, int value)
 void
 CWinHandler::updatePreedit(const IPreeditString* ppd)
 {
+#if 0
     TIConvSrcPtr src = (TIConvSrcPtr)(ppd->string());
 	
 	CString tmp(src);
 	*m_PreeditArea = tmp;
+#endif
 }
 
 void
