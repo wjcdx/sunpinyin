@@ -27,12 +27,6 @@ Cwin_standaloneDlg::Cwin_standaloneDlg(CWnd* pParent /*=NULL*/)
 Cwin_standaloneDlg::~Cwin_standaloneDlg()
 {
 	finit_sunpinyin(pview, pWinHandler);
-	/*if (pview != NULL) {
-		delete pview;
-	}
-	if (pWinHandler != NULL) {
-		delete pWinHandler;
-	}*/
 }
 
 void Cwin_standaloneDlg::DoDataExchange(CDataExchange* pDX)
@@ -63,7 +57,7 @@ BOOL Cwin_standaloneDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	pWinHandler = new CWinHandler(&CandidateListVar, NULL);
+	pWinHandler = new CWinHandler(&CandidateListVar, &InputString);
 	pview = init_sunpinyin(pWinHandler);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -120,7 +114,6 @@ void Cwin_standaloneDlg::OnBnClickedCancel()
 	CDialog::OnCancel();
 }
 
-
 void Cwin_standaloneDlg::OnEnChangeEdit1()
 {
 	// TODO:  如果该控件是 RICHEDIT 控件，它将不
@@ -129,6 +122,7 @@ void Cwin_standaloneDlg::OnEnChangeEdit1()
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	// TODO:  在此添加控件通知处理程序代码
+#if 0
 	CKeyEvent *keyEvent = NULL;
 	int prvLen = InputString.GetLength();
 	UpdateData(true);
@@ -145,5 +139,26 @@ void Cwin_standaloneDlg::OnEnChangeEdit1()
 	delete keyEvent;
 
 	UpdateData(false);
+#endif
 }
 
+BOOL Cwin_standaloneDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (pMsg->message == WM_KEYDOWN) {
+		UpdateData(true);
+
+		int chr = char(pMsg->wParam);
+		//chars are all in upper case before translate
+		if (chr >= 'A' || chr <= 'Z') {
+			chr += 'a' - 'A';
+		}
+
+		chr = translate_key(chr);
+		CKeyEvent keyEvent(chr, chr, 0);
+		key_press_cb(&keyEvent, pview);
+
+		UpdateData(false);
+	}
+	return CDialog::PreTranslateMessage(pMsg);
+}

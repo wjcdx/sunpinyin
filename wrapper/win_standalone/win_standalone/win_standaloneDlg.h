@@ -43,4 +43,6 @@ public:
 	CString Preedit;
 	CIMIWinHandler *pWinHandler;
 	CIMIView *pview;
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

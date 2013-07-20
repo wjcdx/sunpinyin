@@ -8,6 +8,22 @@
 #include "imi_gtkwin.h"
 
 int
+translate_key(int orig)
+{
+	int chr = orig;
+	if (orig == VK_BACK || orig == VK_DELETE) {
+		chr = IM_VK_BACK_SPACE;
+	} else if (orig == VK_PRIOR) {
+		chr = IM_VK_PAGE_UP;
+	} else if (orig == VK_NEXT) {
+		chr = IM_VK_PAGE_DOWN;
+	} else if (orig < 0x20 && orig > 0x7E) {
+		chr = 0;
+	}
+	return chr;
+}
+
+int
 key_press_cb(CKeyEvent *event, CIMIView *pview)
 {
     if (pview != NULL) {
@@ -49,18 +65,10 @@ CWinHandler::updateStatus(int key, int value)
 void
 CWinHandler::updatePreedit(const IPreeditString* ppd)
 {
-    /*TIConvSrcPtr src = (TIConvSrcPtr)(ppd->string());
-    size_t srclen = (ppd->size()+1)*sizeof(TWCHAR);
-    char * dst = m_buf;
-    size_t dstlen = sizeof(m_buf)-1;
-    iconv(m_iconv, &src, &srclen, &dst, &dstlen);
-
-    //gtk_widget_grab_focus(m_PreeditArea);
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW (m_PreeditArea));
-    gtk_text_buffer_set_text (buffer, m_buf, -1);
-    GtkTextIter ti;
-    gtk_text_buffer_get_iter_at_offset(buffer, &ti, ppd->caret());
-    gtk_text_buffer_place_cursor(buffer, &ti);*/
+    TIConvSrcPtr src = (TIConvSrcPtr)(ppd->string());
+	
+	CString tmp(src);
+	*m_PreeditArea = tmp;
 }
 
 void

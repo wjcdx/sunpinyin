@@ -8,6 +8,9 @@
 #include "ime-core/imi_winHandler.h"
 
 int
+translate_key(int orig);
+
+int
 key_press_cb(CKeyEvent *event, CIMIView *pview);
 
 class CWinHandler : public CIMIWinHandler
