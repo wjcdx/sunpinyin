@@ -1,0 +1,1 @@
+C:\Windows\syswow64\regsvr32.exe -u Debug\TextService.dll
