@@ -21,8 +21,8 @@
 #define CAND_HEIGHT    50
 
 ATOM CCandidateWindow::_atomWndClass = 0;
-TCHAR *CCandidateWindow::_pPreeditString = NULL;
-TCHAR *CCandidateWindow::_pCandidatesString = NULL;
+TCHAR CCandidateWindow::_rgPreeditString[128] = { 0 };
+TCHAR CCandidateWindow::_rgCandidatesString[512] = { 0 };
 
 const TCHAR c_szCandidateDescription[] = TEXT("Dummy Candidate Window");
 
@@ -35,8 +35,8 @@ const TCHAR c_szCandidateDescription[] = TEXT("Dummy Candidate Window");
 CCandidateWindow::CCandidateWindow()
 {
     _hwnd = NULL;
-	_pPreeditString = NULL;
-	_pCandidatesString = NULL;
+	memset(_rgPreeditString, 0, sizeof(_rgPreeditString));
+	memset(_rgCandidatesString, 0, sizeof(_rgCandidatesString));
 }
 
 //+---------------------------------------------------------------------------
@@ -130,8 +130,6 @@ void CCandidateWindow::_InvalidateRect()
 
 HRESULT CCandidateWindow::_Update(TCHAR *preedit, TCHAR *candidates)
 {
-	_pPreeditString = preedit;
-	_pCandidatesString = candidates;
 	_InvalidateRect();
 	return S_OK;
 }
@@ -223,12 +221,8 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
 			int x = tm.tmAveCharWidth;
 			int y = tm.tmHeight + tm.tmExternalLeading;
 
-			if (_pPreeditString != NULL) {
-				TextOut(hdc, 0, 0, _pPreeditString, lstrlen(_pPreeditString));
-			}
-			if (_pCandidatesString != NULL) {
-				TextOut(hdc, 0, y, _pCandidatesString, lstrlen(_pCandidatesString));
-			}
+			TextOut(hdc, 0, 0, _rgPreeditString, lstrlen(_rgPreeditString));
+			TextOut(hdc, 0, y, _rgCandidatesString, lstrlen(_rgCandidatesString));
 
             EndPaint(hwnd, &ps);
             return 0;

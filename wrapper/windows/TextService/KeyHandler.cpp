@@ -137,6 +137,9 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     //
     ch = (WCHAR)wParam;
 
+	
+
+
     // first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
         return S_FALSE;
@@ -176,19 +179,16 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
 		_UpdateCandidateList(ec, pContext, NULL);
 	}
 
+	// SUNPINYIN HOOK POINT: AFTER CandidateWindow is shown
+	CKeyEvent event(0, 0, 0);
+	engine.process_key_event(event);
+	//TODO: INVALIDATERECT TO REFRESH CANDIDATEWINDOW
+
 Exit:
     tfSelection.range->Release();
     return S_OK;
 }
 
-
-//+---------------------------------------------------------------------------
-//
-// _HandleNumberKey
-//
-// If the keystroke happens within a composition, eat the key and return S_OK.
-//
-//----------------------------------------------------------------------------
 
 HRESULT CTextService::_HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
 {

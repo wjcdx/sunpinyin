@@ -41,6 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);$(ProjectDir)\..\..\..\src;</IncludePath>
+    <LibraryPath>$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);$(ProjectDir)\..\..\..\;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -63,7 +65,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(MSBuildProgramFiles32)\Windows Kits\8.0\Lib\win8\um\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sunpinyin.dll.3.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>TextService.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -97,6 +99,7 @@
     <ClCompile Include="EndComposition.cpp" />
     <ClCompile Include="EnumDisplayAttributeInfo.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="imi_wdx_win.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="LanguageBar.cpp" />
@@ -104,6 +107,7 @@
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="StartComposition.cpp" />
+    <ClCompile Include="sunpinyin_engine.cpp" />
     <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
     <ClCompile Include="ThreadMgrEventSink.cpp" />
@@ -118,7 +122,9 @@
     <ClInclude Include="EditSession.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="imi_wdx_win.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="sunpinyin_engine.h" />
     <ClInclude Include="TextService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

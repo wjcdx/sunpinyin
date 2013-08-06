@@ -16,6 +16,8 @@
 #ifndef CANDIDATEWINDOW_H
 #define CANDIDATEWINDOW_H
 
+#include <portability.h>
+
 //+---------------------------------------------------------------------------
 //
 // CCandidateWindow
@@ -42,6 +44,9 @@ public:
     HRESULT _OnKeyDown(UINT uVKey);
     HRESULT _OnKeyUp(UINT uVKey);
 
+	static TCHAR _rgPreeditString[128];
+	static TCHAR _rgCandidatesString[512];
+
 private:
     static LRESULT CALLBACK _WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -59,8 +64,6 @@ private:
     static ATOM _atomWndClass;
 
     HWND _hwnd;
-	static TCHAR *_pPreeditString;
-	static TCHAR *_pCandidatesString;
 };
 
 #endif // CANDIDATEWINDOW_H
