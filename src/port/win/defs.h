@@ -4,7 +4,7 @@
 #define NOMINMAX
 
 #include "warnings.h"
-#include <winsock2.h>
+#include <windows.h>
 
 #define snprintf _snprintf
 
