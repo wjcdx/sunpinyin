@@ -17,9 +17,11 @@
 #define TEXTSERVICE_H
 
 #include "sunpinyin_engine.h"
-
-class CLangBarItemButton;
+//#include "CandidateList.h"
+namespace ImeWrapper {
 class CCandidateList;
+};
+class CLangBarItemButton;
 
 class CTextService : public ITfTextInputProcessor,
                      public ITfThreadMgrEventSink,
@@ -148,7 +150,7 @@ private:
     TfGuidAtom _gaDisplayAttributeConverted;
 
     // the candidate list object.
-    CCandidateList *_pCandidateList;
+    ImeWrapper::CCandidateList *_pCandidateList;
 
 	// sunpinyin engine
 	SunPinyinEngine engine;

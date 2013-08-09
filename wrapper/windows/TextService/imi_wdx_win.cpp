@@ -51,7 +51,7 @@ CWinHandler::~CWinHandler()
 }
 
 void
-commit(const TWCHAR* wstr)
+CWinHandler::commit(const TWCHAR* wstr)
 {
 }
 

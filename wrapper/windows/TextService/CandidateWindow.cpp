@@ -128,7 +128,7 @@ void CCandidateWindow::_InvalidateRect()
     }
 }
 
-HRESULT CCandidateWindow::_Update(TCHAR *preedit, TCHAR *candidates)
+HRESULT CCandidateWindow::_Update()
 {
 	_InvalidateRect();
 	return S_OK;

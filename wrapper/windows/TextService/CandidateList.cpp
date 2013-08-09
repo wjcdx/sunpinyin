@@ -67,7 +67,7 @@ STDAPI CGetTextExtentEditSession::DoEditSession(TfEditCookie ec)
 //
 //----------------------------------------------------------------------------
 
-CCandidateList::CCandidateList(CTextService *pTextService)
+ImeWrapper::CCandidateList::CCandidateList(CTextService *pTextService)
 {
     _pTextService = pTextService;
 
@@ -92,7 +92,7 @@ CCandidateList::CCandidateList(CTextService *pTextService)
 //
 //----------------------------------------------------------------------------
 
-CCandidateList::~CCandidateList()
+ImeWrapper::CCandidateList::~CCandidateList()
 {
     _EndCandidateList();
     DllRelease();
@@ -104,7 +104,7 @@ CCandidateList::~CCandidateList()
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::QueryInterface(REFIID riid, void **ppvObj)
+STDAPI ImeWrapper::CCandidateList::QueryInterface(REFIID riid, void **ppvObj)
 {
     if (ppvObj == NULL)
         return E_INVALIDARG;
@@ -137,7 +137,7 @@ STDAPI CCandidateList::QueryInterface(REFIID riid, void **ppvObj)
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CCandidateList::AddRef()
+STDAPI_(ULONG) ImeWrapper::CCandidateList::AddRef()
 {
     return ++_cRef;
 }
@@ -148,7 +148,7 @@ STDAPI_(ULONG) CCandidateList::AddRef()
 //
 //----------------------------------------------------------------------------
 
-STDAPI_(ULONG) CCandidateList::Release()
+STDAPI_(ULONG) ImeWrapper::CCandidateList::Release()
 {
     LONG cr = --_cRef;
 
@@ -168,7 +168,7 @@ STDAPI_(ULONG) CCandidateList::Release()
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::OnKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
+STDAPI ImeWrapper::CCandidateList::OnKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
     if (pfEaten == NULL)
         return E_INVALIDARG;
@@ -185,7 +185,7 @@ STDAPI CCandidateList::OnKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::OnKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
+STDAPI ImeWrapper::CCandidateList::OnKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
     if (pfEaten == NULL)
         return E_INVALIDARG;
@@ -209,7 +209,7 @@ STDAPI CCandidateList::OnKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::OnTestKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
+STDAPI ImeWrapper::CCandidateList::OnTestKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
     if (pfEaten == NULL)
         return E_INVALIDARG;
@@ -226,7 +226,7 @@ STDAPI CCandidateList::OnTestKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::OnTestKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
+STDAPI ImeWrapper::CCandidateList::OnTestKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
     if (pfEaten == NULL)
         return E_INVALIDARG;
@@ -242,7 +242,7 @@ STDAPI CCandidateList::OnTestKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 //
 //----------------------------------------------------------------------------
 
-STDAPI CCandidateList::OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView)
+STDAPI ImeWrapper::CCandidateList::OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView)
 {
     if (pContext != _pContextDocument)
         return S_OK;
@@ -282,7 +282,7 @@ STDAPI CCandidateList::OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, 
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition)
+HRESULT ImeWrapper::CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition)
 {
     TfEditCookie ecTmp;
     HRESULT hr = E_FAIL;
@@ -380,7 +380,7 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-void CCandidateList::_EndCandidateList()
+void ImeWrapper::CCandidateList::_EndCandidateList()
 {
     if (_pCandidateWindow)
     {
@@ -423,7 +423,7 @@ void CCandidateList::_EndCandidateList()
 //
 //----------------------------------------------------------------------------
 
-BOOL CCandidateList::_IsContextCandidateWindow(ITfContext *pContext)
+BOOL ImeWrapper::CCandidateList::_IsContextCandidateWindow(ITfContext *pContext)
 {
     return (_pContextCandidateWindow == pContext) ? TRUE : FALSE;
 }
@@ -434,7 +434,7 @@ BOOL CCandidateList::_IsContextCandidateWindow(ITfContext *pContext)
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_AdviseContextKeyEventSink()
+HRESULT ImeWrapper::CCandidateList::_AdviseContextKeyEventSink()
 {
     HRESULT hr;
     ITfSource *pSource = NULL;
@@ -461,7 +461,7 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_UnadviseContextKeyEventSink()
+HRESULT ImeWrapper::CCandidateList::_UnadviseContextKeyEventSink()
 {
     HRESULT hr;
     ITfSource *pSource = NULL;
@@ -491,7 +491,7 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_AdviseTextLayoutSink()
+HRESULT ImeWrapper::CCandidateList::_AdviseTextLayoutSink()
 {
     HRESULT hr;
     ITfSource *pSource = NULL;
@@ -518,7 +518,7 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_UnadviseTextLayoutSink()
+HRESULT ImeWrapper::CCandidateList::_UnadviseTextLayoutSink()
 {
     HRESULT hr;
     ITfSource *pSource = NULL;
@@ -542,9 +542,9 @@ Exit:
     return hr;
 }
 
-HRESULT CCandidateList::_UpdateCandidateList(TCHAR *preedit, TCHAR *candidates)
+HRESULT ImeWrapper::CCandidateList::_UpdateCandidateList()
 {
-	_pCandidateWindow->_Update(preedit, candidates);
+	_pCandidateWindow->_Update();
 	return S_OK;
 }
 
@@ -554,7 +554,7 @@ HRESULT CTextService::_StartCandidateList(TfEditCookie ec, ITfContext *pContext)
     // create an instance of the candidate list class.
     // 
     if (_pCandidateList == NULL)
-        _pCandidateList = new CCandidateList(this);
+        _pCandidateList = new ImeWrapper::CCandidateList(this);
 
     // 
     // The document manager object is not cached. Get it from pContext.
@@ -578,10 +578,8 @@ HRESULT CTextService::_StartCandidateList(TfEditCookie ec, ITfContext *pContext)
 
 HRESULT CTextService::_UpdateCandidateList(TfEditCookie ec, ITfContext *pContext, WCHAR **candis)
 {
-	TCHAR *preedit = "PreeditString";
-	TCHAR *candidates = "CandidatesString";
 	if (_pCandidateList != NULL) {
-		_pCandidateList->_UpdateCandidateList(preedit, candidates);
+		_pCandidateList->_UpdateCandidateList();
 	}
 	return S_OK;
 }

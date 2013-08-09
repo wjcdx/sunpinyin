@@ -22,6 +22,6 @@ public:
 private:
 	CWinHandler		*m_wh;
     CIMIView        *m_pv;
-}
+};
 
 #endif

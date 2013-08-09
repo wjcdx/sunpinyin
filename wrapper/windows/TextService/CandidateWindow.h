@@ -35,7 +35,7 @@ public:
     BOOL _Create();
     void _Destroy();
 	void _InvalidateRect();
-	HRESULT _Update(TCHAR *preedit, TCHAR *candidates);
+	HRESULT _Update();
 
     void _Move(int x, int y);
     void _Show();

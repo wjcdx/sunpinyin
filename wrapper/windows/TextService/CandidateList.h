@@ -18,58 +18,60 @@
 
 class CCandidateWindow;
 
-class CCandidateList : public ITfContextKeyEventSink,
-                       public ITfTextLayoutSink
-{
-public:
-    CCandidateList(CTextService *pTextService);
-    ~CCandidateList();
+namespace ImeWrapper {
 
-    //
-    // IUnknown methods
-    //
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppvObj);
-    STDMETHODIMP_(ULONG) AddRef(void);
-    STDMETHODIMP_(ULONG) Release(void);
+	class CCandidateList : public ITfContextKeyEventSink,
+						   public ITfTextLayoutSink
+	{
+	public:
+		CCandidateList(CTextService *pTextService);
+		~CCandidateList();
 
-    //
-    // ITfContextKeyEventSink
-    //
-    STDMETHODIMP OnKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
-    STDMETHODIMP OnKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
-    STDMETHODIMP OnTestKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
-    STDMETHODIMP OnTestKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
+		//
+		// IUnknown methods
+		//
+		STDMETHODIMP QueryInterface(REFIID riid, void **ppvObj);
+		STDMETHODIMP_(ULONG) AddRef(void);
+		STDMETHODIMP_(ULONG) Release(void);
 
-    //
-    // ITfTextLayoutSink
-    //
-    STDMETHODIMP OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView);
+		//
+		// ITfContextKeyEventSink
+		//
+		STDMETHODIMP OnKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
+		STDMETHODIMP OnKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
+		STDMETHODIMP OnTestKeyDown(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
+		STDMETHODIMP OnTestKeyUp(WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
 
-    HRESULT _StartCandidateList(TfClientId tid, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition);
-    void _EndCandidateList();
-	HRESULT _UpdateCandidateList(TCHAR *preedit, TCHAR *candidates);
+		//
+		// ITfTextLayoutSink
+		//
+		STDMETHODIMP OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView);
 
-    BOOL _IsContextCandidateWindow(ITfContext *pContext);
+		HRESULT _StartCandidateList(TfClientId tid, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition);
+		void _EndCandidateList();
+		HRESULT _UpdateCandidateList();
 
-private:
-    HRESULT _AdviseContextKeyEventSink();
-    HRESULT _UnadviseContextKeyEventSink();
-    HRESULT _AdviseTextLayoutSink();
-    HRESULT _UnadviseTextLayoutSink();
+		BOOL _IsContextCandidateWindow(ITfContext *pContext);
 
-    CTextService *_pTextService;
-    ITfRange *_pRangeComposition;
-    ITfContext *_pContextCandidateWindow;
-    ITfContext *_pContextDocument;
-    ITfDocumentMgr *_pDocumentMgr;
+	private:
+		HRESULT _AdviseContextKeyEventSink();
+		HRESULT _UnadviseContextKeyEventSink();
+		HRESULT _AdviseTextLayoutSink();
+		HRESULT _UnadviseTextLayoutSink();
 
-    DWORD _dwCookieContextKeyEventSink; // Cookie for ITfContextKeyEventSink
-    DWORD _dwCookieTextLayoutSink; // Cookie for ITfContextKeyEventSink
+		CTextService *_pTextService;
+		ITfRange *_pRangeComposition;
+		ITfContext *_pContextCandidateWindow;
+		ITfContext *_pContextDocument;
+		ITfDocumentMgr *_pDocumentMgr;
 
-    HWND _hwndParent;
-    CCandidateWindow *_pCandidateWindow;
+		DWORD _dwCookieContextKeyEventSink; // Cookie for ITfContextKeyEventSink
+		DWORD _dwCookieTextLayoutSink; // Cookie for ITfContextKeyEventSink
 
-    LONG _cRef; // COM ref count
+		HWND _hwndParent;
+		CCandidateWindow *_pCandidateWindow;
+
+		LONG _cRef; // COM ref count
+	};
 };
-
 #endif // CANDIDATELIST_H
