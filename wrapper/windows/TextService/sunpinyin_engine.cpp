@@ -7,24 +7,26 @@ SunPinyinEngine::SunPinyinEngine()
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
+	//factory.createQuanpinView();
     factory.createXinghuaView();
-    factory.createQuanpinView();
 
+#if 0
 	CSunpinyinSessionFactory::EScheme pinyin_scheme = CSunpinyinSessionFactory::XINGHUA;
-    //    m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
+        m_config.get_py_scheme(CSunpinyinSessionFactory::QUANPIN);
 
     factory.setPinyinScheme(pinyin_scheme);
     if (pinyin_scheme == CSunpinyinSessionFactory::QUANPIN) {
-        //update_fuzzy_pinyins();
-        //update_correction_pinyins();
-        //update_fuzzy_segs();
+        update_fuzzy_pinyins();
+        update_correction_pinyins();
+        update_fuzzy_segs();
     } else {
-        //update_shuangpin_type();
+        update_shuangpin_type();
     }
-    //update_user_data_dir();
-    //update_punct_mappings();
+    update_user_data_dir();
+    update_punct_mappings();
 
-    //factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 10));
+    factory.setCandiWindowSize(m_config.get(CONFIG_GENERAL_PAGE_SIZE, 10));
+#endif
 	factory.setCandiWindowSize(10);
 
     m_pv = factory.createSession();

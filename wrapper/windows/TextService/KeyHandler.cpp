@@ -75,8 +75,10 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 
 
         default:
-            if (_wParam >= 'A' && _wParam <= 'Z')
-                return _pTextService->_HandleCharacterKey(ec, _pContext, _wParam);
+            if (_wParam >= 'A' && _wParam <= 'Z') {
+				char chr = _wParam + 'a' - 'A';
+                return _pTextService->_HandleCharacterKey(ec, _pContext, chr);
+			}
             break;
     }
 
@@ -137,9 +139,6 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     //
     ch = (WCHAR)wParam;
 
-	
-
-
     // first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
         return S_FALSE;
@@ -180,8 +179,8 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
 	}
 
 	// SUNPINYIN HOOK POINT: AFTER CandidateWindow is shown
-	CKeyEvent event(0, 0, 0);
-	engine.process_key_event(event);
+	CKeyEvent event(ch, ch, 0);
+	_oEngine.process_key_event(event);
 	//TODO: INVALIDATERECT TO REFRESH CANDIDATEWINDOW
 
 Exit:

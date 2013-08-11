@@ -17,7 +17,7 @@
 #define TEXTSERVICE_H
 
 #include "sunpinyin_engine.h"
-//#include "CandidateList.h"
+
 namespace ImeWrapper {
 class CCandidateList;
 };
@@ -153,7 +153,7 @@ private:
     ImeWrapper::CCandidateList *_pCandidateList;
 
 	// sunpinyin engine
-	SunPinyinEngine engine;
+	SunPinyinEngine _oEngine;
 
     LONG _cRef;     // COM ref count
 };

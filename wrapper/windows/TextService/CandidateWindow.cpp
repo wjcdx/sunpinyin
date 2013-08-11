@@ -17,8 +17,8 @@
 #include "TextService.h"
 #include "CandidateWindow.h"
 
-#define CAND_WIDTH     200
-#define CAND_HEIGHT    50
+#define CAND_WIDTH     400
+#define CAND_HEIGHT    40
 
 ATOM CCandidateWindow::_atomWndClass = 0;
 TCHAR CCandidateWindow::_rgPreeditString[128] = { 0 };
