@@ -1,0 +1,66 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; indent-tabs-mode: t -*- vim:noet:ts=4
+
+WGET = wget
+TAR = tar
+ENDIANNESS = le
+DATA_DIR = '/usr/share/sunpinyin'
+
+DICT_UTF8_PY = dict.utf8.py
+DICT_UTF8_XH = dict.utf8.xh
+DICT_UTF8_XH_OC = dict.utf8.xh.oc
+
+DICT_BIN_PY = dict3_sc.bin.py
+DICT_BIN_XH = dict3_sc.bin.xh
+
+TSLM_PY = lm_sc.t3g.py
+TSLM_XH = lm_sc.t3g.xh
+
+TSLM_ORG_PY = lm_sc.t3g.orig.py
+TSLM_ORG_XH = lm_sc.t3g.orig.xh
+
+TSLM_LOG_PY = lm_sc.t3g.py.log
+TSLM_LOG_XH = lm_sc.t3g.xh.log
+
+DATA_DICT = ${DICT_BIN_PY} ${DICT_BIN_XH}
+DATA_TSLM = ${TSLM_PY} ${TSLM_XH}
+
+all: install
+
+${DICT_UTF8_PY}: dict.utf8
+	cp $^ $@
+
+${DICT_UTF8_XH}: dict.utf8
+	dconv ${DICT_UTF8_XH_OC} ${DICT_UTF8_PY} $@
+	sed -i '/XXX/d' $@
+
+${DICT_UTF8_XH_OC}:
+
+${TSLM_ORG_PY}: ${DICT_UTF8_PY} lm_sc.t3g.arpa
+	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_PY} $@
+
+${TSLM_ORG_XH}: ${DICT_UTF8_XH} lm_sc.t3g.arpa
+	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH} $@
+
+${TSLM_PY}: ${DICT_UTF8_PY} ${TSLM_ORG_PY}
+	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_PY} -o $@
+
+${TSLM_XH}: ${DICT_UTF8_XH} ${TSLM_ORG_XH}
+	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH} -o $@
+
+${DICT_BIN_PY}: ${DICT_UTF8_PY} ${TSLM_PY}
+	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_PY} -s ${TSLM_PY} \
+		-l ${TSLM_LOG_PY} -t py -o $@
+
+${DICT_BIN_XH}: ${DICT_UTF8_XH} ${TSLM_XH}
+	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH} -s ${TSLM_XH} \
+		-l ${TSLM_LOG_XH} -t xh -o $@
+
+install: ${DATA_TSLM} ${DATA_DICT}
+	install -d ${DATA_DIR}
+	install -Dm644 $^ ${DATA_DIR}
+
+clean:
+	rm -rf ${DICT_UTF8_XH} ${DATA_DICT} ${DATA_TSLM} lm_sc.t3g.orig* lm_sc.t3g*.log
+
+.PHONY: ${DATA_DICT}
