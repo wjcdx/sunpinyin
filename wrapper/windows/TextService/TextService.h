@@ -85,6 +85,10 @@ public:
     void _TerminateComposition(TfEditCookie ec, ITfContext *pContext);
     BOOL _IsComposing();
     void _SetComposition(ITfComposition *pComposition);
+	HRESULT _InsertAtSelection(TfEditCookie ec, _In_ ITfContext *pContext,
+		_In_ WCHAR *pchText, _Outptr_ ITfRange **ppCompRange);
+	HRESULT _CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext,
+		_In_ WCHAR *pchText);
 
     // key event handlers.
 	HRESULT _HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
@@ -95,7 +99,7 @@ public:
     HRESULT _InvokeKeyHandler(ITfContext *pContext, WPARAM wParam, LPARAM lParam);
 
 	HRESULT _StartCandidateList(TfEditCookie ec, ITfContext *pContext);
-	HRESULT _UpdateCandidateList(TfEditCookie ec, ITfContext *pContext, WCHAR **candis);
+	HRESULT _UpdateCandidateList(TfEditCookie ec, ITfContext *pContext);
 	HRESULT _EndCandidateList(TfEditCookie ec, ITfContext *pContext);
 
     void _ClearCompositionDisplayAttributes(TfEditCookie ec, ITfContext *pContext);
@@ -153,7 +157,7 @@ private:
     ImeWrapper::CCandidateList *_pCandidateList;
 
 	// sunpinyin engine
-	SunPinyinEngine _oEngine;
+	SunPinyinEngine *_pEngine;
 
     LONG _cRef;     // COM ref count
 };

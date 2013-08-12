@@ -576,9 +576,11 @@ HRESULT CTextService::_StartCandidateList(TfEditCookie ec, ITfContext *pContext)
     return S_OK;
 }
 
-HRESULT CTextService::_UpdateCandidateList(TfEditCookie ec, ITfContext *pContext, WCHAR **candis)
+HRESULT CTextService::_UpdateCandidateList(TfEditCookie ec, ITfContext *pContext)
 {
-	if (_pCandidateList != NULL) {
+	if (_pCandidateList == NULL) {
+		_StartCandidateList(ec, pContext);
+	} else {
 		_pCandidateList->_UpdateCandidateList();
 	}
 	return S_OK;

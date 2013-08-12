@@ -11,17 +11,46 @@
 #include <xh/input/segment/TXhSyllableSegment.h>
 #include "imi_wdx_win.h"
 
+#include "Globals.h"
+
+class CTextService;
+
 class SunPinyinEngine : public IConfigurable
 {
 public:
-    SunPinyinEngine();
+    SunPinyinEngine(CTextService *pTextService);
     virtual ~SunPinyinEngine();
 
-	bool process_key_event (CKeyEvent &event);
+	// called by TextServiceFramework
+	bool process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event);
+
+	// CALLBACKS of CWinHandler
+	// update candidates
+	void update_candidates(const ICandidateList& cl);
+	// update preedit area
+	void update_preedit_string(const IPreeditString& preedit);
+	// commit selected word
+	void commit_string (const std::wstring& str);
 
 private:
 	CWinHandler		*m_wh;
     CIMIView        *m_pv;
+	CTextService	*m_pTextService;
+	ITfContext		*m_pContext;
+	TfEditCookie	m_oEditCookie;
+
+#ifdef HAVE_ICONV_H
+    iconv_t             m_iconv;
+#endif
+
+    /** Candidate window */
+    char          *m_CandidataArea;
+
+    /** Candidate window */
+    char          *m_PreeditArea;
+
+private:
+    char m_buf[512];
 };
 
 #endif

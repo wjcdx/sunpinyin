@@ -172,16 +172,9 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     //
     _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
-	if (_pCandidateList == NULL) {
-		_StartCandidateList(ec, pContext);
-	} else {
-		_UpdateCandidateList(ec, pContext, NULL);
-	}
-
-	// SUNPINYIN HOOK POINT: AFTER CandidateWindow is shown
+	// SUNPINYIN HOOK POINT
 	CKeyEvent event(ch, ch, 0);
-	_oEngine.process_key_event(event);
-	//TODO: INVALIDATERECT TO REFRESH CANDIDATEWINDOW
+	_pEngine->process_key_event(ec, pContext, event);
 
 Exit:
     tfSelection.range->Release();
@@ -236,14 +229,9 @@ HRESULT CTextService::_HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WP
     tfSelection.range->Collapse(ec, TF_ANCHOR_END);
     pContext->SetSelection(ec, 1, &tfSelection);
 
-    //
-    // set the display attribute to the composition range.
-    //
-    _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
-
-	_TerminateComposition(ec, pContext);
-
-	_EndCandidateList(ec, pContext);
+	// SUNPINYIN HOOK POINT
+	CKeyEvent event(ch, ch, 0);
+	_pEngine->process_key_event(ec, pContext, event);
 
 Exit:
     tfSelection.range->Release();

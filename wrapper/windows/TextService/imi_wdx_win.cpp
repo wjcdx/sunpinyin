@@ -4,6 +4,7 @@
 #include "ime-core/imi_uiobjects.h"
 
 #include "imi_wdx_win.h"
+#include "sunpinyin_engine.h"
 
 int
 translate_key(int orig)
@@ -35,8 +36,8 @@ key_press_cb(CKeyEvent *event, CIMIView *pview)
     return 1;
 }
 
-CWinHandler::CWinHandler(char *candidates, char *preedit)
-	: m_CandidataArea(candidates), m_PreeditArea(preedit)
+CWinHandler::CWinHandler(SunPinyinEngine *pEngine)
+	: m_engine(pEngine)
 {
 #ifdef HAVE_ICONV_H
     m_iconv = iconv_open("UTF-8", TWCHAR_ICONV_NAME);
@@ -53,6 +54,11 @@ CWinHandler::~CWinHandler()
 void
 CWinHandler::commit(const TWCHAR* wstr)
 {
+	if (wstr) {
+		std::wstring str;
+        copy(wstr, wstr+WCSLEN(wstr)+1, back_inserter(str));
+		m_engine->commit_string(str);
+	}
 }
 
 void
@@ -68,52 +74,17 @@ CWinHandler::updateStatus(int key, int value)
 void
 CWinHandler::updatePreedit(const IPreeditString* ppd)
 {
-#if 0
-    TIConvSrcPtr src = (TIConvSrcPtr)(ppd->string());
-	
-	CString tmp(src);
-	*m_PreeditArea = tmp;
-#endif
+	if (ppd) {
+		m_engine->update_preedit_string(*ppd);
+	}
 }
 
 void
 CWinHandler::updateCandidates(const ICandidateList* pcl)
 {
-    wstring cand_str;
-    for (int i=0, sz=pcl->size(); i < sz; ++i) {
-        const TWCHAR* pcand = pcl->candiString(i);
-        if (pcand == NULL) break;
-        cand_str += (i==9)?'0':TWCHAR('1' + i);
-        cand_str += TWCHAR('.');
-        cand_str += pcand;
-        cand_str += TWCHAR(' ');
-    }
-
-#ifdef HAVE_ICONV_H
-	
-	TIConvSrcPtr src = (TIConvSrcPtr)(cand_str.c_str());
-    size_t srclen = (cand_str.size()+1)*sizeof(TWCHAR);
-    char * dst = m_buf;
-    size_t dstlen = sizeof(m_buf) - 1;
-    iconv(m_iconv, &src, &srclen, &dst, &dstlen);
-
-#else
-
-	char utf8[1024] = { 0 };
-
-	//ucs-4 => utf8
-	WCSTOMBS(utf8, cand_str.c_str(), 1024);
-	
-	//utf8 => ansi
-	memset(m_buf, 0, sizeof(m_buf));
-	UTF8toANSI(m_buf, utf8);
-
-#endif
-
-	//CString tmp(m_buf);
-    //*m_CandidataArea = tmp;
-	//memcpy(m_CandidataArea, (LPCTSTR)tmp, tmp.GetLength());
-	memcpy(m_CandidataArea, m_buf, strlen(m_buf));
+	if (pcl) {
+		m_engine->update_candidates(*pcl);
+	}
 }
 
 // -*- indent-tabs-mode: nil -*- vim:et:ts=4

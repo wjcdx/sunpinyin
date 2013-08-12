@@ -3,16 +3,12 @@
 
 #include "ime-core/imi_winHandler.h"
 
-int
-translate_key(int orig);
-
-int
-key_press_cb(CKeyEvent *event, CIMIView *pview);
+class SunPinyinEngine;
 
 class CWinHandler : public CIMIWinHandler
 {
 public:
-    CWinHandler(char *candidates, char *preedit);
+    CWinHandler(SunPinyinEngine *pEngine);
 
     /* Inherited methods implementation */
     /*@{*/
@@ -34,21 +30,8 @@ public:
     virtual void  updateStatus(int key, int value);
     /*@}*/
 
-protected:
-#ifdef HAVE_ICONV_H
-    iconv_t             m_iconv;
-#endif
-    /*@{*/
-    //CIMIView           *mp_view;
-
-    /** Candidate window */
-    char          *m_CandidataArea;
-
-    /** Candidate window */
-    char          *m_PreeditArea;
-
 private:
-    char m_buf[512];
+	SunPinyinEngine *m_engine;
 };
 
 #endif

@@ -83,6 +83,11 @@ CTextService::CTextService()
     //
     _pCandidateList = NULL;
 
+	//
+	// Initialize the sunpinyin engine.
+	//
+	_pEngine = new SunPinyinEngine(this);
+
     _cRef = 1;
 }
 
