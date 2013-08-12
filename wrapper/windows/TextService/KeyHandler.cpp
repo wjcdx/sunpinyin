@@ -220,14 +220,14 @@ HRESULT CTextService::_HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WP
     // insert the text
     // Use SetText here instead of InsertTextAtSelection because a composition is already started
     // Don't allow the app to adjust the insertion point inside our composition
-	WCHAR *candidate = L"ÎÒ";
-    if (tfSelection.range->SetText(ec, 0, candidate, 1) != S_OK)
-        goto Exit;
+	//WCHAR *candidate = L"ÎÒ";
+    //if (tfSelection.range->SetText(ec, 0, candidate, 1) != S_OK)
+    //    goto Exit;
 
     // update the selection, and make it an insertion point just past
     // the inserted text.
-    tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-    pContext->SetSelection(ec, 1, &tfSelection);
+    //tfSelection.range->Collapse(ec, TF_ANCHOR_END);
+    //pContext->SetSelection(ec, 1, &tfSelection);
 
 	// SUNPINYIN HOOK POINT
 	CKeyEvent event(ch, ch, 0);

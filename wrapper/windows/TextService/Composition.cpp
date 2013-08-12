@@ -102,10 +102,48 @@ Exit:
     return hr;
 }
 
+
+BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover);
 HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext, _In_ WCHAR *pchText)
 {
-	ITfRange *pRangeInsert = nullptr;
-	_InsertAtSelection(ec, pContext, pchText, &pRangeInsert);
+    ITfRange *pRangeComposition;
+    TF_SELECTION tfSelection;
+    ULONG cFetched;
+    WCHAR ch;
+    BOOL fCovered;
+
+	//ITfRange *pRangeInsert = nullptr;
+	//_InsertAtSelection(ec, pContext, pchText, &pRangeInsert);
+
+	// first, test where a keystroke would go in the document if an insert is done
+    if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
+        return S_FALSE;
+
+    // is the insertion point covered by a composition?
+    if (_pComposition->GetRange(&pRangeComposition) == S_OK)
+    {
+        fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
+
+        pRangeComposition->Release();
+
+        if (!fCovered)
+        {
+            goto Exit;
+        }
+    }
+
+    // insert the text
+    // Use SetText here instead of InsertTextAtSelection because a composition is already started
+    // Don't allow the app to adjust the insertion point inside our composition
+    if (tfSelection.range->SetText(ec, 0, pchText, lstrlenW(pchText)) != S_OK)
+        goto Exit;
+
+    // update the selection, and make it an insertion point just past
+    // the inserted text.
+    tfSelection.range->Collapse(ec, TF_ANCHOR_END);
+    pContext->SetSelection(ec, 1, &tfSelection);
+
+
 
 	//
     // set the display attribute to the composition range.
@@ -117,4 +155,8 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
 	_EndCandidateList(ec, pContext);
 
 	return S_OK;
+
+Exit:
+    tfSelection.range->Release();
+    return S_OK;
 }

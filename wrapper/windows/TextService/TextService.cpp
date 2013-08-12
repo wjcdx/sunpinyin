@@ -86,7 +86,7 @@ CTextService::CTextService()
 	//
 	// Initialize the sunpinyin engine.
 	//
-	_pEngine = new SunPinyinEngine(this);
+	_pEngine = NULL;
 
     _cRef = 1;
 }
@@ -235,6 +235,11 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     //
     if (!_InitDisplayAttributeGuidAtom())
         goto ExitError;
+
+	//
+	// Initialize the sunpinyin engine.
+	//
+	_pEngine = new SunPinyinEngine(this);
 
     return S_OK;
 

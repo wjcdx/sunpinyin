@@ -35,8 +35,6 @@ const TCHAR c_szCandidateDescription[] = TEXT("Dummy Candidate Window");
 CCandidateWindow::CCandidateWindow()
 {
     _hwnd = NULL;
-	memset(_rgPreeditString, 0, sizeof(_rgPreeditString));
-	memset(_rgCandidatesString, 0, sizeof(_rgCandidatesString));
 }
 
 //+---------------------------------------------------------------------------
