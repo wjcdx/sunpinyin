@@ -6,6 +6,12 @@ TAR = tar
 ENDIANNESS = le
 DATA_DIR = '/usr/share/sunpinyin'
 
+GENPYT=./genpyt.exe
+TSLMPACK=./tslmpack.exe
+TSLMENDIAN=./tslmendian.exe
+DCONV=./dconv.exe
+
+
 DICT_UTF8_PY = dict.utf8.py
 DICT_UTF8_XH = dict.utf8.xh
 DICT_UTF8_XH_OC = dict.utf8.xh.oc
@@ -31,29 +37,30 @@ ${DICT_UTF8_PY}: dict.utf8
 	cp $^ $@
 
 ${DICT_UTF8_XH}: dict.utf8
-	dconv ${DICT_UTF8_XH_OC} ${DICT_UTF8_PY} $@
+	${DCONV} ${DICT_UTF8_XH_OC} ${DICT_UTF8_PY} $@
 	sed -i '/XXX/d' $@
 
 ${DICT_UTF8_XH_OC}:
 
 ${TSLM_ORG_PY}: ${DICT_UTF8_PY} lm_sc.t3g.arpa
-	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_PY} $@
+	${TSLMPACK} lm_sc.t3g.arpa ${DICT_UTF8_PY} $@
 
 ${TSLM_ORG_XH}: ${DICT_UTF8_XH} lm_sc.t3g.arpa
-	tslmpack lm_sc.t3g.arpa ${DICT_UTF8_XH} $@
+	${TSLMPACK} lm_sc.t3g.arpa ${DICT_UTF8_XH} $@
 
 ${TSLM_PY}: ${DICT_UTF8_PY} ${TSLM_ORG_PY}
-	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_PY} -o $@
+	${TSLMENDIAN} -e ${ENDIANNESS} -i ${TSLM_ORG_PY} -o $@
+
 
 ${TSLM_XH}: ${DICT_UTF8_XH} ${TSLM_ORG_XH}
-	tslmendian -e ${ENDIANNESS} -i ${TSLM_ORG_XH} -o $@
+	${TSLMENDIAN} -e ${ENDIANNESS} -i ${TSLM_ORG_XH} -o $@
 
 ${DICT_BIN_PY}: ${DICT_UTF8_PY} ${TSLM_PY}
-	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_PY} -s ${TSLM_PY} \
+	${GENPYT} -e ${ENDIANNESS} -i ${DICT_UTF8_PY} -s ${TSLM_PY} \
 		-l ${TSLM_LOG_PY} -t py -o $@
 
 ${DICT_BIN_XH}: ${DICT_UTF8_XH} ${TSLM_XH}
-	genpyt -e ${ENDIANNESS} -i ${DICT_UTF8_XH} -s ${TSLM_XH} \
+	${GENPYT} -e ${ENDIANNESS} -i ${DICT_UTF8_XH} -s ${TSLM_XH} \
 		-l ${TSLM_LOG_XH} -t xh -o $@
 
 install: ${DATA_TSLM} ${DATA_DICT}
