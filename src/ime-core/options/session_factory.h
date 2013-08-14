@@ -13,7 +13,8 @@
 #include "style_policy_xh.h"
 
 //#define trace() printf("%s(%d): %s\n", __FILE__, __LINE__, __func__)
-#define trace() system("echo abc >> /tmp/ibus")
+//#define trace() system("echo abc >> /tmp/ibus")
+#define trace() 
 
 class CSunpinyinSessionFactory : private CNonCopyable
 {
