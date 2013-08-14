@@ -70,9 +70,9 @@ bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, 
     return 1;
 }
 
-void SunPinyinEngine::commit_string (const std::wstring& str)
+void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)
 {
-	m_pTextService->_CommitSelectedCandidate(m_oEditCookie, m_pContext, (WCHAR *)str.c_str());
+	m_pTextService->_CommitSelectedCandidate(m_oEditCookie, m_pContext, wstr, length);
 }
 
 void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
@@ -92,11 +92,11 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 
 	if (size <= 0) {
 		// TODO: NONE FOR NOW
-		return;
+		//return;
 	}
 
 	wstring cand_str;
-    for (int i=0, sz=cl.size(); i < sz; ++i) {
+    for (int i=0; i < size; ++i) {
         const TWCHAR* pcand = cl.candiString(i);
         if (pcand == NULL) break;
         cand_str += (i==9)?'0':TWCHAR('1' + i);
@@ -126,7 +126,7 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 
 #endif
 
-	memcpy(m_CandidataArea, m_buf, strlen(m_buf));
+	memcpy(m_CandidataArea, m_buf, 512/*strlen(m_buf)*/);
 	// SHOW/UPDATE CANDIDATE WINDOW
 	m_pTextService->_UpdateCandidateList(m_oEditCookie, m_pContext);
 }

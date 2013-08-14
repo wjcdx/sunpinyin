@@ -30,7 +30,7 @@ public:
 	// update preedit area
 	void update_preedit_string(const IPreeditString& preedit);
 	// commit selected word
-	void commit_string (const std::wstring& str);
+	void commit_string (const WCHAR *wstr, int length);
 
 private:
 	CWinHandler		*m_wh;

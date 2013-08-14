@@ -88,7 +88,11 @@ public:
 	HRESULT _InsertAtSelection(TfEditCookie ec, _In_ ITfContext *pContext,
 		_In_ WCHAR *pchText, _Outptr_ ITfRange **ppCompRange);
 	HRESULT _CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext,
-		_In_ WCHAR *pchText);
+		_In_ const WCHAR *pchText, int length);
+
+	// key event handlers for composition/candidate/phrase common objects.
+    HRESULT _HandleComplete(TfEditCookie ec, _In_ ITfContext *pContext);
+    HRESULT _HandleCancel(TfEditCookie ec, _In_ ITfContext *pContext);
 
     // key event handlers.
 	HRESULT _HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);

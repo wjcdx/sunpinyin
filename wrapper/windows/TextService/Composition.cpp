@@ -104,7 +104,7 @@ Exit:
 
 
 BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover);
-HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext, _In_ WCHAR *pchText)
+HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext, _In_ const WCHAR *pchText, int length)
 {
     ITfRange *pRangeComposition;
     TF_SELECTION tfSelection;
@@ -118,6 +118,13 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
 	// first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
         return S_FALSE;
+
+	//
+    // make range start to selection
+    //
+    ITfRange* pAheadSelection = nullptr;
+    pContext->GetStart(ec, &pAheadSelection);
+	pAheadSelection->ShiftEndToRange(ec, tfSelection.range, TF_ANCHOR_START);
 
     // is the insertion point covered by a composition?
     if (_pComposition->GetRange(&pRangeComposition) == S_OK)
@@ -135,7 +142,8 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
     // insert the text
     // Use SetText here instead of InsertTextAtSelection because a composition is already started
     // Don't allow the app to adjust the insertion point inside our composition
-    if (tfSelection.range->SetText(ec, 0, pchText, lstrlenW(pchText)) != S_OK)
+    //if (tfSelection.range->SetText(ec, 0, pchText, lstrlenW(pchText)) != S_OK)
+	if (pAheadSelection->SetText(ec, 0, pchText, length) != S_OK)
         goto Exit;
 
     // update the selection, and make it an insertion point just past
@@ -144,19 +152,48 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
     pContext->SetSelection(ec, 1, &tfSelection);
 
 
-
 	//
     // set the display attribute to the composition range.
     //
     _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
-	_TerminateComposition(ec, pContext);
-
-	_EndCandidateList(ec, pContext);
-
-	return S_OK;
+	_HandleComplete(ec, pContext);
 
 Exit:
     tfSelection.range->Release();
     return S_OK;
 }
+
+//+---------------------------------------------------------------------------
+//
+// _HandleComplete
+//
+//----------------------------------------------------------------------------
+
+HRESULT CTextService::_HandleComplete(TfEditCookie ec, _In_ ITfContext *pContext)
+{
+    _EndCandidateList(ec, pContext);
+
+    // just terminate the composition
+    _TerminateComposition(ec, pContext);
+
+    return S_OK;
+}
+
+//+---------------------------------------------------------------------------
+//
+// _HandleCancel
+//
+//----------------------------------------------------------------------------
+
+HRESULT CTextService::_HandleCancel(TfEditCookie ec, _In_ ITfContext *pContext)
+{
+    //_RemoveDummyCompositionForComposing(ec, _pComposition);
+
+    _EndCandidateList(ec, pContext);
+
+    _TerminateComposition(ec, pContext);
+
+    return S_OK;
+}
+

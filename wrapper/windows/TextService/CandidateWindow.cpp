@@ -219,8 +219,8 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
 			int x = tm.tmAveCharWidth;
 			int y = tm.tmHeight + tm.tmExternalLeading;
 
-			TextOut(hdc, 0, 0, _rgPreeditString, lstrlen(_rgPreeditString));
-			TextOut(hdc, 0, y, _rgCandidatesString, lstrlen(_rgCandidatesString));
+			TextOut(hdc, 0, 0, _rgPreeditString, 128/*lstrlen(_rgPreeditString)*/);
+			TextOut(hdc, 0, y, _rgCandidatesString, 512/*lstrlen(_rgCandidatesString)*/);
 
             EndPaint(hwnd, &ps);
             return 0;

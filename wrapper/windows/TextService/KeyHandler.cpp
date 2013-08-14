@@ -18,6 +18,8 @@
 #include "TextService.h"
 #include "CandidateList.h"
 
+#include "ime-core/imi_keys.h"
+
 //+---------------------------------------------------------------------------
 //
 // CKeyHandlerEditSession
@@ -59,6 +61,8 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 
         case VK_SPACE:
             return _pTextService->_HandleSpaceKey(ec, _pContext);
+		case VK_BACK:
+			return _pTextService->_HandleCharacterKey(ec, _pContext, IM_VK_BACK_SPACE);
 		case '0':
 		case '1':
 		case '2':
@@ -191,8 +195,10 @@ HRESULT CTextService::_HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WP
     BOOL fCovered;
 
     // Start the new compositon if there is no composition.
-    if (!_IsComposing())
-        _StartComposition(pContext);
+    if (!_IsComposing()) {
+        //_StartComposition(pContext);
+		return S_OK;
+	}
 
     //
     // Assign VK_ value to the char. So the inserted the character is always
@@ -247,7 +253,8 @@ Exit:
 HRESULT CTextService::_HandleReturnKey(TfEditCookie ec, ITfContext *pContext)
 {
     // just terminate the composition
-    _TerminateComposition(ec, pContext);
+    //_TerminateComposition(ec, pContext);
+	_HandleCancel(ec, pContext);
     return S_OK;
 }
 
@@ -266,9 +273,9 @@ HRESULT CTextService::_HandleSpaceKey(TfEditCookie ec, ITfContext *pContext)
     // the specific range to apply the display attribute rather than 
     // applying the display attribute to the entire composition range.
     //
-    _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeConverted);
+    //_SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeConverted);
 
-    return _StartCandidateList(ec, pContext);
+    return _HandleNumberKey(ec, pContext, '1');
 }
 
 //+---------------------------------------------------------------------------

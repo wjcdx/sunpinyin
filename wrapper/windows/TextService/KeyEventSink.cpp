@@ -87,12 +87,17 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
         case VK_RIGHT:
         case VK_RETURN:
         case VK_SPACE:
+		case VK_BACK:
             if (_IsComposing())
                 return TRUE;
             return FALSE;
     }
 
-	if (wParam >= '0' && wParam <= '9')
+	if (wParam >= '0' && wParam <= '9') {
+		if (_IsComposing())
+			return TRUE;
+		return FALSE;
+	}
 		return TRUE;
 
     if (wParam >= 'A' && wParam <= 'Z')
