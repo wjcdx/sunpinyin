@@ -100,6 +100,7 @@ public:
     HRESULT _HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
     HRESULT _HandleReturnKey(TfEditCookie ec, ITfContext *pContext);
     HRESULT _HandleSpaceKey(TfEditCookie ec, ITfContext *pContext);
+	HRESULT _HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
     HRESULT _InvokeKeyHandler(ITfContext *pContext, WPARAM wParam, LPARAM lParam);
 
 	HRESULT _StartCandidateList(TfEditCookie ec, ITfContext *pContext);

@@ -4,6 +4,7 @@
 #include "CandidateWindow.h"
 #include "TextService.h"
 
+
 SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	: m_pTextService(pTextService), m_PreeditArea(CCandidateWindow::_rgPreeditString),
 	  m_CandidataArea(CCandidateWindow::_rgCandidatesString)
@@ -88,15 +89,17 @@ void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
 
 void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 {
+	wstring cand_str;
 	int size = cl.size();
 
 	if (size <= 0) {
-		// TODO: NONE FOR NOW
-		//return;
+		// TODO: update the candidates window directly.
+		memset(m_buf, 0, sizeof(m_buf));
+		goto Exit;
 	}
 
-	wstring cand_str;
-    for (int i=0; i < size; ++i) {
+	int i = 0;
+    for (i=0; i < size; ++i) {
         const TWCHAR* pcand = cl.candiString(i);
         if (pcand == NULL) break;
         cand_str += (i==9)?'0':TWCHAR('1' + i);
@@ -104,6 +107,9 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
         cand_str += pcand;
         cand_str += TWCHAR(' ');
     }
+	for (; i < 512/4; i++) {
+		cand_str += TWCHAR(' ');
+	}
 
 #ifdef HAVE_ICONV_H
 	
@@ -126,6 +132,7 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 
 #endif
 
+Exit:
 	memcpy(m_CandidataArea, m_buf, 512/*strlen(m_buf)*/);
 	// SHOW/UPDATE CANDIDATE WINDOW
 	m_pTextService->_UpdateCandidateList(m_oEditCookie, m_pContext);

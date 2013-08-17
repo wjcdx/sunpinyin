@@ -142,7 +142,6 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
     // insert the text
     // Use SetText here instead of InsertTextAtSelection because a composition is already started
     // Don't allow the app to adjust the insertion point inside our composition
-    //if (tfSelection.range->SetText(ec, 0, pchText, lstrlenW(pchText)) != S_OK)
 	if (pAheadSelection->SetText(ec, 0, pchText, length) != S_OK)
         goto Exit;
 
@@ -150,7 +149,6 @@ HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext 
     // the inserted text.
     tfSelection.range->Collapse(ec, TF_ANCHOR_END);
     pContext->SetSelection(ec, 1, &tfSelection);
-
 
 	//
     // set the display attribute to the composition range.
