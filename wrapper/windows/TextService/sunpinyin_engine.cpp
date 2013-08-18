@@ -79,12 +79,21 @@ void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)
 
 void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
 {
-#if 0
-    TIConvSrcPtr src = (TIConvSrcPtr)(ppd->string());
-	
-	CString tmp(src);
-	*m_PreeditArea = tmp;
-#endif
+	const TWCHAR *twStr = preedit.string();
+
+	char utf8[1024] = { 0 };
+	char ansi[1024] = { 0 };
+	int size = 0;
+
+	//ucs-4 => utf8
+	size = WCSTOMBS(utf8, twStr, 1024);
+
+	//utf8 => ansi
+	size = UTF8toANSI(ansi, utf8);
+
+	if (size > 128) size = 128;
+	memset(m_PreeditArea, 0, 128);
+	memcpy(m_PreeditArea, ansi, size);
 }
 
 
