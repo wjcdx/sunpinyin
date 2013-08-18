@@ -69,17 +69,6 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
     if (!_IsKeyboardOpen())
         return FALSE;
 
-    //
-    // The text service key handler does not do anything while the candidate
-    // window is shown.
-    // The candidate list handles the keys through ITfContextKeyEventSink.
-    //
-    /*if (_pCandidateList &&
-        _pCandidateList->_IsContextCandidateWindow(pContext))
-    {
-        return FALSE;
-    }*/
-
     // eat only keys that CKeyHandlerEditSession can hadles.
     switch (wParam)
     {
@@ -88,6 +77,8 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
         case VK_RETURN:
         case VK_SPACE:
 		case VK_BACK:
+		case VK_PRIOR:
+		case VK_NEXT:
             if (_IsComposing())
                 return TRUE;
             return FALSE;
@@ -98,7 +89,6 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
 			return TRUE;
 		return FALSE;
 	}
-		return TRUE;
 
     if (wParam >= 'A' && wParam <= 'Z')
         return TRUE;
@@ -146,7 +136,9 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
 
     if (*pfEaten)
     {
-        _InvokeKeyHandler(pContext, wParam, lParam);
+		CKeyEvent event(0, 0, 0);
+		PropareKeyEvent(event, wParam, lParam);
+        _InvokeKeyHandler(pContext, event);
     }
     return S_OK;
 }

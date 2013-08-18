@@ -95,13 +95,11 @@ public:
     HRESULT _HandleCancel(TfEditCookie ec, _In_ ITfContext *pContext);
 
     // key event handlers.
-	HRESULT _HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _HandleReturnKey(TfEditCookie ec, ITfContext *pContext);
-    HRESULT _HandleSpaceKey(TfEditCookie ec, ITfContext *pContext);
-	HRESULT _HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _InvokeKeyHandler(ITfContext *pContext, WPARAM wParam, LPARAM lParam);
+    HRESULT _HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
+	HRESULT _DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
+    HRESULT _HandleArrowKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
+	HRESULT _HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
+    HRESULT _InvokeKeyHandler(ITfContext *pContext, CKeyEvent &oEvent);
 
 	HRESULT _StartCandidateList(TfEditCookie ec, ITfContext *pContext);
 	HRESULT _UpdateCandidateList(TfEditCookie ec, ITfContext *pContext);

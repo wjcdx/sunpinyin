@@ -32,6 +32,11 @@ public:
 	// commit selected word
 	void commit_string (const WCHAR *wstr, int length);
 
+	void committed() { m_bCommitted = true; }
+	bool isCommitted() { return m_bCommitted; }
+
+	void updated() { m_bCommitted = false; }
+
 private:
 	CWinHandler		*m_wh;
     CIMIView        *m_pv;
@@ -51,6 +56,10 @@ private:
 
 private:
     char m_buf[512];
+	// if candidate list is empty, there may be
+	// two situations: a) it's none indeed;
+	// b) it's committed, 
+	bool m_bCommitted;
 };
 
 #endif

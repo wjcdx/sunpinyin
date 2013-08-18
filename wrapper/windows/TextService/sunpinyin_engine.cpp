@@ -7,7 +7,7 @@
 
 SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	: m_pTextService(pTextService), m_PreeditArea(CCandidateWindow::_rgPreeditString),
-	  m_CandidataArea(CCandidateWindow::_rgCandidatesString)
+	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bCommitted(false)
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
@@ -74,6 +74,7 @@ bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, 
 void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)
 {
 	m_pTextService->_CommitSelectedCandidate(m_oEditCookie, m_pContext, wstr, length);
+	this->committed();
 }
 
 void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
@@ -93,6 +94,11 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 	int size = cl.size();
 
 	if (size <= 0) {
+		// candidate is just committed
+		if (isCommitted())
+			return;
+
+		// there's no candidates for the input string
 		// TODO: update the candidates window directly.
 		memset(m_buf, 0, sizeof(m_buf));
 		goto Exit;
@@ -136,4 +142,5 @@ Exit:
 	memcpy(m_CandidataArea, m_buf, 512/*strlen(m_buf)*/);
 	// SHOW/UPDATE CANDIDATE WINDOW
 	m_pTextService->_UpdateCandidateList(m_oEditCookie, m_pContext);
+	this->updated();
 }

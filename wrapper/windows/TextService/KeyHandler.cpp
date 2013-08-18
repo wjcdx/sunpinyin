@@ -18,7 +18,6 @@
 #include "TextService.h"
 #include "CandidateList.h"
 
-#include "ime-core/imi_keys.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -29,16 +28,18 @@
 class CKeyHandlerEditSession : public CEditSessionBase
 {
 public:
-    CKeyHandlerEditSession(CTextService *pTextService, ITfContext *pContext, WPARAM wParam) : CEditSessionBase(pTextService, pContext)
+    CKeyHandlerEditSession(CTextService *pTextService, ITfContext *pContext, CKeyEvent &oEvent) : CEditSessionBase(pTextService, pContext)
     {
-        _wParam = wParam;
+		_uiCode = oEvent.code;
+		_uiModifiers = oEvent.modifiers;
     }
 
     // ITfEditSession
     STDMETHODIMP DoEditSession(TfEditCookie ec);
 
 private:
-    WPARAM _wParam;
+	UINT _uiCode;
+	UINT _uiModifiers;
 };
 
 //+---------------------------------------------------------------------------
@@ -49,20 +50,20 @@ private:
 
 STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 {
-
-    switch (_wParam)
+	CKeyEvent oEvent(_uiCode, _uiCode, _uiModifiers);
+    switch (_uiCode)
     {
-        case VK_LEFT:
-        case VK_RIGHT:
-            return _pTextService->_HandleArrowKey(ec, _pContext, _wParam);
+		case IM_VK_BACK_SPACE:
+			return _pTextService->_HandleBackSpaceKey(ec, _pContext, oEvent);
 
-        case VK_RETURN:
-            return _pTextService->_HandleReturnKey(ec, _pContext);
-
-        case VK_SPACE:
-            return _pTextService->_HandleSpaceKey(ec, _pContext);
-		case VK_BACK:
-			return _pTextService->_HandleBackSpaceKey(ec, _pContext, VK_BACK);
+		case IM_VK_LEFT:
+        case IM_VK_RIGHT:
+			return _pTextService->_HandleArrowKey(ec, _pContext, oEvent);
+			
+        case IM_VK_ENTER:
+        case IM_VK_SPACE:
+		case IM_VK_PAGE_UP:
+		case IM_VK_PAGE_DOWN:
 		case '0':
 		case '1':
 		case '2':
@@ -73,21 +74,14 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 		case '7':
 		case '8':
 		case '9':
-			//MessageBox(NULL, "Number inputed.", NULL, MB_OK);
-			return _pTextService->_HandleNumberKey(ec, _pContext, _wParam);
-
-
-
+			return _pTextService->_DispatchKeyEvent(ec, _pContext, oEvent);
         default:
-            if (_wParam >= 'A' && _wParam <= 'Z') {
-				char chr = _wParam + 'a' - 'A';
-                return _pTextService->_HandleCharacterKey(ec, _pContext, chr);
-			}
-            break;
+			if ((_uiCode >= 'A' && _uiCode <= 'Z')
+			|| (_uiCode >= 'a' && _uiCode <= 'z'))
+            return _pTextService->_HandleCharacterKey(ec, _pContext, oEvent);
     }
 
     return S_OK;
-
 }
 
 //+---------------------------------------------------------------------------
@@ -125,7 +119,7 @@ BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover
 //
 //----------------------------------------------------------------------------
 
-HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
+HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
 {
     ITfRange *pRangeComposition;
     TF_SELECTION tfSelection;
@@ -141,7 +135,7 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     // Assign VK_ value to the char. So the inserted the character is always
     // uppercase.
     //
-    ch = (WCHAR)wParam;
+    ch = (WCHAR)oEvent.code;
 
     // first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
@@ -203,8 +197,7 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
 	// SUNPINYIN HOOK POINT
-	CKeyEvent event(ch, ch, 0);
-	_pEngine->process_key_event(ec, pContext, event);
+	_pEngine->process_key_event(ec, pContext, oEvent);
 
 Exit:
     tfSelection.range->Release();
@@ -212,74 +205,28 @@ Exit:
 }
 
 
-HRESULT CTextService::_HandleNumberKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
-{
-    WCHAR ch;
-
-    // Start the new compositon if there is no composition.
-    if (!_IsComposing()) {
-        //_StartComposition(pContext);
-		return S_OK;
-	}
-
-    //
-    // Assign VK_ value to the char. So the inserted the character is always
-    // uppercase.
-    //
-    ch = (WCHAR)wParam;
-
-	// SUNPINYIN HOOK POINT
-	CKeyEvent event(ch, ch, 0);
-	_pEngine->process_key_event(ec, pContext, event);
-
-    return S_OK;
-}
-
 //+---------------------------------------------------------------------------
 //
-// _HandleReturnKey
+// _DispatchKeyEvent
 //
 //----------------------------------------------------------------------------
 
-HRESULT CTextService::_HandleReturnKey(TfEditCookie ec, ITfContext *pContext)
+HRESULT CTextService::_DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
 {
-    // just terminate the composition
-	// SUNPINYIN HOOK POINT
-	CKeyEvent event(IM_VK_ENTER, IM_VK_ENTER, 0);
-	_pEngine->process_key_event(ec, pContext, event);
-
+	_pEngine->process_key_event(ec, pContext, oEvent);
     return S_OK;
 }
 
-//+---------------------------------------------------------------------------
-//
-// _HandleSpaceKey
-//
-//----------------------------------------------------------------------------
 
-HRESULT CTextService::_HandleSpaceKey(TfEditCookie ec, ITfContext *pContext)
+HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
 {
-	CKeyEvent event(IM_VK_SPACE, IM_VK_SPACE, 0);
-	_pEngine->process_key_event(ec, pContext, event);
-
-    return S_OK;
-}
-
-HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
-{
-	ITfRange *pOriginRangle;
+	ITfRange *pOriginRange;
     ITfRange *pRangeComposition;
     TF_SELECTION tfSelection;
     ULONG cFetched;
-    WCHAR ch;
     BOOL fCovered;
 	ULONG ulGot = 0;
 
-    //
-    // Assign VK_ value to the char. So the inserted the character is always
-    // uppercase.
-    //
-    ch = (WCHAR)wParam;
 
     // first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
@@ -295,7 +242,7 @@ HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext,
             goto Exit;
         }
 		HRESULT ret = S_OK;
-		ret = pRangeComposition->Clone(&pOriginRangle);
+		ret = pRangeComposition->Clone(&pOriginRange);
 
 		WCHAR text[512] = { 0 };
 		pRangeComposition->GetText(ec, 0, text, 512, &ulGot);
@@ -306,7 +253,7 @@ HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext,
 		ret = pRangeComposition->Collapse(ec, TF_ANCHOR_END);
 		ret = pRangeComposition->ShiftStart(ec, -1, &lShifted, NULL);
 
-		ret = pOriginRangle->SetText(ec, 0, text, ulGot - 1);
+		ret = pOriginRange->SetText(ec, 0, text, ulGot - 1);
     }
 
     // update the selection, and make it an insertion point just past
@@ -321,15 +268,14 @@ HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext,
 
 Dispatch:
 	// SUNPINYIN HOOK POINT
-	CKeyEvent event(IM_VK_BACK_SPACE, IM_VK_BACK_SPACE, 0);
-	_pEngine->process_key_event(ec, pContext, event);
+	_pEngine->process_key_event(ec, pContext, oEvent);
 
 	if (ulGot == 1) {
 		_HandleCancel(ec, pContext);
 	}
 
 Exit:
-	pOriginRangle->Release();
+	pOriginRange->Release();
 	pRangeComposition->Release();
     tfSelection.range->Release();
     return S_OK;
@@ -344,7 +290,7 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT CTextService::_HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
+HRESULT CTextService::_HandleArrowKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
 {
     ITfRange *pRangeComposition;
     LONG cch;
@@ -365,7 +311,7 @@ HRESULT CTextService::_HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPA
         goto Exit;
 
     // adjust the selection
-    if (wParam == VK_LEFT)
+    if (oEvent == IM_VK_LEFT)
     {
         if (tfSelection.range->IsEqualStart(ec, pRangeComposition, TF_ANCHOR_START, &fEqual) == S_OK &&
             !fEqual)
@@ -376,7 +322,7 @@ HRESULT CTextService::_HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPA
     }
     else
     {
-        // VK_RIGHT
+        // IM_VK_RIGHT
         if (tfSelection.range->IsEqualEnd(ec, pRangeComposition, TF_ANCHOR_END, &fEqual) == S_OK &&
             !fEqual)
         {
@@ -404,13 +350,13 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT CTextService::_InvokeKeyHandler(ITfContext *pContext, WPARAM wParam, LPARAM lParam)
+HRESULT CTextService::_InvokeKeyHandler(ITfContext *pContext, CKeyEvent &oEvent)
 {
     CKeyHandlerEditSession *pEditSession;
     HRESULT hr = E_FAIL;
 
     // Insert a char in place of this keystroke
-    if ((pEditSession = new CKeyHandlerEditSession(this, pContext, wParam)) == NULL)
+    if ((pEditSession = new CKeyHandlerEditSession(this, pContext, oEvent)) == NULL)
         goto Exit;
 
     // a lock is required
