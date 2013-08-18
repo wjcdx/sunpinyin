@@ -21,7 +21,7 @@
 #include <direct.h>
 #define mkdir(x, y) _mkdir(x)
 
-void UTF8toANSI(char *ansi, char *utf8);
+size_t UTF8toANSI(char *ansi, char *utf8);
 
 #endif
 
