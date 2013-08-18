@@ -97,8 +97,6 @@ public:
     // key event handlers.
     HRESULT _HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
 	HRESULT _DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
-    HRESULT _HandleArrowKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
-	HRESULT _HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
     HRESULT _InvokeKeyHandler(ITfContext *pContext, CKeyEvent &oEvent);
 
 	HRESULT _StartCandidateList(TfEditCookie ec, ITfContext *pContext);

@@ -54,12 +54,8 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
     switch (_uiCode)
     {
 		case IM_VK_BACK_SPACE:
-			return _pTextService->_HandleBackSpaceKey(ec, _pContext, oEvent);
-
 		case IM_VK_LEFT:
         case IM_VK_RIGHT:
-			return _pTextService->_HandleArrowKey(ec, _pContext, oEvent);
-			
         case IM_VK_ENTER:
         case IM_VK_SPACE:
 		case IM_VK_PAGE_UP:
@@ -75,6 +71,7 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 		case '8':
 		case '9':
 			return _pTextService->_DispatchKeyEvent(ec, _pContext, oEvent);
+
         default:
 			if ((_uiCode >= 'A' && _uiCode <= 'Z')
 			|| (_uiCode >= 'a' && _uiCode <= 'z'))
@@ -141,35 +138,9 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
         return S_FALSE;
 
-	//{
-	//	CHAR text[512] = {0};
-	//	CHAR msg[512] = {0};
-	//	ULONG ulGot = 0;
-	//	tfSelection.range->GetText(ec, 0, (WCHAR *)text, 512, &ulGot);
-	//	for (int i=0, j=0; i < 512; i++) {
-	//		if (text[i] == 0)
-	//			continue;
-	//		msg[j++] = text[i];
-	//	}
-	//	MessageBox(NULL, msg, nullptr, MB_OK);
-	//}
-
     // is the insertion point covered by a composition?
     if (_pComposition->GetRange(&pRangeComposition) == S_OK)
     {
-		//{
-		//	CHAR text[512] = {0};
-		//	CHAR msg[512] = {0};
-		//	ULONG ulGot = 0;
-		//	pRangeComposition->GetText(ec, 0, (WCHAR *)text, 512, &ulGot);
-		//	for (int i=0, j=0; i < 512; i++) {
-		//		if (text[i] == 0)
-		//			continue;
-		//		msg[j++] = text[i];
-		//	}
-		//	MessageBox(NULL, msg, nullptr, MB_OK);
-		//}
-
         fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
 
         pRangeComposition->Release();
@@ -217,128 +188,6 @@ HRESULT CTextService::_DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, C
     return S_OK;
 }
 
-
-HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
-{
-	//ITfRange *pOriginRange;
-    ITfRange *pRangeComposition;
-    TF_SELECTION tfSelection;
-    ULONG cFetched;
-    BOOL fCovered;
-	//ULONG ulGot = 0;
-
-
-    // first, test where a keystroke would go in the document if an insert is done
-    if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
-        return S_FALSE;
-
-    // is the insertion point covered by a composition?
-    if (_pComposition->GetRange(&pRangeComposition) == S_OK)
-    {
-        fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
-
-        if (!fCovered)
-        {
-            goto Exit;
-        }
-		//HRESULT ret = S_OK;
-		//ret = pRangeComposition->Clone(&pOriginRange);
-
-		//WCHAR text[512] = { 0 };
-		//pRangeComposition->GetText(ec, 0, text, 512, &ulGot);
-		//if (ulGot <= 0)
-		//	goto Exit;
-
-		//LONG lShifted;
-		//ret = pRangeComposition->Collapse(ec, TF_ANCHOR_END);
-		//ret = pRangeComposition->ShiftStart(ec, -1, &lShifted, NULL);
-
-		//ret = pOriginRange->SetText(ec, 0, text, ulGot - 1);
-    }
-
-    // update the selection, and make it an insertion point just past
-    // the inserted text.
-    //tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-    //pContext->SetSelection(ec, 1, &tfSelection);
-
-    //
-    // set the display attribute to the composition range.
-    //
-    //_SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
-
-Dispatch:
-	// SUNPINYIN HOOK POINT
-	_pEngine->process_key_event(ec, pContext, oEvent);
-
-	//if (ulGot == 1) {
-	//	_HandleCancel(ec, pContext);
-	//}
-
-Exit:
-	//pOriginRange->Release();
-	pRangeComposition->Release();
-    tfSelection.range->Release();
-    return S_OK;
-}
-
-
-//+---------------------------------------------------------------------------
-//
-// _HandleArrowKey
-//
-// Update the selection within a composition.
-//
-//----------------------------------------------------------------------------
-
-HRESULT CTextService::_HandleArrowKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
-{
-    ITfRange *pRangeComposition;
-    LONG cch;
-    BOOL fEqual;
-    TF_SELECTION tfSelection;
-    ULONG cFetched;
-
-    // get the selection
-    if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK ||
-        cFetched != 1)
-    {
-        // no selection?
-        return S_OK; // eat the keystroke
-    }
-
-    // get the composition range
-    if (_pComposition->GetRange(&pRangeComposition) != S_OK)
-        goto Exit;
-
-    // adjust the selection
-    if (oEvent == IM_VK_LEFT)
-    {
-        if (tfSelection.range->IsEqualStart(ec, pRangeComposition, TF_ANCHOR_START, &fEqual) == S_OK &&
-            !fEqual)
-        {
-            tfSelection.range->ShiftStart(ec, -1, &cch, NULL);
-        }
-        tfSelection.range->Collapse(ec, TF_ANCHOR_START);
-    }
-    else
-    {
-        // IM_VK_RIGHT
-        if (tfSelection.range->IsEqualEnd(ec, pRangeComposition, TF_ANCHOR_END, &fEqual) == S_OK &&
-            !fEqual)
-        {
-            tfSelection.range->ShiftEnd(ec, +1, &cch, NULL);
-        }
-        tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-    }
-
-    pContext->SetSelection(ec, 1, &tfSelection);
-
-    pRangeComposition->Release();
-
-Exit:
-    tfSelection.range->Release();
-    return S_OK; // eat the keystroke
-}
 
 //+---------------------------------------------------------------------------
 //
