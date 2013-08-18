@@ -135,7 +135,7 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     // Assign VK_ value to the char. So the inserted the character is always
     // uppercase.
     //
-    ch = (WCHAR)oEvent.code;
+    //ch = (WCHAR)oEvent.code;
 
     // first, test where a keystroke would go in the document if an insert is done
     if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
@@ -183,18 +183,18 @@ HRESULT CTextService::_HandleCharacterKey(TfEditCookie ec, ITfContext *pContext,
     // insert the text
     // Use SetText here instead of InsertTextAtSelection because a composition is already started
     // Don't allow the app to adjust the insertion point inside our composition
-    if (tfSelection.range->SetText(ec, 0, &ch, 1) != S_OK)
-        goto Exit;
+    //if (tfSelection.range->SetText(ec, 0, &ch, 1) != S_OK)
+    //    goto Exit;
 
     // update the selection, and make it an insertion point just past
     // the inserted text.
-    tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-    pContext->SetSelection(ec, 1, &tfSelection);
+    /*tfSelection.range->Collapse(ec, TF_ANCHOR_END);
+    pContext->SetSelection(ec, 1, &tfSelection);*/
 
     //
     // set the display attribute to the composition range.
     //
-    _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
+    //_SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
 	// SUNPINYIN HOOK POINT
 	_pEngine->process_key_event(ec, pContext, oEvent);
@@ -220,12 +220,12 @@ HRESULT CTextService::_DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, C
 
 HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent)
 {
-	ITfRange *pOriginRange;
+	//ITfRange *pOriginRange;
     ITfRange *pRangeComposition;
     TF_SELECTION tfSelection;
     ULONG cFetched;
     BOOL fCovered;
-	ULONG ulGot = 0;
+	//ULONG ulGot = 0;
 
 
     // first, test where a keystroke would go in the document if an insert is done
@@ -241,41 +241,41 @@ HRESULT CTextService::_HandleBackSpaceKey(TfEditCookie ec, ITfContext *pContext,
         {
             goto Exit;
         }
-		HRESULT ret = S_OK;
-		ret = pRangeComposition->Clone(&pOriginRange);
+		//HRESULT ret = S_OK;
+		//ret = pRangeComposition->Clone(&pOriginRange);
 
-		WCHAR text[512] = { 0 };
-		pRangeComposition->GetText(ec, 0, text, 512, &ulGot);
-		if (ulGot <= 0)
-			goto Exit;
+		//WCHAR text[512] = { 0 };
+		//pRangeComposition->GetText(ec, 0, text, 512, &ulGot);
+		//if (ulGot <= 0)
+		//	goto Exit;
 
-		LONG lShifted;
-		ret = pRangeComposition->Collapse(ec, TF_ANCHOR_END);
-		ret = pRangeComposition->ShiftStart(ec, -1, &lShifted, NULL);
+		//LONG lShifted;
+		//ret = pRangeComposition->Collapse(ec, TF_ANCHOR_END);
+		//ret = pRangeComposition->ShiftStart(ec, -1, &lShifted, NULL);
 
-		ret = pOriginRange->SetText(ec, 0, text, ulGot - 1);
+		//ret = pOriginRange->SetText(ec, 0, text, ulGot - 1);
     }
 
     // update the selection, and make it an insertion point just past
     // the inserted text.
-    tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-    pContext->SetSelection(ec, 1, &tfSelection);
+    //tfSelection.range->Collapse(ec, TF_ANCHOR_END);
+    //pContext->SetSelection(ec, 1, &tfSelection);
 
     //
     // set the display attribute to the composition range.
     //
-    _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
+    //_SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
 
 Dispatch:
 	// SUNPINYIN HOOK POINT
 	_pEngine->process_key_event(ec, pContext, oEvent);
 
-	if (ulGot == 1) {
-		_HandleCancel(ec, pContext);
-	}
+	//if (ulGot == 1) {
+	//	_HandleCancel(ec, pContext);
+	//}
 
 Exit:
-	pOriginRange->Release();
+	//pOriginRange->Release();
 	pRangeComposition->Release();
     tfSelection.range->Release();
     return S_OK;
