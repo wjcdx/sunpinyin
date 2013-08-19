@@ -7,7 +7,7 @@
 
 SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	: m_pTextService(pTextService), m_PreeditArea(CCandidateWindow::_rgPreeditString),
-	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bCommitted(false)
+	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bUpdateNeeded(true)
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
@@ -65,7 +65,6 @@ bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, 
 		if (event.value < 0x20 && event.value > 0x7E)
             event.value = 0;
 
-        //CKeyEvent key_event (keycode, keyvalue, event->state);
         m_pv->onKeyEvent(event);
     }
     return 1;
@@ -74,16 +73,23 @@ bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, 
 void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)
 {
 	m_pTextService->_CommitSelectedCandidate(m_oEditCookie, m_pContext, wstr, length);
-	this->committed();
+	updateNeeded(false);
 }
 
 void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
 {
 	const TWCHAR *twStr = preedit.string();
+	int size = preedit.size();
+
+	if (size <= 0) {
+		m_pTextService->_HandleComplete(m_oEditCookie, m_pContext);
+		updateNeeded(false);
+		return;
+	}
 
 	char utf8[1024] = { 0 };
 	char ansi[1024] = { 0 };
-	int size = 0;
+	
 
 	//ucs-4 => utf8
 	size = WCSTOMBS(utf8, twStr, 1024);
@@ -92,7 +98,7 @@ void SunPinyinEngine::update_preedit_string(const IPreeditString& preedit)
 	size = UTF8toANSI(ansi, utf8);
 
 	if (size > 128) size = 128;
-	memset(m_PreeditArea, 0, 128);
+	memset(m_PreeditArea, 0, strlen(m_PreeditArea));
 	memcpy(m_PreeditArea, ansi, size);
 }
 
@@ -103,14 +109,15 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 	int size = cl.size();
 
 	if (size <= 0) {
-		// candidate is just committed
-		if (isCommitted())
+		if (!isUpdateNeeded()) {
 			return;
-
+		}
 		// there's no candidates for the input string
 		// TODO: update the candidates window directly.
 		memset(m_buf, 0, sizeof(m_buf));
 		goto Exit;
+	} else {
+		updateNeeded(true);
 	}
 
 	int i = 0;
@@ -122,9 +129,6 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
         cand_str += pcand;
         cand_str += TWCHAR(' ');
     }
-	for (; i < 512/4; i++) {
-		cand_str += TWCHAR(' ');
-	}
 
 #ifdef HAVE_ICONV_H
 	
@@ -148,8 +152,8 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
 #endif
 
 Exit:
-	memcpy(m_CandidataArea, m_buf, 512/*strlen(m_buf)*/);
+	memset(m_CandidataArea, 0, strlen(m_CandidataArea));
+	memcpy(m_CandidataArea, m_buf, strlen(m_buf));
 	// SHOW/UPDATE CANDIDATE WINDOW
 	m_pTextService->_UpdateCandidateList(m_oEditCookie, m_pContext);
-	this->updated();
 }
