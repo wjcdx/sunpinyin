@@ -19,6 +19,7 @@
 
 #define CAND_WIDTH     400
 #define CAND_HEIGHT    40
+#define CAND_LENGTH    30
 
 ATOM CCandidateWindow::_atomWndClass = 0;
 TCHAR CCandidateWindow::_rgPreeditString[128] = { 0 };
@@ -212,17 +213,30 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
             return 0;
 
         case WM_PAINT:
-            hdc = BeginPaint(hwnd, &ps);
+
+			hdc = BeginPaint(hwnd, &ps);
             SetBkMode(hdc, TRANSPARENT);
 
 			GetTextMetrics(hdc, &tm);
 			int x = tm.tmAveCharWidth;
 			int y = tm.tmHeight + tm.tmExternalLeading;
 
-			TextOut(hdc, 0, 0, _rgPreeditString, 128/*lstrlen(_rgPreeditString)*/);
-			TextOut(hdc, 0, y, _rgCandidatesString, 512/*lstrlen(_rgCandidatesString)*/);
+			int uiPreeditLength = lstrlen(_rgPreeditString);
+			int uiCandidateLength = lstrlen(_rgCandidatesString);
+
+			TextOut(hdc, 0, 0, _rgPreeditString, uiPreeditLength);
+			TextOut(hdc, 0, y, _rgCandidatesString, uiCandidateLength);
+
+			UINT uiWndWidth = max(uiPreeditLength, uiCandidateLength);
+			uiWndWidth = max(uiWndWidth, CAND_LENGTH);
 
             EndPaint(hwnd, &ps);
+
+			// adjust the size of the window according to the text out.
+			SetWindowPos(hwnd, 0, 0, 0,
+				x * (uiWndWidth + 2 ),
+				2 * y + 2, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+
             return 0;
     }
 
