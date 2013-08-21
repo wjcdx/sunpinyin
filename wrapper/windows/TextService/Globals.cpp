@@ -134,8 +134,12 @@ BOOL PropareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lParam)
 	case VK_NEXT:
 		oEvent.code = IM_VK_PAGE_DOWN;
 		break;
+	case VK_OEM_COMMA:
+		oEvent.code = IM_VK_COMMA;
+		break;
 
     default:
+
 		if (wParam >= '0' && wParam <= '9') {
 			oEvent.code = wParam;
 		}

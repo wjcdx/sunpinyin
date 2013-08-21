@@ -70,6 +70,7 @@ STDAPI CKeyHandlerEditSession::DoEditSession(TfEditCookie ec)
 		case '7':
 		case '8':
 		case '9':
+		case IM_VK_COMMA:
 			return _pTextService->_DispatchKeyEvent(ec, _pContext, oEvent);
 
         default:

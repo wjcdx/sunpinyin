@@ -37,6 +37,9 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
     if (!m_pv)
         return;
 
+	m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_FULLSYMBOL, true);
+	m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_FULLPUNC, true);
+
     //m_hotkey_profile = new CHotkeyProfile();
     //factory.initSession(m_hotkey_profile);
 

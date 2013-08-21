@@ -82,6 +82,8 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
             if (_IsComposing())
                 return TRUE;
             return FALSE;
+		case VK_OEM_COMMA:
+			return TRUE;
     }
 
 	if (wParam >= '0' && wParam <= '9') {

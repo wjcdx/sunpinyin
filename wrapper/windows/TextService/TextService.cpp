@@ -297,5 +297,11 @@ STDAPI CTextService::Deactivate()
 
     _tfClientId = TF_CLIENTID_NULL;
 
+	if (_pEngine != NULL)
+	{
+		delete _pEngine;
+		_pEngine = NULL;
+	}
+
     return S_OK;
 }
