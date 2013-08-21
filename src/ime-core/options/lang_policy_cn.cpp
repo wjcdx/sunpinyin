@@ -83,42 +83,26 @@ CSimplifiedChinesePolicy::destroyContext(CIMIContext *context)
     delete context;
 }
 
+struct u8_code {          
+	char uc1, uc2, uc3, uc4;
+};
+
 string_pairs
 CSimplifiedChinesePolicy::getDefaultPunctMapping() const
 {
-    static const char* punc_map [] = {
-    		" ", "¡¡",
-        ",", "£¬",
-        ";", "£»",
-        "!", "£¡",
-        "?", "£¿",
-        ".", "¡£",
-        ":", "£º",
-        "^", "¡­¡­",
-        "\\", "¡¢",
-        "\"", "¡°",
-        "\"", "¡±",
-        "'", "¡®",
-        "'", "¡¯",
-        "_", "¡ª¡ª",
-        "<", "¡¶",
-        ">", "¡·",
-        "(", "£¨",
-        ")", "£©",
-        "[", "¡¾",
-        "]", "¡¿",
-        "{", "¡º",
-        "}", "¡»",
-        "$", "£¤",
-        NULL,
+    static struct u8_code punc_map[] = {
+    	{0x20, 0x00}, {0xE3, 0x80, 0x80},
+        {0x2c, 0x00}, {0xEF, 0xBC, 0x8C},
+        {0x3b, 0x00}, {0xEF, 0xBC, 0x9B},
+        {0x00, 0x00},
     };
 
     string_pairs default_punc_map;
 
-    const char *const *p = punc_map;
-    while (*p) {
-        std::string k = *p++;
-        std::string v = *p++;
+    struct u8_code *p = punc_map;
+    while (p->uc1) {
+        std::string k = (const char *)p++;
+        std::string v = (const char *)p++;
         default_punc_map.push_back(std::make_pair(k, v));
     }
     return default_punc_map;
