@@ -85,17 +85,15 @@ public:
     void _TerminateComposition(TfEditCookie ec, ITfContext *pContext);
     BOOL _IsComposing();
     void _SetComposition(ITfComposition *pComposition);
-	HRESULT _InsertAtSelection(TfEditCookie ec, _In_ ITfContext *pContext,
-		_In_ WCHAR *pchText, _Outptr_ ITfRange **ppCompRange);
 	HRESULT _CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext,
 		_In_ const WCHAR *pchText, int length);
+	HRESULT CTextService::_HandleComposition(TfEditCookie ec, ITfContext *pContext);
 
 	// key event handlers for composition/candidate/phrase common objects.
     HRESULT _HandleComplete(TfEditCookie ec, _In_ ITfContext *pContext);
     HRESULT _HandleCancel(TfEditCookie ec, _In_ ITfContext *pContext);
 
     // key event handlers.
-    HRESULT _HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
 	HRESULT _DispatchKeyEvent(TfEditCookie ec, ITfContext *pContext, CKeyEvent &oEvent);
     HRESULT _InvokeKeyHandler(ITfContext *pContext, CKeyEvent &oEvent);
 
@@ -129,6 +127,7 @@ private:
 
     // utility function for KeyEventSink
     BOOL _IsKeyEaten(ITfContext *pContext, WPARAM wParam);
+	BOOL PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lParam);
 
     //
     // state
@@ -159,6 +158,7 @@ private:
 
 	// sunpinyin engine
 	SunPinyinEngine *_pEngine;
+	BOOL _bKeyEaten;
 
     LONG _cRef;     // COM ref count
 };

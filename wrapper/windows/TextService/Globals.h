@@ -69,6 +69,5 @@ extern const GUID c_guidDisplayAttributeInput;
 extern const GUID c_guidDisplayAttributeConverted;
 
 WCHAR ConvertVKey(UINT code);
-BOOL PropareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lParam);
 
 #endif // GLOBALS_H

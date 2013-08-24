@@ -64,13 +64,9 @@ bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, 
 	m_oEditCookie = ec;
 
 	if (m_pv != NULL) {
-
-		if (event.value < 0x20 && event.value > 0x7E)
-            event.value = 0;
-
-        m_pv->onKeyEvent(event);
+        return m_pv->onKeyEvent(event);
     }
-    return 1;
+    return false;
 }
 
 void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)

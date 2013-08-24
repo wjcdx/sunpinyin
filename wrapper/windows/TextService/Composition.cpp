@@ -59,49 +59,6 @@ void CTextService::_SetComposition(ITfComposition *pComposition)
     _pComposition = pComposition;
 }
 
-//+---------------------------------------------------------------------------
-//
-// _InsertAtSelection
-//
-//----------------------------------------------------------------------------
-
-HRESULT CTextService::_InsertAtSelection(TfEditCookie ec, _In_ ITfContext *pContext, _In_ WCHAR *pchText, _Outptr_ ITfRange **ppCompRange)
-{
-    ITfRange* rangeInsert = nullptr;
-    ITfInsertAtSelection* pias = nullptr;
-    HRESULT hr = S_OK;
-
-    if (ppCompRange == nullptr)
-    {
-        hr = E_INVALIDARG;
-        goto Exit;
-    }
-
-    *ppCompRange = nullptr;
-
-    hr = pContext->QueryInterface(IID_ITfInsertAtSelection, (void **)&pias);
-    if (FAILED(hr))
-    {
-        goto Exit;
-    }
-
-    hr = pias->InsertTextAtSelection(ec, TF_IAS_QUERYONLY, pchText, (LONG)lstrlenW(pchText), &rangeInsert);
-
-    if ( FAILED(hr) || rangeInsert == nullptr)
-    {
-        rangeInsert = nullptr;
-        pias->Release();
-        goto Exit;
-    }
-
-    *ppCompRange = rangeInsert;
-    pias->Release();
-    hr = S_OK;
-
-Exit:
-    return hr;
-}
-
 
 BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover);
 HRESULT CTextService::_CommitSelectedCandidate(TfEditCookie ec, _In_ ITfContext *pContext, _In_ const WCHAR *pchText, int length)
