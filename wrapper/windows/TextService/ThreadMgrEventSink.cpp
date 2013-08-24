@@ -61,6 +61,38 @@ STDAPI CTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pD
 	pDocMgrPrevFocus;
     _InitTextEditSink(pDocMgrFocus);
 
+	if (_pCandidateList) {
+		ITfDocumentMgr* pCandidateListDocumentMgr = nullptr;
+		ITfContext* pTfContext = _pCandidateList->_GetContextDocument();
+        if ((nullptr != pTfContext) && SUCCEEDED(pTfContext->GetDocumentMgr(&pCandidateListDocumentMgr)))
+        {
+            if (pCandidateListDocumentMgr != pDocMgrFocus)
+            {
+				// Hide Candidate Window
+				_pCandidateList->OnKillThreadFocus();
+            }
+            else 
+            {
+				// TODO: Show Candidate Window
+				_pCandidateList->OnSetThreadFocus();
+            }
+
+            pCandidateListDocumentMgr->Release();
+        }
+	}
+	if (_pDocMgrLastFocused)
+    {
+        _pDocMgrLastFocused->Release();
+		_pDocMgrLastFocused = nullptr;
+    }
+
+    _pDocMgrLastFocused = pDocMgrFocus;
+
+    if (_pDocMgrLastFocused)
+    {
+        _pDocMgrLastFocused->AddRef();
+    }
+
     return S_OK;
 }
 

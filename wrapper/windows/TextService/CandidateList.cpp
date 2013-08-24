@@ -275,6 +275,22 @@ STDAPI ImeWrapper::CCandidateList::OnLayoutChange(ITfContext *pContext, TfLayout
     return S_OK;
 }
 
+HRESULT ImeWrapper::CCandidateList::OnSetThreadFocus()
+{
+	if (_pCandidateWindow) {
+		_pCandidateWindow->_Show();
+	}
+	return S_OK;
+}
+
+HRESULT ImeWrapper::CCandidateList::OnKillThreadFocus()
+{
+	if (_pCandidateWindow) {
+		_pCandidateWindow->_Hide();
+	}
+	return S_OK;
+}
+
 
 //+---------------------------------------------------------------------------
 //
@@ -389,11 +405,11 @@ void ImeWrapper::CCandidateList::_EndCandidateList()
         _pCandidateWindow = NULL;
     }
 
-    /*if (_pRangeComposition)
+    if (_pRangeComposition)
     {
        _pRangeComposition->Release();
        _pRangeComposition = NULL;
-    }*/
+    }
 
     if (_pContextCandidateWindow)
     {

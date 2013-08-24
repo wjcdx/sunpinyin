@@ -47,9 +47,15 @@ namespace ImeWrapper {
 		//
 		STDMETHODIMP OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView);
 
+		// Event for ITfThreadFocusSink
+		HRESULT OnSetThreadFocus();
+		HRESULT OnKillThreadFocus();
+
 		HRESULT _StartCandidateList(TfClientId tid, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition);
 		void _EndCandidateList();
 		HRESULT _UpdateCandidateList();
+
+		ITfContext* _GetContextDocument() { return _pContextDocument; };
 
 		BOOL _IsContextCandidateWindow(ITfContext *pContext);
 

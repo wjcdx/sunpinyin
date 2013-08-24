@@ -17,10 +17,8 @@
 #define TEXTSERVICE_H
 
 #include "sunpinyin_engine.h"
+#include "CandidateList.h"
 
-namespace ImeWrapper {
-class CCandidateList;
-};
 class CLangBarItemButton;
 
 class CTextService : public ITfTextInputProcessor,
@@ -137,6 +135,9 @@ private:
 
     // The cookie of ThreadMgrEventSink
     DWORD _dwThreadMgrEventSinkCookie;
+
+
+	ITfDocumentMgr* _pDocMgrLastFocused;
 
     //
     // private variables for TextEditSink
