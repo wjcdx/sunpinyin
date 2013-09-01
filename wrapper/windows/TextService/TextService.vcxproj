@@ -192,7 +192,8 @@
     <ClCompile Include="imi_wdx_win.cpp" />
     <ClCompile Include="KeyEventSink.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
-    <ClCompile Include="LanguageBar.cpp" />
+    <ClCompile Include="LangBar\LangBarButton.cpp" />
+    <ClCompile Include="LangBar\LangBarItem.cpp" />
     <ClCompile Include="PreComp.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -203,9 +204,6 @@
     <ClCompile Include="ThreadMgrEventSink.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="TextService.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="CandidateList.h" />
     <ClInclude Include="CandidateWindow.h" />
     <ClInclude Include="DisplayAttributeInfo.h" />
@@ -213,9 +211,24 @@
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imi_wdx_win.h" />
+    <ClInclude Include="LangBar\LangBarButton.h" />
+    <ClInclude Include="LangBar\LangBarItem.h" />
+    <ClInclude Include="LangBar\LangBarItemInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="sunpinyin_engine.h" />
     <ClInclude Include="TextService.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\eng.ico" />
+    <Image Include="Images\han.ico" />
+    <Image Include="Images\punceng.ico" />
+    <Image Include="Images\punchan.ico" />
+    <Image Include="Images\TextService.ico" />
+    <Image Include="Images\widthfull.ico" />
+    <Image Include="Images\widthhalf.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TextService.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

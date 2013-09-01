@@ -19,7 +19,7 @@
 #include "sunpinyin_engine.h"
 #include "CandidateList.h"
 
-class CLangBarItemButton;
+class CLangBarItem;
 
 class CTextService : public ITfTextInputProcessor,
                      public ITfThreadMgrEventSink,
@@ -145,7 +145,7 @@ private:
     ITfContext   *_pTextEditSinkContext;
     DWORD _dwTextEditSinkCookie;
 
-    CLangBarItemButton *_pLangBarItem;
+    CLangBarItem *_pLangBarItem;
 
     // the current composition object.
     ITfComposition *_pComposition;

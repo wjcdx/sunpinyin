@@ -12,6 +12,9 @@
 #include "imi_wdx_win.h"
 
 #include "Globals.h"
+#include "LangBar/LangBarMenu.h"
+#include "LangBar/LangBarButton.h"
+
 
 class CTextService;
 
@@ -32,8 +35,21 @@ public:
 	// commit selected word
 	void commit_string (const WCHAR *wstr, int length);
 
+	// if it's needed to update the candidate window
 	void updateNeeded(bool needed) { m_bUpdateNeeded = needed; }
 	bool isUpdateNeeded() { return m_bUpdateNeeded; }
+
+	// callback function of CLangBarItem
+	bool update_prop_status(unsigned id, bool status);
+	// update status of CLangBarItem
+	void update_status_property(bool);
+    void update_punct_property(bool);
+    void update_letter_property(bool);
+
+	// handle language bar items
+	bool init_language_bar(ITfLangBarItemMgr *pLangBarItemMgr);
+	bool uninit_language_bar(ITfLangBarItemMgr *pLangBarItemMgr);
+	void setup_langbar_items();
 
 private:
 	CWinHandler		*m_wh;
@@ -61,6 +77,10 @@ private:
 	// it's needn't to update candidate list window
 	// for b & c.
 	bool m_bUpdateNeeded;
+
+
+	CLangBarButton m_lbbStatus;
+	//CLangBarMenu m_lbmMenu;
 };
 
 #endif

@@ -103,3 +103,13 @@ WCHAR ConvertVKey(UINT code)
     return 0;
 }
 
+int CharToWchar(WCHAR *wchStr, const char *chStr)
+{
+	int i = 0;
+	for (; chStr[i] != '\0'; i++)
+	{
+		wchStr[i] = chStr[i];
+	}
+	return i ? (i + 1) : 0;
+}
+

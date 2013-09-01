@@ -3,11 +3,13 @@
 #include "sunpinyin_engine.h"
 #include "CandidateWindow.h"
 #include "TextService.h"
+#include "Globals.h"
 
 
 SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	: m_pTextService(pTextService), m_PreeditArea(CCandidateWindow::_rgPreeditString),
-	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bUpdateNeeded(true)
+	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bUpdateNeeded(true),
+	m_lbbStatus(CLangBarButton(pTextService, this, c_guidLangBarItemButton, LANGBAR_ITEM_DESC))
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
@@ -45,6 +47,9 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 
 	m_wh = new CWinHandler(this);
     factory.initSession(m_wh);
+
+	// init language bare items
+	setup_langbar_items();
 }
 
 SunPinyinEngine::~SunPinyinEngine()
@@ -56,6 +61,11 @@ SunPinyinEngine::~SunPinyinEngine()
     }
 
     delete m_wh;
+	m_wh = NULL;
+
+	// the object will be freed automatically,
+	// and it's needn't to care about the ref-count of itself.
+	//m_lbbStatus.Release();
 }
 
 bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event)
@@ -155,4 +165,66 @@ Exit:
 	memcpy(m_CandidataArea, m_buf, strlen(m_buf));
 	// SHOW/UPDATE CANDIDATE WINDOW
 	m_pTextService->_UpdateCandidateList(m_oEditCookie, m_pContext);
+}
+
+
+bool SunPinyinEngine::update_prop_status(unsigned id, bool status)
+{
+	if (!m_pv)
+		return false;
+	m_pv->setStatusAttrValue(id, status);
+	return true;
+}
+
+void SunPinyinEngine::update_status_property(bool cn)
+{
+	m_lbbStatus.SetState(cn);
+}
+
+void SunPinyinEngine::update_punct_property(bool full)
+{
+	//m_lbmMenu.SetItemStatus(CIMIWinHandler::STATUS_ID_FULLPUNC, full);
+}
+
+void SunPinyinEngine::update_letter_property(bool full)
+{
+	//m_lbmMenu.SetItemStatus(CIMIWinHandler::STATUS_ID_FULLSYMBOL, full);
+}
+
+bool SunPinyinEngine::init_language_bar(ITfLangBarItemMgr *pLangBarItemMgr)
+{
+	if (pLangBarItemMgr == NULL)
+		return false;
+
+	if (pLangBarItemMgr->AddItem(&m_lbbStatus) != S_OK)
+        return false;
+
+	m_lbbStatus.SetState(true);
+
+	return true;
+}
+
+bool SunPinyinEngine::uninit_language_bar(ITfLangBarItemMgr *pLangBarItemMgr)
+{
+	if (pLangBarItemMgr == NULL)
+		return false;
+	if (pLangBarItemMgr->RemoveItem(&m_lbbStatus) != S_OK)
+        return false;
+	return true;
+}
+
+void SunPinyinEngine::setup_langbar_items()
+{
+	CLangBarItemInfo statusTrueInfo;
+	CLangBarItemInfo statusFalseInfo;
+
+	statusTrueInfo.setText(std::string("EN"));
+	statusTrueInfo.setIcon(IDI_ENG);
+	statusTrueInfo.setTooltip(std::string("Switch to Chinese input mode"));
+	statusFalseInfo.setText(std::string("CN"));
+	statusFalseInfo.setIcon(IDI_HAN);
+	statusFalseInfo.setTooltip(std::string("Switch to English input mode"));
+
+	m_lbbStatus.SetupInfo(statusTrueInfo, statusFalseInfo);
+	//m_lbbStatus.SetStatus(true);
 }

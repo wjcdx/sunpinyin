@@ -211,13 +211,7 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
         _InitTextEditSink(pDocMgrFocus);
         pDocMgrFocus->Release();
     }
-
-    //
-    // Initialize Language Bar.
-    //
-    if (!_InitLanguageBar())
-        goto ExitError;
-
+    
     //
     // Initialize KeyEventSink
     //
@@ -240,6 +234,12 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
 	// Initialize the sunpinyin engine.
 	//
 	_pEngine = new SunPinyinEngine(this);
+
+	//
+    // Initialize Language Bar.
+    // Inited by _pEngine
+    if (!_InitLanguageBar())
+        goto ExitError;
 
     return S_OK;
 

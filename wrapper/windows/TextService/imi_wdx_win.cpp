@@ -6,35 +6,6 @@
 #include "imi_wdx_win.h"
 #include "sunpinyin_engine.h"
 
-int
-translate_key(int orig)
-{
-	int chr = orig;
-	if (orig == VK_BACK || orig == VK_DELETE) {
-		chr = IM_VK_BACK_SPACE;
-	} else if (orig == VK_PRIOR) {
-		chr = IM_VK_PAGE_UP;
-	} else if (orig == VK_NEXT) {
-		chr = IM_VK_PAGE_DOWN;
-	} else if (orig < 0x20 && orig > 0x7E) {
-		chr = 0;
-	}
-	return chr;
-}
-
-int
-key_press_cb(CKeyEvent *event, CIMIView *pview)
-{
-    if (pview != NULL) {
-
-		if (event->value < 0x20 && event->value > 0x7E)
-            event->value = 0;
-
-        //CKeyEvent key_event (keycode, keyvalue, event->state);
-        pview->onKeyEvent(*event);
-    }
-    return 1;
-}
 
 CWinHandler::CWinHandler(SunPinyinEngine *pEngine)
 	: m_engine(pEngine)
@@ -64,11 +35,17 @@ CWinHandler::commit(const TWCHAR* wstr)
 void
 CWinHandler::updateStatus(int key, int value)
 {
-    /*switch (key) {
-    case STATUS_ID_CN:          switchCN( value != 0 ); break;
-    case STATUS_ID_FULLPUNC:    switchFullPunc( value != 0 ); break;
-    case STATUS_ID_FULLSYMBOL:  switchFullSimbol( value != 0 ); break;
-    }*/
+    switch (key) {
+    case STATUS_ID_CN:
+		m_engine->update_status_property(value);
+		break;
+    case STATUS_ID_FULLPUNC:
+		m_engine->update_punct_property(value);
+		break;
+    case STATUS_ID_FULLSYMBOL:
+		m_engine->update_letter_property(value);
+		break;
+    }
 }
 
 void

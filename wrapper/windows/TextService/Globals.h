@@ -29,8 +29,8 @@ void DllRelease();
 
 #define TEXTSERVICE_LANGID    MAKELANGID(LANG_CHINESE_SIMPLIFIED, SUBLANG_CHINESE_SIMPLIFIED)
 
-#define TEXTSERVICE_DESC    L"Sample Text Service"
-#define TEXTSERVICE_DESC_A   "Sample Text Service"
+#define TEXTSERVICE_DESC    L"XingHua Input Method"
+#define TEXTSERVICE_DESC_A   "XingHua Input Method"
 #define TEXTSERVICE_MODEL   TEXT("Apartment")
 
 #define TEXTSERVICE_ICON_INDEX  0
@@ -69,5 +69,7 @@ extern const GUID c_guidDisplayAttributeInput;
 extern const GUID c_guidDisplayAttributeConverted;
 
 WCHAR ConvertVKey(UINT code);
+
+int CharToWchar(WCHAR *wchStr, const char *chStr);
 
 #endif // GLOBALS_H
