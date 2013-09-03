@@ -194,6 +194,9 @@
     <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="LangBar\LangBarButton.cpp" />
     <ClCompile Include="LangBar\LangBarItem.cpp" />
+    <ClCompile Include="LangBar\LangBarMenu.cpp" />
+    <ClCompile Include="LangBar\LangBarMenuItem.cpp" />
+    <ClCompile Include="LangBar\LangBarMenuItemInfo.cpp" />
     <ClCompile Include="PreComp.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -214,18 +217,22 @@
     <ClInclude Include="LangBar\LangBarButton.h" />
     <ClInclude Include="LangBar\LangBarItem.h" />
     <ClInclude Include="LangBar\LangBarItemInfo.h" />
+    <ClInclude Include="LangBar\LangBarMenu.h" />
+    <ClInclude Include="LangBar\LangBarMenuItem.h" />
+    <ClInclude Include="LangBar\LangBarMenuItemInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="sunpinyin_engine.h" />
     <ClInclude Include="TextService.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Images\punceng.bmp" />
     <Image Include="Images\eng.ico" />
     <Image Include="Images\han.ico" />
-    <Image Include="Images\punceng.ico" />
-    <Image Include="Images\punchan.ico" />
+    <Image Include="Images\menu.ico" />
+    <Image Include="Images\punchan.bmp" />
     <Image Include="Images\TextService.ico" />
-    <Image Include="Images\widthfull.ico" />
-    <Image Include="Images\widthhalf.ico" />
+    <Image Include="Images\widthfull.bmp" />
+    <Image Include="Images\widthhalf.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TextService.rc" />

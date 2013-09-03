@@ -3,7 +3,7 @@
 
 CLangBarButton::CLangBarButton(CTextService *pTextService, SunPinyinEngine *pEngine,
 							   REFGUID guidLangBar, LPCWSTR description)
-		: CLangBarItem(pTextService, pEngine), _bState(true)
+		: CLangBarItem(pTextService, pEngine), _bState(true), _uiID(0)
 {
 	// initialize TF_LANGBARITEMINFO structure.
     _tfLangBarItemInfo.clsidService = c_clsidTextService;												    // This LangBarItem belongs to this TextService.

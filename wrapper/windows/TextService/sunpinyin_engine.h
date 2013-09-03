@@ -80,7 +80,7 @@ private:
 
 
 	CLangBarButton m_lbbStatus;
-	//CLangBarMenu m_lbmMenu;
+	CLangBarMenu m_lbmMenu;
 };
 
 #endif

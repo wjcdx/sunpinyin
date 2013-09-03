@@ -35,6 +35,7 @@ void DllRelease();
 
 #define TEXTSERVICE_ICON_INDEX  0
 #define LANGBAR_ITEM_DESC   L"Sample Text Service Button"
+#define LANGBAR_MENU_DESC   L"Sample Text Service Menu"
 
 //+---------------------------------------------------------------------------
 //
@@ -64,6 +65,7 @@ extern const CLSID c_clsidTextService;
 extern const GUID c_guidProfile;
 
 extern const GUID c_guidLangBarItemButton;
+extern const GUID c_guidLangBarItemMenu;
 
 extern const GUID c_guidDisplayAttributeInput;
 extern const GUID c_guidDisplayAttributeConverted;

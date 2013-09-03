@@ -9,7 +9,7 @@ class CLangBarButton : public CLangBarItem
 public:
 	
 	CLangBarButton(CTextService *pTextService, SunPinyinEngine *pEngine, REFGUID guidLangBar, LPCWSTR description);
-	~CLangBarButton() {};
+	~CLangBarButton() {}
 
 	// ITfLangBarItem
     virtual STDMETHODIMP GetStatus(DWORD *pdwStatus);
@@ -26,6 +26,9 @@ public:
 		_lbiTrueInfo = tInfo;
 		_lbiFalseInfo = fInfo;
 	}
+
+	void SetId(UINT id) { _uiID = id; }
+	UINT GetId() { return _uiID; }
 
 	// called by engine to set LangBarButton status
 	virtual void SetState(BOOL state);

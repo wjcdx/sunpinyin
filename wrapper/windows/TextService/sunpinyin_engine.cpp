@@ -9,7 +9,8 @@
 SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	: m_pTextService(pTextService), m_PreeditArea(CCandidateWindow::_rgPreeditString),
 	m_CandidataArea(CCandidateWindow::_rgCandidatesString), m_bUpdateNeeded(true),
-	m_lbbStatus(CLangBarButton(pTextService, this, c_guidLangBarItemButton, LANGBAR_ITEM_DESC))
+	m_lbbStatus(CLangBarButton(pTextService, this, c_guidLangBarItemButton, LANGBAR_ITEM_DESC)),
+	m_lbmMenu(CLangBarMenu(pTextService, this, c_guidLangBarItemMenu, LANGBAR_MENU_DESC))
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
@@ -199,6 +200,9 @@ bool SunPinyinEngine::init_language_bar(ITfLangBarItemMgr *pLangBarItemMgr)
 	if (pLangBarItemMgr->AddItem(&m_lbbStatus) != S_OK)
         return false;
 
+	if (pLangBarItemMgr->AddItem(&m_lbmMenu) != S_OK)
+		return false;
+
 	m_lbbStatus.SetState(true);
 
 	return true;
@@ -210,6 +214,10 @@ bool SunPinyinEngine::uninit_language_bar(ITfLangBarItemMgr *pLangBarItemMgr)
 		return false;
 	if (pLangBarItemMgr->RemoveItem(&m_lbbStatus) != S_OK)
         return false;
+
+	if (pLangBarItemMgr->RemoveItem(&m_lbmMenu) != S_OK)
+		return false;
+
 	return true;
 }
 
@@ -226,5 +234,32 @@ void SunPinyinEngine::setup_langbar_items()
 	statusFalseInfo.setTooltip(std::string("Switch to English input mode"));
 
 	m_lbbStatus.SetupInfo(statusTrueInfo, statusFalseInfo);
-	//m_lbbStatus.SetStatus(true);
+	m_lbbStatus.SetId(CIMIWinHandler::STATUS_ID_CN);
+
+	CLangBarMenuItem lbmItem(this);
+	CLangBarMenuItemInfo lbmiiTrueInfo;
+	CLangBarMenuItemInfo lbmiiFalseInfo;
+
+	lbmiiTrueInfo.SetText(std::string("FULL"));
+	lbmiiTrueInfo.SetBmp(IDB_WIDTHFULL);
+	lbmiiFalseInfo.SetText(std::string("HALF"));
+	lbmiiFalseInfo.SetBmp(IDB_WIDTHHALF);
+	lbmItem.SetInfo(lbmiiTrueInfo, lbmiiFalseInfo);
+	lbmItem.SetIndex(0);
+	lbmItem.SetId(CIMIWinHandler::STATUS_ID_FULLSYMBOL);
+	lbmItem.SetState(true);
+	m_lbmMenu.AddItem(lbmItem);
+
+	lbmiiTrueInfo.SetText(std::string("CHN"));
+	lbmiiTrueInfo.SetBmp(IDB_PUNCHAN);
+	lbmiiFalseInfo.SetText(std::string("ENG"));
+	lbmiiFalseInfo.SetBmp(IDB_PUNCENG);
+	lbmItem.SetInfo(lbmiiTrueInfo, lbmiiFalseInfo);
+	lbmItem.SetIndex(1);
+	lbmItem.SetId(CIMIWinHandler::STATUS_ID_FULLPUNC);
+	lbmItem.SetState(true);
+	m_lbmMenu.AddItem(lbmItem);
+	m_lbmMenu.SetText("Menu");
+	m_lbmMenu.SetIcon(IDI_MENU);
+
 }
