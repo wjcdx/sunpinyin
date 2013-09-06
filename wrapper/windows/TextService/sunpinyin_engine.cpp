@@ -299,7 +299,7 @@ SunPinyinEngine::update_config()
     update_cand_window_size();
     update_max_best();
     update_max_tail_candidate();
-    //update_charset_level();
+    update_charset_level();
     update_page_key_minus();
     update_page_key_comma();
     update_page_key_bracket();
@@ -330,14 +330,22 @@ SunPinyinEngine::update_charset_level()
     //printf("charset is %s.\n", charset.c_str());
     CIMIContext* ic = m_pv->getIC();
     assert(ic);
-    if (charset == "GB2312") {
-        ic->setCharsetLevel(0);
-    } else if (charset == "GBK") {
-        ic->setCharsetLevel(1);
-    }   
-    else {
-        ic->setCharsetLevel(2);
-    }
+    //if (charset == "GB2312") {
+    //    ic->setCharsetLevel(0);
+    //} else if (charset == "GBK") {
+    //    ic->setCharsetLevel(1);
+    //}   
+    //else {
+    //    ic->setCharsetLevel(2);
+    //}
+
+	// TODO: FIX ME!
+	// because iconv is not supported for now,
+	// the charset level defaults to 3 while
+	// lexicon file is parsed. Because the chars
+	// may be un-recognized, the default level is
+	// not changed.
+	ic->setCharsetLevel(3);
 }
 
 void
