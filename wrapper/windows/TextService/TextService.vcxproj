@@ -182,6 +182,8 @@
     <ClCompile Include="CandidateWindow.cpp" />
     <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="Composition.cpp" />
+    <ClCompile Include="Config\GVariant.cpp" />
+    <ClCompile Include="Config\sunpinyin_config.cpp" />
     <ClCompile Include="DisplayAttribute.cpp" />
     <ClCompile Include="DisplayAttributeInfo.cpp" />
     <ClCompile Include="DisplayAttributeProvider.cpp" />
@@ -209,6 +211,9 @@
   <ItemGroup>
     <ClInclude Include="CandidateList.h" />
     <ClInclude Include="CandidateWindow.h" />
+    <ClInclude Include="Config\GVariant.h" />
+    <ClInclude Include="Config\sunpinyin_config.h" />
+    <ClInclude Include="Config\sunpinyin_config_keys.h" />
     <ClInclude Include="DisplayAttributeInfo.h" />
     <ClInclude Include="EditSession.h" />
     <ClInclude Include="EnumDisplayAttributeInfo.h" />
@@ -236,6 +241,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TextService.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Config\configs.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,6 +10,7 @@
 #include <ime-core/options/session_factory.h>
 #include <xh/input/segment/TXhSyllableSegment.h>
 #include "imi_wdx_win.h"
+#include "Config/sunpinyin_config.h"
 
 #include "Globals.h"
 #include "LangBar/LangBarMenu.h"
@@ -51,9 +52,39 @@ public:
 	bool uninit_language_bar(ITfLangBarItemMgr *pLangBarItemMgr);
 	void setup_langbar_items();
 
+	virtual bool onConfigChanged(const COptionEvent& event);
+
+private:
+    void update_config();
+    void update_history_power();
+    void update_cand_window_size();
+    void update_mode_key();
+    void update_punct_key();
+    void update_page_key_minus();
+    void update_page_key_comma();
+    void update_page_key_bracket();
+    void update_page_key(const char* conf_key, bool default_val,
+                         unsigned page_up, unsigned page_down);
+    void update_candi_delete_key();
+    void update_cancel_with_backspace();
+    void update_smart_punc();
+    void update_max_best();
+    void update_max_tail_candidate();
+
+    void update_charset_level();
+    void update_user_data_dir();
+    void update_punct_mappings();
+    void update_fuzzy_pinyins();
+    void update_correction_pinyins();
+    void update_fuzzy_segs();
+    void update_shuangpin_type();
+
 private:
 	CWinHandler		*m_wh;
     CIMIView        *m_pv;
+	CHotkeyProfile  *m_hotkey_profile;
+	SunPinyinConfig m_config;
+
 	CTextService	*m_pTextService;
 	ITfContext		*m_pContext;
 	TfEditCookie	m_oEditCookie;

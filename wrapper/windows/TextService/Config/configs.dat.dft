@@ -1,0 +1,54 @@
+#General/DataDir
+#General/UserDataDir
+Pinyin/Scheme 3 XingHua
+#General/PunctMapping/Enabled
+#General/PunctMapping/Mappings
+#General/Charset
+#QuanPin/Fuzzy/Enabled
+#QuanPin/Fuzzy/Pinyins
+#QuanPin/AutoCorrection/Enabled
+#QuanPin/AutoCorrection/Pinyins
+#Pinyin/ShuangPinType
+
+General/PageSize 2 10
+General/MemoryPower 2 3
+General/Charset 3 GBK
+General/MaxBest 2 10
+General/MaxTailCandidate 2 3
+General/InitialStatus/Mode 3 Chinese
+General/InitialStatus/Punct 3 Full
+General/InitialStatus/Letter 3 Half
+
+QuanPin/Fuzzy/Any 1 yes
+QuanPin/Fuzzy/ZhiZi 1 no
+QuanPin/Fuzzy/ChiCi 1 no
+QuanPin/Fuzzy/ShiSi 1 no
+QuanPin/Fuzzy/AnAng 1 no
+QuanPin/Fuzzy/OnOng 1 no
+QuanPin/Fuzzy/EnEng 1 no
+QuanPin/Fuzzy/InIng 1 no
+QuanPin/Fuzzy/EngOng 1 no
+QuanPin/Fuzzy/IanIang 1 no
+QuanPin/Fuzzy/UanUang 1 no
+QuanPin/Fuzzy/NeLe 1 no
+QuanPin/Fuzzy/FoHe 1 no
+QuanPin/Fuzzy/LeRi 1 no
+QuanPin/Fuzzy/KeGe 1 no
+
+QuanPin/FuzzySegs/Enabled 1 no
+QuanPin/InnerFuzzy/Enabled 1 no
+
+QuanPin/AutoCorrecting/IgnIng 1 no
+QuanPin/AutoCorrecting/OgnOng 1 no
+QuanPin/AutoCorrecting/UenUn 1 no
+QuanPin/AutoCorrecting/ImgIng 1 no
+QuanPin/AutoCorrecting/IouIu 1 no
+QuanPin/AutoCorrecting/UeiUi 1 no
+
+Keyboard/ModeSwitch shift
+Keyboard/PunctSwitch ControlComma
+Keyboard/Page/CommaPeriod 1 no
+Keyboard/Page/MinusEquals 1 no
+Keyboard/Page/Brackets 1 no
+Keyboard/CancelBackspace 1 yes
+Keyboard/SmartPunct 1 yes
