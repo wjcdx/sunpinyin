@@ -43,7 +43,7 @@
 #include <sunpinyin.h>
 #include "GVariant.h"
 
-class ConfigWindow;
+class CConfigWindow;
 
 enum CharsetLevel
 {
@@ -120,6 +120,7 @@ private:
     CSunpinyinSessionFactory::EScheme get_scheme(const std::string& name);
 
 	std::string m_config_file;
+	CConfigWindow *m_pConfigWindow;
 };
 
 #endif // SUNPINYIN_CONFIG_H

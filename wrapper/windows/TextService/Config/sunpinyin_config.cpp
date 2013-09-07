@@ -38,6 +38,7 @@
 #include <sunpinyin.h>
 #include "sunpinyin_config_keys.h"
 #include "sunpinyin_config.h"
+#include "ConfigWindow.h"
 
 using namespace std;
 
@@ -50,6 +51,12 @@ SunPinyinConfig::SunPinyinConfig()
     m_scheme_names["XingHua"]  = CSunpinyinSessionFactory::XINGHUA;
 
 	init_configs(m_config_pairs);
+
+	m_pConfigWindow = new CConfigWindow(this);
+	if (!m_pConfigWindow->_Create())
+		return;
+	m_pConfigWindow->_InitWindowItems();
+	m_pConfigWindow->_Show();
 }
 
 SunPinyinConfig::~SunPinyinConfig()

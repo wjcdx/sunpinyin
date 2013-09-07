@@ -49,6 +49,9 @@
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <UseOfAtl>false</UseOfAtl>
+    <CLRSupport>false</CLRSupport>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -97,6 +100,7 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BrowseInformation>true</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,6 +167,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BrowseInformation>true</BrowseInformation>
       <UndefinePreprocessorDefinitions>_UNICODE;UNICODE</UndefinePreprocessorDefinitions>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -182,6 +187,7 @@
     <ClCompile Include="CandidateWindow.cpp" />
     <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="Composition.cpp" />
+    <ClCompile Include="Config\ConfigWindow.cpp" />
     <ClCompile Include="Config\GVariant.cpp" />
     <ClCompile Include="Config\sunpinyin_config.cpp" />
     <ClCompile Include="DisplayAttribute.cpp" />
@@ -211,6 +217,7 @@
   <ItemGroup>
     <ClInclude Include="CandidateList.h" />
     <ClInclude Include="CandidateWindow.h" />
+    <ClInclude Include="Config\ConfigWindow.h" />
     <ClInclude Include="Config\GVariant.h" />
     <ClInclude Include="Config\sunpinyin_config.h" />
     <ClInclude Include="Config\sunpinyin_config_keys.h" />

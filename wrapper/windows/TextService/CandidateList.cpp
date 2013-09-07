@@ -377,7 +377,6 @@ HRESULT ImeWrapper::CCandidateList::_StartCandidateList(TfClientId tfClientId, I
 
         _pCandidateWindow->_Move(rc.left, rc.bottom);
         _pCandidateWindow->_Show();
-		//MessageBox(NULL, "Windows is Shown!", NULL, MB_OK);
 
         hr = S_OK;
     }
