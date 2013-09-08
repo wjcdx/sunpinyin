@@ -187,6 +187,9 @@
     <ClCompile Include="CandidateWindow.cpp" />
     <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="Composition.cpp" />
+    <ClCompile Include="Config\ConfigButton.cpp" />
+    <ClCompile Include="Config\ConfigEdit.cpp" />
+    <ClCompile Include="Config\ConfigItem.cpp" />
     <ClCompile Include="Config\ConfigWindow.cpp" />
     <ClCompile Include="Config\GVariant.cpp" />
     <ClCompile Include="Config\sunpinyin_config.cpp" />
@@ -217,6 +220,9 @@
   <ItemGroup>
     <ClInclude Include="CandidateList.h" />
     <ClInclude Include="CandidateWindow.h" />
+    <ClInclude Include="Config\ConfigButton.h" />
+    <ClInclude Include="Config\ConfigEdit.h" />
+    <ClInclude Include="Config\ConfigItem.h" />
     <ClInclude Include="Config\ConfigWindow.h" />
     <ClInclude Include="Config\GVariant.h" />
     <ClInclude Include="Config\sunpinyin_config.h" />

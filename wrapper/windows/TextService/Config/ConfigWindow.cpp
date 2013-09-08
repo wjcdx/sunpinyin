@@ -17,14 +17,16 @@
 #include "ConfigWindow.h"
 #include "sunpinyin_config.h"
 #include "sunpinyin_config_keys.h"
+#include "ConfigItem.h"
+#include "ConfigButton.h"
+#include "ConfigEdit.h"
 
-#define CAND_WIDTH     400
-#define CAND_HEIGHT    40
-#define CAND_LENGTH    30
+
 
 ATOM CConfigWindow::_atomWndClass = 0;
+SunPinyinConfig *CConfigWindow::_pConfig = NULL;
+std::map<int, CConfigItem *> CConfigWindow::_ConfigItems;
 
-static const TCHAR c_szCandidateDescription[] = TEXT("Dummy Config Window");
 
 //+---------------------------------------------------------------------------
 //
@@ -33,11 +35,25 @@ static const TCHAR c_szCandidateDescription[] = TEXT("Dummy Config Window");
 //----------------------------------------------------------------------------
 
 CConfigWindow::CConfigWindow(SunPinyinConfig *config)
-	: _pConfig(config)
 {
     _hwnd = NULL;
 	_InitWindowClass();
+
+	_pConfig = config;
+	_SetupConfigItems();
 }
+
+CConfigWindow::~CConfigWindow()
+{
+	std::map<int, CConfigItem *>::iterator it = _ConfigItems.begin();
+	std::map<int, CConfigItem *>::iterator ite = _ConfigItems.end();
+
+	for (; it != ite;) {
+		delete it->second;
+		_ConfigItems.erase(it++);
+	}
+}
+
 
 //+---------------------------------------------------------------------------
 //
@@ -45,7 +61,6 @@ CConfigWindow::CConfigWindow(SunPinyinConfig *config)
 //
 //----------------------------------------------------------------------------
 
-/* static */
 BOOL CConfigWindow::_InitWindowClass()
 {
     WNDCLASS wc;
@@ -173,20 +188,6 @@ void CConfigWindow::_Hide()
 }
 
 
-CConfigWindow::ButtonInfo CConfigWindow::_buttons[] =
-{
-	//BS_PUSHBUTTON, TEXT ("PUSHBUTTON"),
-	//BS_DEFPUSHBUTTON, TEXT ("DEFPUSHBUTTON"),
-	//BS_CHECKBOX, TEXT ("CHECKBOX"),
-	BS_AUTOCHECKBOX, TEXT ("Init Mode Chinese"), TEXT (CONFIG_GENERAL_INITIAL_MODE),
-	//BS_RADIOBUTTON, TEXT ("RADIOBUTTON"),
-	//BS_3STATE, TEXT ("3STATE"),
-	//BS_AUTO3STATE, TEXT ("AUTO3STATE"),
-	//BS_GROUPBOX, TEXT ("GROUPBOX"),
-	//BS_AUTORADIOBUTTON, TEXT ("AUTORADIO"),
-	//BS_OWNERDRAW, TEXT ("OWNERDRAW")
-};
-
 //+---------------------------------------------------------------------------
 //
 // _WindowProc
@@ -197,6 +198,7 @@ CConfigWindow::ButtonInfo CConfigWindow::_buttons[] =
 LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
+	HWND hwndItem;
 	static int cxChar, cyChar;
 	int i = 0;
 	int id = 0;
@@ -210,15 +212,16 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 			cxChar = LOWORD (GetDialogBaseUnits ()) ;
 			cyChar = HIWORD (GetDialogBaseUnits ()) ;
-			for (i = 0 ; i < NUM ; i++) {
-				_hwndButtons[i] = CreateWindow(
-					TEXT("button"), _buttons[i].szText,
-					WS_CHILD | WS_VISIBLE | _buttons[i].iStyle,
+			for (i = 0 ; i < _ConfigItems.size(); i++) {
+				hwndItem = CreateWindow( 
+					_ConfigItems[i]->GetClass(), _ConfigItems[i]->GetText(),
+					WS_CHILD | WS_VISIBLE | _ConfigItems[i]->GetStyle(),
 					cxChar, cyChar * (1 + 2 * i),
 					20 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU) i,
 					((LPCREATESTRUCT) lParam)->hInstance,
 					NULL);
+				_ConfigItems[i]->SetHwnd(hwndItem);
 			}
 			return 0 ;
 
@@ -237,22 +240,38 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		case WM_COMMAND:
 
 			id = LOWORD (wParam);
-			_OnConfigChanged(id);
+			_ConfigItems[id]->OnConfigChanged();
 
 			break ;
 		case WM_DESTROY :
+			_pConfig->save_configs();
 			PostQuitMessage (0) ;
-		return 0 ;
+			return 0 ;
     }
 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 void
-CConfigWindow::_OnConfigChanged(int id)
+CConfigWindow::_SetupConfigItems()
 {
-	bool state = false;
-	state = SendMessage ((HWND) _hwndButtons[id], BM_GETCHECK, 0, 0);
-	_pConfig->
+	CConfigButton * btn = new CConfigButton(_pConfig, BS_AUTOCHECKBOX,
+		TEXT ("Init Mode Chinese"), TEXT (CONFIG_GENERAL_INITIAL_MODE));
+	btn->SetupString(true, TEXT ("Chinese"), TEXT ("English"));
+	_ConfigItems[0] = btn;
+
+	CConfigEdit *edit = new CConfigEdit(_pConfig, 0, TEXT("History Power"),
+		TEXT (CONFIG_GENERAL_MEMORY_POWER));
+	_ConfigItems[1] = edit;
 }
 
+void
+CConfigWindow::_InitConfigItems()
+{
+	std::map<int, CConfigItem *>::iterator it = _ConfigItems.begin();
+	std::map<int, CConfigItem *>::iterator ite = _ConfigItems.end();
+
+	for (; it != ite; it++) {
+		it->second->Init();
+	}
+}

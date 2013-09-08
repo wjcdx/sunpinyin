@@ -103,18 +103,16 @@ public:
 	 */
 	bool show_config_window(SunPinyinConfig *config);
 
-
-
-private:
+	 /**
+     * called by config window when a value changed in config
+     */
+    void on_config_value_changed(const char *key,
+                                       GVariant &value);
 
 	GVariant config_get_value(const char *key);
 	void config_set_value(const char *key, GVariant &value);
 
-    /**
-     * called by ibus when a value changed in config
-     */
-    void on_config_value_changed(const char *key,
-                                       GVariant &value);
+private:
 
     std::string get_scheme_name(CSunpinyinSessionFactory::EScheme scheme);
     CSunpinyinSessionFactory::EScheme get_scheme(const std::string& name);

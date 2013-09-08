@@ -55,7 +55,7 @@ SunPinyinConfig::SunPinyinConfig()
 	m_pConfigWindow = new CConfigWindow(this);
 	if (!m_pConfigWindow->_Create())
 		return;
-	m_pConfigWindow->_InitWindowItems();
+	m_pConfigWindow->_InitConfigItems();
 	m_pConfigWindow->_Show();
 }
 
@@ -126,7 +126,7 @@ SunPinyinConfig::get(const char* key, bool val)
     assert(m_config != NULL);
     
     //ConfigItem item(key);
-    GVariant& value = config_get_value(key);
+    GVariant value = config_get_value(key);
     bool result = val;
 	if (value.TypeEquals(GVariant::G_VARIANT_CLASS_BOOLEAN)) {
 		result = (value.GetBool() == TRUE);
@@ -148,7 +148,7 @@ SunPinyinConfig::get(const char* key, const std::string& val)
 {
     assert(m_config != NULL);
     
-    GVariant& value = config_get_value(key);
+    GVariant value = config_get_value(key);
     string result = val;
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_STRING)) {
 		result = value.GetString();
@@ -170,7 +170,7 @@ SunPinyinConfig::get(const char* key, int val)
 {
     assert(m_config != NULL);
     
-    GVariant& value = config_get_value(key);
+    GVariant value = config_get_value(key);
     int result = val;
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_INT32)) {
 		result =  value.GetInt();
@@ -192,7 +192,7 @@ SunPinyinConfig::get(const char* key, const std::vector<std::string>& val)
 {
     assert(m_config != NULL);
     
-    GVariant& value = config_get_value(key);
+    GVariant value = config_get_value(key);
     vector<string> result(val);
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_ARRAY)) {
 		result =  value.GetArray();
