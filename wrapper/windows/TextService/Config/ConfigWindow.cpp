@@ -223,7 +223,7 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 					NULL);
 				_ConfigItems[i]->SetHwnd(hwndItem);
 			}
-			return 0 ;
+			return 0;
 
    //     case WM_PAINT:
 
@@ -244,10 +244,9 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			_ConfigItems[id]->OnConfigChanged(code);
 
 			break ;
-		case WM_DESTROY :
+		case WM_DESTROY:
 			_pConfig->save_configs();
-			PostQuitMessage (0) ;
-			return 0 ;
+			return 0;
     }
 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
