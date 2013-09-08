@@ -37,7 +37,6 @@ std::map<int, CConfigItem *> CConfigWindow::_ConfigItems;
 CConfigWindow::CConfigWindow(SunPinyinConfig *config)
 {
     _hwnd = NULL;
-	_InitWindowClass();
 
 	_pConfig = config;
 	_SetupConfigItems();
@@ -45,8 +44,6 @@ CConfigWindow::CConfigWindow(SunPinyinConfig *config)
 
 CConfigWindow::~CConfigWindow()
 {
-	_UninitWindowClass();
-
 	std::map<int, CConfigItem *>::iterator it = _ConfigItems.begin();
 	std::map<int, CConfigItem *>::iterator ite = _ConfigItems.end();
 

@@ -52,8 +52,6 @@ SunPinyinConfig::SunPinyinConfig()
     m_scheme_names["XingHua"]  = CSunpinyinSessionFactory::XINGHUA;
 
 	init_configs(m_config_pairs);
-
-	show_config_window();
 }
 
 SunPinyinConfig::~SunPinyinConfig()
@@ -357,12 +355,20 @@ SunPinyinConfig::serialize_config_value(GVariant &gvar)
 bool
 SunPinyinConfig::show_config_window()
 {
-	if (m_pConfigWindow)
+	if (m_pConfigWindow) {
 		m_pConfigWindow->_Show();
+		return true;
+	}
 
 	m_pConfigWindow = new CConfigWindow(this);
-	if (!m_pConfigWindow->_Create())
+	if (!m_pConfigWindow) {
 		return false;
+	}
+	if (!m_pConfigWindow->_Create()) {
+		delete m_pConfigWindow;
+		m_pConfigWindow = NULL;
+	}
+
 	m_pConfigWindow->_InitConfigItems();
 	m_pConfigWindow->_Show();
 	return true;

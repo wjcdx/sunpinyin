@@ -248,6 +248,7 @@
     <Image Include="Images\han.ico" />
     <Image Include="Images\menu.ico" />
     <Image Include="Images\punchan.bmp" />
+    <Image Include="Images\setup.bmp" />
     <Image Include="Images\TextService.ico" />
     <Image Include="Images\widthfull.bmp" />
     <Image Include="Images\widthhalf.bmp" />

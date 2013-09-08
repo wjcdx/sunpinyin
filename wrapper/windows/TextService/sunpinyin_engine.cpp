@@ -167,6 +167,12 @@ bool SunPinyinEngine::update_prop_status(unsigned id, bool status)
 {
 	if (!m_pv)
 		return false;
+
+	// process for special lang bar item
+	if (id == LANGBAR_ITEM_ID_CONFIG_SETUP) {
+		return m_config.show_config_window();
+	}
+
 	m_pv->setStatusAttrValue(id, status);
 	return true;
 }
@@ -253,6 +259,15 @@ void SunPinyinEngine::setup_langbar_items()
 	lbmItem.SetId(CIMIWinHandler::STATUS_ID_FULLPUNC);
 	lbmItem.SetState(true);
 	m_lbmMenu.AddItem(lbmItem);
+
+	lbmiiTrueInfo.SetText(std::string("Settings"));
+	lbmiiTrueInfo.SetBmp(IDB_SETUP);
+	lbmItem.SetInfo(lbmiiTrueInfo, lbmiiTrueInfo);
+	lbmItem.SetIndex(2);
+	lbmItem.SetId(LANGBAR_ITEM_ID_CONFIG_SETUP);
+	lbmItem.SetState(true);
+	m_lbmMenu.AddItem(lbmItem);
+	
 	m_lbmMenu.SetText("Menu");
 	m_lbmMenu.SetIcon(IDI_MENU);
 

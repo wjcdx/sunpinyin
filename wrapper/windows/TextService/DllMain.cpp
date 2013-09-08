@@ -15,6 +15,7 @@
 
 #include "Globals.h"
 #include "CandidateWindow.h"
+#include "Config/ConfigWindow.h"
 
 //+---------------------------------------------------------------------------
 //
@@ -35,6 +36,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID pvReserved)
 
             // register candidate window class.
             CCandidateWindow::_InitWindowClass();
+			CConfigWindow::_InitWindowClass();
 
             break;
 
@@ -42,6 +44,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID pvReserved)
 
             // unregister candidate window class.
             CCandidateWindow::_UninitWindowClass();
+			CConfigWindow::_UninitWindowClass();
 
             DeleteCriticalSection(&g_cs);
 

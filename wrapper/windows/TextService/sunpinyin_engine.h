@@ -22,6 +22,10 @@ class CTextService;
 class SunPinyinEngine : public IConfigurable
 {
 public:
+	enum {
+		LANGBAR_ITEM_ID_CONFIG_SETUP = 1000,
+	};
+
     SunPinyinEngine(CTextService *pTextService);
     virtual ~SunPinyinEngine();
 

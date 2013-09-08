@@ -35,8 +35,8 @@ public:
     CConfigWindow(SunPinyinConfig *config);
 	~CConfigWindow();
 
-    BOOL _InitWindowClass();
-    void _UninitWindowClass();
+    static BOOL _InitWindowClass();
+    static void _UninitWindowClass();
 
     BOOL _Create();
     void _Destroy();
