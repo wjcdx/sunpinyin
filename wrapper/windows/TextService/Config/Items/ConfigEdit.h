@@ -25,7 +25,7 @@ public:
 	virtual ~CConfigEdit() {}
 
 	void Init();
-	void OnConfigChanged();
+	void OnConfigChanged(int code);
 
 private:
 

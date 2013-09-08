@@ -17,6 +17,7 @@
 #define CONFIG_ITEM_H
 
 #include <portability.h>
+#include "../../Globals.h"
 class SunPinyinConfig;
 
 //+---------------------------------------------------------------------------
@@ -33,7 +34,7 @@ public:
 	virtual ~CConfigItem();
 
 	virtual void Init() {}
-	virtual void OnConfigChanged();
+	virtual void OnConfigChanged(int code);
 
 	void SetHwnd(HWND hwnd) { _hwnd = hwnd; }
 

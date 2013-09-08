@@ -6,17 +6,18 @@ CConfigEdit::Init()
 {
 	int iStart = 0, iEnd = 0;
 	std::string val = GetConfigValue();
-	
-	SendMessage (_hwnd, EM_GETSEL, (WPARAM) &iStart, (LPARAM) &iEnd);
-	SendMessage (_hwnd, EM_SETSEL, iStart, iEnd);
-	SendMessage (_hwnd, EM_REPLACESEL, 0, (LPARAM) val.c_str());
+	Edit_SetText(_hwnd, val.c_str());
 }
 
 void
-CConfigEdit::OnConfigChanged()
+CConfigEdit::OnConfigChanged(int code)
 {
 	TCHAR szBuffer[512] = { 0 };
-	int iLength = SendMessage (_hwnd, EM_GETLINE, 0, (LPARAM) szBuffer);
+
+	if (code != EN_KILLFOCUS)
+		return;
+
+	Edit_GetText(_hwnd, szBuffer, 512);
 	_pConfig->on_config_value_changed(_szKey, PrepareValue(std::string(szBuffer)));
 }
 

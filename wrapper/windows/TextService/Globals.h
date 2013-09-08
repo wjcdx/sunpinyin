@@ -17,6 +17,7 @@
 #define GLOBALS_H
 
 #include <windows.h>
+#include <Windowsx.h>
 #include <ole2.h>
 #include <olectl.h>
 #include <assert.h>

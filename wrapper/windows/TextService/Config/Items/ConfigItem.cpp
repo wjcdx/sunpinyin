@@ -12,10 +12,10 @@ CConfigItem::CConfigItem(SunPinyinConfig *config, TCHAR *clazz, int style, TCHAR
 }
 
 CConfigItem::~CConfigItem()
-{}
+{
+}
 
 void
-CConfigItem::OnConfigChanged()
+CConfigItem::OnConfigChanged(int code)
 {
-
 }

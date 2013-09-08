@@ -15,30 +15,20 @@ class CConfigButton : public CConfigItem
 {
 public:
 	CConfigButton()
-		: CConfigItem(), _bString(false)
+		: CConfigItem()
 	{}
 	CConfigButton(SunPinyinConfig *config, int style, TCHAR *txt, TCHAR *key)
-		: CConfigItem(config, TEXT("BUTTON"), style, txt, key), _bString(false)
+		: CConfigItem(config, TEXT("BUTTON"), style, txt, key)
 	{}
 	virtual ~CConfigButton() {}
 
-	void SetupString(bool bStr, TCHAR *yes, TCHAR *no) {
-		_bString = bStr;
-		_trueString = std::string(yes);
-		_falseString = std::string(no);
-	}
-
 	void Init();
-	void OnConfigChanged();
+	void OnConfigChanged(int code);
 
 private:
 
 	GVariant PrepareValue(bool state);
 	bool GetConfigValue();
-
-	bool _bString;
-	std::string _trueString;
-	std::string _falseString;
 };
 
 #endif

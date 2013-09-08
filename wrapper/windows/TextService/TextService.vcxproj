@@ -187,11 +187,11 @@
     <ClCompile Include="CandidateWindow.cpp" />
     <ClCompile Include="Compartment.cpp" />
     <ClCompile Include="Composition.cpp" />
-    <ClCompile Include="Config\ConfigButton.cpp" />
-    <ClCompile Include="Config\ConfigEdit.cpp" />
-    <ClCompile Include="Config\ConfigItem.cpp" />
     <ClCompile Include="Config\ConfigWindow.cpp" />
     <ClCompile Include="Config\GVariant.cpp" />
+    <ClCompile Include="Config\Items\ConfigButton.cpp" />
+    <ClCompile Include="Config\Items\ConfigEdit.cpp" />
+    <ClCompile Include="Config\Items\ConfigItem.cpp" />
     <ClCompile Include="Config\sunpinyin_config.cpp" />
     <ClCompile Include="DisplayAttribute.cpp" />
     <ClCompile Include="DisplayAttributeInfo.cpp" />
@@ -220,11 +220,11 @@
   <ItemGroup>
     <ClInclude Include="CandidateList.h" />
     <ClInclude Include="CandidateWindow.h" />
-    <ClInclude Include="Config\ConfigButton.h" />
-    <ClInclude Include="Config\ConfigEdit.h" />
-    <ClInclude Include="Config\ConfigItem.h" />
     <ClInclude Include="Config\ConfigWindow.h" />
     <ClInclude Include="Config\GVariant.h" />
+    <ClInclude Include="Config\Items\ConfigButton.h" />
+    <ClInclude Include="Config\Items\ConfigEdit.h" />
+    <ClInclude Include="Config\Items\ConfigItem.h" />
     <ClInclude Include="Config\sunpinyin_config.h" />
     <ClInclude Include="Config\sunpinyin_config_keys.h" />
     <ClInclude Include="DisplayAttributeInfo.h" />

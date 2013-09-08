@@ -45,8 +45,8 @@ QuanPin/AutoCorrecting/ImgIng 1 no
 QuanPin/AutoCorrecting/IouIu 1 no
 QuanPin/AutoCorrecting/UeiUi 1 no
 
-Keyboard/ModeSwitch shift
-Keyboard/PunctSwitch ControlComma
+Keyboard/ModeSwitch 3 Shift
+Keyboard/PunctSwitch 3 ControlComma
 Keyboard/Page/CommaPeriod 1 no
 Keyboard/Page/MinusEquals 1 no
 Keyboard/Page/Brackets 1 no

@@ -17,9 +17,9 @@
 #include "ConfigWindow.h"
 #include "sunpinyin_config.h"
 #include "sunpinyin_config_keys.h"
-#include "ConfigItem.h"
-#include "ConfigButton.h"
-#include "ConfigEdit.h"
+#include "Items/ConfigItem.h"
+#include "Items/ConfigButton.h"
+#include "Items/ConfigEdit.h"
 
 
 
@@ -201,7 +201,7 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	HWND hwndItem;
 	static int cxChar, cyChar;
 	int i = 0;
-	int id = 0;
+	int id = 0, code = 0;
 	bool state = false;
 
 
@@ -240,7 +240,8 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		case WM_COMMAND:
 
 			id = LOWORD (wParam);
-			_ConfigItems[id]->OnConfigChanged();
+			code = HIWORD (wParam);
+			_ConfigItems[id]->OnConfigChanged(code);
 
 			break ;
 		case WM_DESTROY :
@@ -256,12 +257,11 @@ void
 CConfigWindow::_SetupConfigItems()
 {
 	CConfigButton * btn = new CConfigButton(_pConfig, BS_AUTOCHECKBOX,
-		TEXT ("Init Mode Chinese"), TEXT (CONFIG_GENERAL_INITIAL_MODE));
-	btn->SetupString(true, TEXT ("Chinese"), TEXT ("English"));
+		TEXT ("SmartPunct"), TEXT (CONFIG_KEYBOARD_SMARK_PUNCT));
 	_ConfigItems[0] = btn;
 
-	CConfigEdit *edit = new CConfigEdit(_pConfig, 0, TEXT("History Power"),
-		TEXT (CONFIG_GENERAL_MEMORY_POWER));
+	CConfigEdit *edit = new CConfigEdit(_pConfig, 0, TEXT("GB2312"),
+		TEXT (CONFIG_GENERAL_CHARSET_LEVEL));
 	_ConfigItems[1] = edit;
 }
 
