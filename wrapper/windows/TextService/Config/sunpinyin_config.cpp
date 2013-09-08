@@ -44,7 +44,8 @@ using namespace std;
 
 
 SunPinyinConfig::SunPinyinConfig()
-	: m_config_file(std::string("D:/cygwin/home/wjcdx/git/spy/wrapper/windows/TextService/Config/configs.dat"))
+	: m_config_file(std::string("D:/cygwin/home/wjcdx/git/spy/wrapper/windows/TextService/Config/configs.dat")),
+	m_pConfigWindow(NULL)
 {
     m_scheme_names["QuanPin"]    = CSunpinyinSessionFactory::QUANPIN;
     m_scheme_names["ShuangPin"]  = CSunpinyinSessionFactory::SHUANGPIN;
@@ -52,11 +53,7 @@ SunPinyinConfig::SunPinyinConfig()
 
 	init_configs(m_config_pairs);
 
-	m_pConfigWindow = new CConfigWindow(this);
-	if (!m_pConfigWindow->_Create())
-		return;
-	m_pConfigWindow->_InitConfigItems();
-	m_pConfigWindow->_Show();
+	show_config_window();
 }
 
 SunPinyinConfig::~SunPinyinConfig()
@@ -355,6 +352,30 @@ SunPinyinConfig::serialize_config_value(GVariant &gvar)
 		break;
     }
 	return std::string(value);
+}
+
+bool
+SunPinyinConfig::show_config_window()
+{
+	if (m_pConfigWindow)
+		m_pConfigWindow->_Show();
+
+	m_pConfigWindow = new CConfigWindow(this);
+	if (!m_pConfigWindow->_Create())
+		return false;
+	m_pConfigWindow->_InitConfigItems();
+	m_pConfigWindow->_Show();
+	return true;
+}
+
+void
+SunPinyinConfig::config_window_closing()
+{
+	save_configs();
+	if (m_pConfigWindow) {
+		delete m_pConfigWindow;
+		m_pConfigWindow = NULL;
+	}
 }
 
 

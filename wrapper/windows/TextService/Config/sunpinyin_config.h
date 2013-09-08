@@ -101,7 +101,8 @@ public:
 	 * if anything changed, config.on_config_value_changed
 	 * will be called.
 	 */
-	bool show_config_window(SunPinyinConfig *config);
+	bool show_config_window();
+	void config_window_closing();
 
 	 /**
      * called by config window when a value changed in config

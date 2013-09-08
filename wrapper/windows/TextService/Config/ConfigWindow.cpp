@@ -45,6 +45,8 @@ CConfigWindow::CConfigWindow(SunPinyinConfig *config)
 
 CConfigWindow::~CConfigWindow()
 {
+	_UninitWindowClass();
+
 	std::map<int, CConfigItem *>::iterator it = _ConfigItems.begin();
 	std::map<int, CConfigItem *>::iterator ite = _ConfigItems.end();
 
@@ -245,7 +247,7 @@ LRESULT CALLBACK CConfigWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 			break ;
 		case WM_DESTROY:
-			_pConfig->save_configs();
+			_pConfig->config_window_closing();
 			return 0;
     }
 
