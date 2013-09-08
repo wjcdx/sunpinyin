@@ -184,12 +184,12 @@ void SunPinyinEngine::update_status_property(bool cn)
 
 void SunPinyinEngine::update_punct_property(bool full)
 {
-	//m_lbmMenu.SetItemStatus(CIMIWinHandler::STATUS_ID_FULLPUNC, full);
+	m_lbmMenu.SetItemState(CIMIWinHandler::STATUS_ID_FULLPUNC, full);
 }
 
 void SunPinyinEngine::update_letter_property(bool full)
 {
-	//m_lbmMenu.SetItemStatus(CIMIWinHandler::STATUS_ID_FULLSYMBOL, full);
+	m_lbmMenu.SetItemState(CIMIWinHandler::STATUS_ID_FULLSYMBOL, full);
 }
 
 bool SunPinyinEngine::init_language_bar(ITfLangBarItemMgr *pLangBarItemMgr)
