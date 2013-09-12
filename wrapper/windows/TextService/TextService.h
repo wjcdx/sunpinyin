@@ -125,7 +125,7 @@ private:
 
     // utility function for KeyEventSink
     BOOL _IsKeyEaten(ITfContext *pContext, WPARAM wParam);
-	BOOL PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lParam);
+	BOOL PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam);
 
     //
     // state

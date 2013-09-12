@@ -29,7 +29,11 @@ public:
     SunPinyinEngine(CTextService *pTextService);
     virtual ~SunPinyinEngine();
 
+	void enable ();
+
 	// called by TextServiceFramework
+	bool is_mode_switch_key (CKeyEvent &event);
+	bool is_chinese_mode ();
 	bool process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event);
 
 	// CALLBACKS of CWinHandler

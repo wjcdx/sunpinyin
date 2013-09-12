@@ -61,6 +61,9 @@ static const WCHAR c_szPKeyF6[]    = L"Function 6";
 
 BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
 {
+	CKeyEvent event(0, 0, 0);
+	PrepareKeyEvent(event, wParam);
+
     // if the keyboard is disabled, keys are not consumed.
     if (_IsKeyboardDisabled())
         return FALSE;
@@ -68,6 +71,9 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
     // if the keyboard is closed, keys are not consumed.
     if (!_IsKeyboardOpen())
         return FALSE;
+
+	if (!_pEngine->is_chinese_mode() && !_pEngine->is_mode_switch_key(event))
+		return FALSE;
 
 	wParam &= 0xff;
     switch (wParam)
@@ -84,12 +90,6 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
 	case VK_BACK:
     case VK_RETURN:
 	case VK_ESCAPE:
-	case VK_LSHIFT:
-	case VK_RSHIFT:
-	case VK_LCONTROL:
-	case VK_RCONTROL:
-	case VK_LMENU:
-	case VK_RMENU:
 	case VK_SPACE:
 		if (!_IsComposing())
 			return FALSE;
@@ -98,7 +98,7 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
 	return TRUE;
 }
 
-BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lParam)
+BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
 {
  	WCHAR wch = ConvertVKey((UINT)wParam);
 
@@ -141,22 +141,6 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lPar
 	case VK_ESCAPE:
 		oEvent.code = IM_VK_ESCAPE;
 		break;
-	case VK_LSHIFT:
-		oEvent.code = IM_VK_SHIFT_L;
-		break;
-	case VK_RSHIFT:
-		oEvent.code = IM_VK_SHIFT_R;
-		break;
-	case VK_LCONTROL:
-		oEvent.code = IM_VK_CONTROL_L;
-		break;
-	case VK_RCONTROL:
-		oEvent.code = IM_VK_CONTROL_R;
-		break;
-	case VK_LMENU:
-	case VK_RMENU:
-		oEvent.code = IM_VK_ALT;
-		break;
 	case VK_SPACE:
 		oEvent.code = IM_VK_SPACE;
 
@@ -172,9 +156,28 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam, LPARAM lPar
     SHORT sksCtrl = GetKeyState(VK_CONTROL);
     SHORT sksShft = GetKeyState(VK_SHIFT);
 
-	if (sksMenu & 0x8000) oEvent.modifiers |= IM_ALT_MASK;
-	if (sksCtrl & 0x8000) oEvent.modifiers |= IM_CTRL_MASK;
-	if (sksShft & 0x8000) oEvent.modifiers |= IM_SHIFT_MASK;
+	if (sksMenu & 0x8000) {
+		oEvent.modifiers |= IM_ALT_MASK;
+		oEvent.code = IM_VK_ALT;
+	}
+	if (sksCtrl & 0x8000) {
+		oEvent.modifiers |= IM_CTRL_MASK;
+
+		if (GetKeyState(VK_LCONTROL) & 0x8000) {
+			oEvent.code = IM_VK_CONTROL_L;
+		} else if (GetKeyState(VK_RCONTROL) & 0x8000) {
+			oEvent.code = IM_VK_CONTROL_R;
+		}
+	}
+	if (sksShft & 0x8000) {
+		oEvent.modifiers |= IM_SHIFT_MASK;
+
+		if (GetKeyState(VK_LSHIFT) & 0x8000) {
+			oEvent.code = IM_VK_SHIFT_L;
+		} else if (GetKeyState(VK_RSHIFT) & 0x8000) {
+			oEvent.code = IM_VK_SHIFT_R;
+		}
+	}
 
 	if (wch > 0x20 && wch < 0x7f // isprint(key_val) && !isspace(key_val)
 		&& !(oEvent.modifiers & IM_CTRL_MASK)) {
@@ -229,7 +232,7 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
     if (_bKeyEaten)
     {
 		CKeyEvent event(0, 0, 0);
-		PrepareKeyEvent(event, wParam, lParam);
+		PrepareKeyEvent(event, wParam);
 		// let the handler judge if it's eaten.
         _InvokeKeyHandler(pContext, event);
     }

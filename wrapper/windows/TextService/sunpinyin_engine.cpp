@@ -45,6 +45,8 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 
 	// init language bare items
 	setup_langbar_items();
+	// init status of lang bar and engine with configs
+	enable();
 }
 
 SunPinyinEngine::~SunPinyinEngine()
@@ -63,15 +65,54 @@ SunPinyinEngine::~SunPinyinEngine()
 	//m_lbbStatus.Release();
 }
 
+void
+SunPinyinEngine::enable ()
+{
+    bool is_cn = m_config.is_initial_mode_cn();
+    update_status_property (is_cn);
+    m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_CN, is_cn);
+
+    bool is_letter_full = m_config.is_initial_letter_full();
+	update_letter_property (is_letter_full);
+    m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_FULLSYMBOL, is_letter_full);
+
+    bool is_punct_full = m_config.is_initial_punct_full();
+	update_punct_property (is_punct_full);
+    m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_FULLPUNC, is_punct_full);
+}
+
+bool SunPinyinEngine::is_mode_switch_key (CKeyEvent &event)
+{
+	return m_hotkey_profile->isModeSwitchKey(event);
+}
+
+bool SunPinyinEngine::is_chinese_mode ()
+{
+	return m_pv->getStatusAttrValue(CIMIWinHandler::STATUS_ID_CN);
+}
+
 bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event)
 {
 	m_pContext = pContext;
 	m_oEditCookie = ec;
 
-	if (m_pv != NULL) {
-        return m_pv->onKeyEvent(event);
+	assert(m_pv != NULL);
+
+	// the engine can not handle english mode itself,
+	// it needs help of the wrapper.
+	if (!m_pv->getStatusAttrValue(CIMIWinHandler::STATUS_ID_CN)) {
+        // we are in English input mode
+        if (!m_hotkey_profile->isModeSwitchKey(event)) {
+            m_hotkey_profile->rememberLastKey(event);
+            return FALSE;
+        }
+    } else if (m_hotkey_profile->isModeSwitchKey(event)) {
+        m_pv->onKeyEvent(CKeyEvent(IM_VK_ENTER, 0, 0));
+        m_pv->setStatusAttrValue(CIMIWinHandler::STATUS_ID_CN, false);
+        return TRUE;
     }
-    return false;
+
+	return m_pv->onKeyEvent(event);
 }
 
 void SunPinyinEngine::commit_string (const WCHAR *wstr, int length)
@@ -226,12 +267,12 @@ void SunPinyinEngine::setup_langbar_items()
 	CLangBarItemInfo statusTrueInfo;
 	CLangBarItemInfo statusFalseInfo;
 
-	statusTrueInfo.setText(std::string("EN"));
-	statusTrueInfo.setIcon(IDI_ENG);
-	statusTrueInfo.setTooltip(std::string("Switch to Chinese input mode"));
-	statusFalseInfo.setText(std::string("CN"));
-	statusFalseInfo.setIcon(IDI_HAN);
-	statusFalseInfo.setTooltip(std::string("Switch to English input mode"));
+	statusTrueInfo.setText(std::string("CN"));
+	statusTrueInfo.setIcon(IDI_HAN);
+	statusTrueInfo.setTooltip(std::string("Switch to English input mode"));
+	statusFalseInfo.setText(std::string("EN"));
+	statusFalseInfo.setIcon(IDI_ENG);
+	statusFalseInfo.setTooltip(std::string("Switch to Chinese input mode"));
 
 	m_lbbStatus.SetupInfo(statusTrueInfo, statusFalseInfo);
 	m_lbbStatus.SetId(CIMIWinHandler::STATUS_ID_CN);
@@ -376,10 +417,10 @@ SunPinyinEngine::update_mode_key()
     std::string mode_switch("Shift");
     mode_switch = m_config.get(CONFIG_KEYBOARD_MODE_SWITCH, mode_switch);
 
-    CKeyEvent shift_l  (IM_VK_SHIFT_L, 0, IM_SHIFT_MASK|IM_RELEASE_MASK);
-    CKeyEvent shift_r  (IM_VK_SHIFT_R, 0, IM_SHIFT_MASK|IM_RELEASE_MASK);
-    CKeyEvent control_l(IM_VK_CONTROL_L, 0, IM_CTRL_MASK|IM_RELEASE_MASK);
-    CKeyEvent control_r(IM_VK_CONTROL_R, 0, IM_CTRL_MASK|IM_RELEASE_MASK);
+    CKeyEvent shift_l  (IM_VK_SHIFT_L, 0, IM_SHIFT_MASK);
+    CKeyEvent shift_r  (IM_VK_SHIFT_R, 0, IM_SHIFT_MASK);
+    CKeyEvent control_l(IM_VK_CONTROL_L, 0, IM_CTRL_MASK);
+    CKeyEvent control_r(IM_VK_CONTROL_R, 0, IM_CTRL_MASK);
 
     if (mode_switch == "Shift") {
         m_hotkey_profile->removeModeSwitchKey(control_l);
