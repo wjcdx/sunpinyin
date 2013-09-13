@@ -72,6 +72,11 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
     if (!_IsKeyboardOpen())
         return FALSE;
 
+	// TODO: use Preserved Keys to enable some function keys.
+	// we block all CTRL events to enable CTRL+A/X/C/V and other edit functions.
+	if (event.modifiers & IM_CTRL_MASK)
+		return FALSE;
+
 	if (!_pEngine->is_chinese_mode() && !_pEngine->is_mode_switch_key(event))
 		return FALSE;
 
