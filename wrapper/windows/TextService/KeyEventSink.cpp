@@ -59,11 +59,8 @@ static const WCHAR c_szPKeyF6[]    = L"Function 6";
 //
 //----------------------------------------------------------------------------
 
-BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
+BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &event)
 {
-	CKeyEvent event(0, 0, 0);
-	PrepareKeyEvent(event, wParam);
-
     // if the keyboard is disabled, keys are not consumed.
     if (_IsKeyboardDisabled())
         return FALSE;
@@ -106,6 +103,7 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
 BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
 {
  	WCHAR wch = ConvertVKey((UINT)wParam);
+	UINT state = 0;
 
 	wParam &= 0xff;
     switch (wParam)
@@ -148,12 +146,14 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
 		break;
 	case VK_SPACE:
 		oEvent.code = IM_VK_SPACE;
-
+		break;
+	case VK_MENU:
+	case VK_SHIFT:
+	case VK_CONTROL:
     default:
 		oEvent.code = wch;
         break;
 	}
-	oEvent.value = oEvent.code;
 
 	// high-order bit : key down
     // low-order bit  : toggled
@@ -161,37 +161,30 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
     SHORT sksCtrl = GetKeyState(VK_CONTROL);
     SHORT sksShft = GetKeyState(VK_SHIFT);
 
-	if (sksMenu & 0x8000) {
+	if (sksMenu) {
 		oEvent.modifiers |= IM_ALT_MASK;
-		oEvent.code = IM_VK_ALT;
+		
+		state = IM_VK_ALT;
 	}
-	if (sksCtrl & 0x8000) {
+
+	if (sksCtrl) {
 		oEvent.modifiers |= IM_CTRL_MASK;
 
-		if (GetKeyState(VK_LCONTROL) & 0x8000) {
-			oEvent.code = IM_VK_CONTROL_L;
-		} else if (GetKeyState(VK_RCONTROL) & 0x8000) {
-			oEvent.code = IM_VK_CONTROL_R;
+		if (GetKeyState(VK_LCONTROL)) {
+			state = IM_VK_CONTROL_L;
+		} else if (GetKeyState(VK_RCONTROL)) {
+			state = IM_VK_CONTROL_R;
 		}
 	}
-	if (sksShft & 0x8000) {
+
+	if (sksShft) {
 		oEvent.modifiers |= IM_SHIFT_MASK;
-
-		if (GetKeyState(VK_LSHIFT) & 0x8000) {
-			oEvent.code = IM_VK_SHIFT_L;
-		} else if (GetKeyState(VK_RSHIFT) & 0x8000) {
-			oEvent.code = IM_VK_SHIFT_R;
+		if (GetKeyState(VK_LSHIFT)) {
+			state = IM_VK_SHIFT_L;
+		} else if (GetKeyState(VK_RSHIFT)) {
+			state = IM_VK_SHIFT_R;
 		}
 	}
-
-	if (wch > 0x20 && wch < 0x7f // isprint(key_val) && !isspace(key_val)
-		&& !(oEvent.modifiers & IM_CTRL_MASK)) {
-		// we only care about key_val here
-		oEvent.value = oEvent.code;
-    } else {
-        // what matters is key_code
-		oEvent.value = 0;
-    }
 
     return TRUE;
 }
@@ -209,6 +202,39 @@ STDAPI CTextService::OnSetFocus(BOOL fForeground)
     return S_OK;
 }
 
+static bool IsKeyDownHandled(CKeyEvent &event)
+{
+	if (event.modifiers) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static bool IsKeyDownEaten(CKeyEvent &event)
+{
+	if (event.modifiers) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static bool IsKeyUpHandled(CKeyEvent &event)
+{
+	if (event.modifiers & IM_SHIFT_MASK
+		&& event.code == 0) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+static bool IsKeyUpEaten(CKeyEvent &event)
+{
+	if (event.modifiers & IM_CTRL_MASK) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
 //+---------------------------------------------------------------------------
 //
 // OnTestKeyDown
@@ -218,7 +244,21 @@ STDAPI CTextService::OnSetFocus(BOOL fForeground)
 
 STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
-    *pfEaten = _IsKeyEaten(pContext, wParam);
+	CKeyEvent event(0, 0, 0);
+	PrepareKeyEvent(event, wParam);
+    _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
+	
+	// process CTRL/SHIFT keys while key is up.
+	// eat it but not handle it.
+	if (_bKeyEaten) {
+		_bKeyEaten = IsKeyDownEaten(event);
+	}
+
+	if (event.code != 0) {
+		_bKeyEaten = !!_bKeyEaten;
+	}
+
+	*pfEaten = _bKeyEaten;
     return S_OK;
 }
 
@@ -232,15 +272,24 @@ STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM l
 
 STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
-    _bKeyEaten = _IsKeyEaten(pContext, wParam);
+	CKeyEvent event(0, 0, 0);
+	PrepareKeyEvent(event, wParam);
+    _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
 
-    if (_bKeyEaten)
+	if (_bKeyEaten) {
+		_bKeyEaten = IsKeyDownEaten(event);
+	}
+
+	if (event.code != 0) {
+		_bKeyEaten = !!_bKeyEaten;
+	}
+
+	if (_bKeyEaten && IsKeyDownHandled(event))
     {
-		CKeyEvent event(0, 0, 0);
-		PrepareKeyEvent(event, wParam);
 		// let the handler judge if it's eaten.
         _InvokeKeyHandler(pContext, event);
     }
+
 	*pfEaten = _bKeyEaten;
     return S_OK;
 }
@@ -254,7 +303,20 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
 
 STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
-    *pfEaten = _IsKeyEaten(pContext, wParam);
+	CKeyEvent event(0, 0, 0);
+	PrepareKeyEvent(event, wParam);
+
+    _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
+
+	if (_bKeyEaten) {
+		_bKeyEaten = IsKeyUpEaten(event);
+	}
+
+	if (event.code != 0) {
+		_bKeyEaten = !!_bKeyEaten;
+	}
+
+	*pfEaten = _bKeyEaten;
     return S_OK;
 }
 
@@ -268,7 +330,24 @@ STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 
 STDAPI CTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
-    *pfEaten = _IsKeyEaten(pContext, wParam);
+	CKeyEvent event(0, 0, 0);
+	PrepareKeyEvent(event, wParam);
+	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
+
+	if (_bKeyEaten) {
+		_bKeyEaten = IsKeyUpEaten(event);
+	}
+
+	if (event.code != 0) {
+		_bKeyEaten = !!_bKeyEaten;
+	}
+
+	if (_bKeyEaten && IsKeyUpHandled(event))
+    {
+		// let the handler judge if it's eaten.
+        _InvokeKeyHandler(pContext, event);
+    }
+	*pfEaten = _bKeyEaten;
     return S_OK;
 }
 

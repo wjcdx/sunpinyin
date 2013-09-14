@@ -91,12 +91,27 @@ bool SunPinyinEngine::is_chinese_mode ()
 	return m_pv->getStatusAttrValue(CIMIWinHandler::STATUS_ID_CN);
 }
 
+static bool translate_key(CKeyEvent &oEvent)
+{
+	if (oEvent.code > 0x20 && oEvent.code < 0x7f // isprint(key_val) && !isspace(key_val)
+		&& !(oEvent.modifiers & IM_CTRL_MASK)) {
+		// we only care about key_val here
+		oEvent.value = oEvent.code;
+    } else {
+        // what matters is key_code
+		oEvent.value = 0;
+    }
+	return true;
+}
+
 bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event)
 {
 	m_pContext = pContext;
 	m_oEditCookie = ec;
 
 	assert(m_pv != NULL);
+
+	translate_key(event);
 
 	// the engine can not handle english mode itself,
 	// it needs help of the wrapper.
@@ -417,21 +432,15 @@ SunPinyinEngine::update_mode_key()
     std::string mode_switch("Shift");
     mode_switch = m_config.get(CONFIG_KEYBOARD_MODE_SWITCH, mode_switch);
 
-    CKeyEvent shift_l  (IM_VK_SHIFT_L, 0, IM_SHIFT_MASK);
-    CKeyEvent shift_r  (IM_VK_SHIFT_R, 0, IM_SHIFT_MASK);
-    CKeyEvent control_l(IM_VK_CONTROL_L, 0, IM_CTRL_MASK);
-    CKeyEvent control_r(IM_VK_CONTROL_R, 0, IM_CTRL_MASK);
+	CKeyEvent shift  (0, 0, IM_SHIFT_MASK);
+	CKeyEvent control(0, 0, IM_CTRL_MASK);
 
     if (mode_switch == "Shift") {
-        m_hotkey_profile->removeModeSwitchKey(control_l);
-        m_hotkey_profile->removeModeSwitchKey(control_r);
-        m_hotkey_profile->addModeSwitchKey(shift_l);
-        m_hotkey_profile->addModeSwitchKey(shift_r);
+        m_hotkey_profile->removeModeSwitchKey(control);
+        m_hotkey_profile->addModeSwitchKey(shift);
     } else if (mode_switch == "Control") {
-        m_hotkey_profile->removeModeSwitchKey(shift_l);
-        m_hotkey_profile->removeModeSwitchKey(shift_r);
-        m_hotkey_profile->addModeSwitchKey(control_l);
-        m_hotkey_profile->addModeSwitchKey(control_r);
+        m_hotkey_profile->removeModeSwitchKey(shift);
+        m_hotkey_profile->addModeSwitchKey(control);
     }
 }
 

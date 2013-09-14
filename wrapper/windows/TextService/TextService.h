@@ -124,7 +124,7 @@ private:
     void _UninitPreservedKey();
 
     // utility function for KeyEventSink
-    BOOL _IsKeyEaten(ITfContext *pContext, WPARAM wParam);
+	BOOL _IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &event);
 	BOOL PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam);
 
     //
