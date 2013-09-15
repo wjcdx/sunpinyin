@@ -18,7 +18,7 @@ void CLangBarButton::SetState(BOOL state)
 	if (_bState != state && _pLangBarItemSink) 
     {
 		_bState = state;
-		_pLangBarItemSink->OnUpdate(TF_LBI_TOOLTIP | TF_LBI_ICON | TF_LBI_TEXT);
+		_pLangBarItemSink->OnUpdate(TF_LBI_BTNALL);
     }
 }
 

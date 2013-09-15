@@ -45,7 +45,7 @@ static const GUID GUID_PRESERVEDKEY_F6 = {
 //
 static const TF_PRESERVEDKEY c_pkeyOnOff0 = { 0xC0, TF_MOD_ALT };
 static const TF_PRESERVEDKEY c_pkeyOnOff1 = { VK_KANJI, TF_MOD_IGNORE_ALL_MODIFIER };
-static const TF_PRESERVEDKEY c_pkeyF6 =   { VK_F6, TF_MOD_ON_KEYUP };
+static const TF_PRESERVEDKEY c_pkeyF6 =   { VK_SHIFT, TF_MOD_ON_KEYUP };
 
 //
 // the description for the preserved keys
@@ -74,8 +74,8 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 	if (event.modifiers & IM_CTRL_MASK)
 		return FALSE;
 
-	if (!_pEngine->is_chinese_mode() && !_pEngine->is_mode_switch_key(event))
-		return FALSE;
+	//if (!_pEngine->is_chinese_mode() && !_pEngine->is_mode_switch_key(event))
+	//	return FALSE;
 
 	wParam &= 0xff;
     switch (wParam)
@@ -155,6 +155,10 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
         break;
 	}
 
+	if (wch != 0) {
+		wch = wch;
+	}
+
 	// high-order bit : key down
     // low-order bit  : toggled
     SHORT sksMenu = GetKeyState(VK_MENU);
@@ -220,18 +224,11 @@ static bool IsKeyDownEaten(CKeyEvent &event)
 
 static bool IsKeyUpHandled(CKeyEvent &event)
 {
-	if (event.modifiers & IM_SHIFT_MASK
-		&& event.code == 0) {
-		return TRUE;
-	}
 	return FALSE;
 }
 
 static bool IsKeyUpEaten(CKeyEvent &event)
 {
-	if (event.modifiers & IM_CTRL_MASK) {
-		return FALSE;
-	}
 	return TRUE;
 }
 
@@ -248,14 +245,8 @@ STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM l
 	PrepareKeyEvent(event, wParam);
     _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
 	
-	// process CTRL/SHIFT keys while key is up.
-	// eat it but not handle it.
 	if (_bKeyEaten) {
 		_bKeyEaten = IsKeyDownEaten(event);
-	}
-
-	if (event.code != 0) {
-		_bKeyEaten = !!_bKeyEaten;
 	}
 
 	*pfEaten = _bKeyEaten;
@@ -280,10 +271,6 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
 		_bKeyEaten = IsKeyDownEaten(event);
 	}
 
-	if (event.code != 0) {
-		_bKeyEaten = !!_bKeyEaten;
-	}
-
 	if (_bKeyEaten && IsKeyDownHandled(event))
     {
 		// let the handler judge if it's eaten.
@@ -305,15 +292,10 @@ STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 {
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
-
-    _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
-
+	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
+	
 	if (_bKeyEaten) {
 		_bKeyEaten = IsKeyUpEaten(event);
-	}
-
-	if (event.code != 0) {
-		_bKeyEaten = !!_bKeyEaten;
 	}
 
 	*pfEaten = _bKeyEaten;
@@ -338,15 +320,12 @@ STDAPI CTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
 		_bKeyEaten = IsKeyUpEaten(event);
 	}
 
-	if (event.code != 0) {
-		_bKeyEaten = !!_bKeyEaten;
-	}
-
 	if (_bKeyEaten && IsKeyUpHandled(event))
     {
 		// let the handler judge if it's eaten.
         _InvokeKeyHandler(pContext, event);
     }
+
 	*pfEaten = _bKeyEaten;
     return S_OK;
 }
@@ -367,7 +346,13 @@ STDAPI CTextService::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *p
         _SetKeyboardOpen(fOpen ? FALSE : TRUE);
         *pfEaten = TRUE;
     }
-    else
+    else if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_F6))
+	{
+		CKeyEvent event(0, 0, IM_SHIFT_MASK);
+		_InvokeKeyHandler(pContext, event);
+		*pfEaten = TRUE;
+	}
+	else
     {
         *pfEaten = FALSE;
     }
