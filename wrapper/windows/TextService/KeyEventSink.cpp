@@ -29,7 +29,7 @@ static const GUID GUID_PRESERVEDKEY_ONOFF = {
   };
 
 /* 6a0bde42-6adf-11d7-a6ea-00065b84435c */
-static const GUID GUID_PRESERVEDKEY_F6 = { 
+static const GUID GUID_PRESERVEDKEY_STATUS_SWITCH = { 
     0x6a0bde42,
     0x6adf,
     0x11d7,
@@ -45,13 +45,13 @@ static const GUID GUID_PRESERVEDKEY_F6 = {
 //
 static const TF_PRESERVEDKEY c_pkeyOnOff0 = { 0xC0, TF_MOD_ALT };
 static const TF_PRESERVEDKEY c_pkeyOnOff1 = { VK_KANJI, TF_MOD_IGNORE_ALL_MODIFIER };
-static const TF_PRESERVEDKEY c_pkeyF6 =   { VK_SHIFT, TF_MOD_ON_KEYUP };
+static const TF_PRESERVEDKEY c_pkeyStatusSwitch =   { VK_SHIFT, TF_MOD_ON_KEYUP };
 
 //
 // the description for the preserved keys
 //
 static const WCHAR c_szPKeyOnOff[] = L"OnOff";
-static const WCHAR c_szPKeyF6[]    = L"Function 6";
+static const WCHAR c_szPKeyStatusSwitch[]    = L"Function 6";
 
 //+---------------------------------------------------------------------------
 //
@@ -355,9 +355,9 @@ STDAPI CTextService::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *p
         _SetKeyboardOpen(fOpen ? FALSE : TRUE);
         *pfEaten = TRUE;
     }
-    else if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_F6))
+    else if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_STATUS_SWITCH))
 	{
-		if (!CheckShiftKeyOnly(&c_pkeyF6))
+		if (!CheckShiftKeyOnly(&c_pkeyStatusSwitch))
         {
             *pfEaten = FALSE;
             return S_OK;
@@ -445,12 +445,12 @@ BOOL CTextService::_InitPreservedKey()
                                     c_szPKeyOnOff,
                                     wcslen(c_szPKeyOnOff));
 
-    // register F6 key
+    // register SHIFT key
     hr = pKeystrokeMgr->PreserveKey(_tfClientId, 
-                                    GUID_PRESERVEDKEY_F6,
-                                    &c_pkeyF6,
-                                    c_szPKeyF6,
-                                    wcslen(c_szPKeyF6));
+                                    GUID_PRESERVEDKEY_STATUS_SWITCH,
+                                    &c_pkeyStatusSwitch,
+                                    c_szPKeyStatusSwitch,
+                                    wcslen(c_szPKeyStatusSwitch));
 
     pKeystrokeMgr->Release();
 
@@ -473,7 +473,7 @@ void CTextService::_UninitPreservedKey()
 
     pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_ONOFF, &c_pkeyOnOff0);
     pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_ONOFF, &c_pkeyOnOff1);
-    pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_F6,    &c_pkeyF6);
+	pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_STATUS_SWITCH, &c_pkeyStatusSwitch);
 
     pKeystrokeMgr->Release();
 }
