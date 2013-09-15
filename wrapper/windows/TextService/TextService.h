@@ -25,6 +25,7 @@ class CTextService : public ITfTextInputProcessor,
                      public ITfThreadMgrEventSink,
                      public ITfTextEditSink,
                      public ITfKeyEventSink,
+					 public ITfThreadFocusSink,
                      public ITfCompositionSink,
                      public ITfDisplayAttributeProvider
 {
@@ -58,6 +59,10 @@ public:
     STDMETHODIMP OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
     STDMETHODIMP OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten);
     STDMETHODIMP OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *pfEaten);
+
+	// ITfThreadFocusSink
+    STDMETHODIMP OnSetThreadFocus();
+    STDMETHODIMP OnKillThreadFocus();
 
     // ITfCompositionSink
     STDMETHODIMP OnCompositionTerminated(TfEditCookie ecWrite, ITfComposition *pComposition);
@@ -119,6 +124,9 @@ private:
     BOOL _InitKeyEventSink();
     void _UninitKeyEventSink();
 
+	BOOL _InitThreadFocusSink();
+    void _UninitThreadFocusSink();
+
     // initialize and uninitialize PreservedKey.
     BOOL _InitPreservedKey();
     void _UninitPreservedKey();
@@ -137,6 +145,8 @@ private:
     // The cookie of ThreadMgrEventSink
     DWORD _dwThreadMgrEventSinkCookie;
 
+	// The cookie of ThreadFocusSink
+    DWORD _dwThreadFocusSinkCookie;
 
 	ITfDocumentMgr* _pDocMgrLastFocused;
 

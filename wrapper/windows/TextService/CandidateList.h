@@ -57,17 +57,17 @@ namespace ImeWrapper {
 
 		ITfContext* _GetContextDocument() { return _pContextDocument; };
 
-		BOOL _IsContextCandidateWindow(ITfContext *pContext);
+		//BOOL _IsContextCandidateWindow(ITfContext *pContext);
 
 	private:
-		HRESULT _AdviseContextKeyEventSink();
+		//HRESULT _AdviseContextKeyEventSink();
 		HRESULT _UnadviseContextKeyEventSink();
 		HRESULT _AdviseTextLayoutSink();
 		HRESULT _UnadviseTextLayoutSink();
 
 		CTextService *_pTextService;
 		ITfRange *_pRangeComposition;
-		ITfContext *_pContextCandidateWindow;
+		//ITfContext *_pContextCandidateWindow;
 		ITfContext *_pContextDocument;
 		ITfDocumentMgr *_pDocumentMgr;
 

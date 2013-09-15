@@ -74,7 +74,7 @@ ImeWrapper::CCandidateList::CCandidateList(CTextService *pTextService)
     _hwndParent = NULL;
     _pCandidateWindow = NULL;
     _pRangeComposition = NULL;
-    _pContextCandidateWindow = NULL;
+    //_pContextCandidateWindow = NULL;
     _pContextDocument = NULL;
     _pDocumentMgr = NULL;
 
@@ -316,8 +316,8 @@ HRESULT ImeWrapper::CCandidateList::_StartCandidateList(TfClientId tfClientId, I
     // create a new context on the document manager object for
     // the candidate ui.
     //
-    if (FAILED(pDocumentMgr->CreateContext(tfClientId, 0, NULL, &_pContextCandidateWindow, &ecTmp)))
-        return E_FAIL;
+    //if (FAILED(pDocumentMgr->CreateContext(tfClientId, 0, NULL, &_pContextCandidateWindow, &ecTmp)))
+    //    return E_FAIL;
 
     //
     // push the new context. 
@@ -337,8 +337,8 @@ HRESULT ImeWrapper::CCandidateList::_StartCandidateList(TfClientId tfClientId, I
     // 
     // advise ITfContextKeyEventSink to the new context.
     // 
-    if (FAILED(_AdviseContextKeyEventSink()))
-        goto Exit;
+    //if (FAILED(_AdviseContextKeyEventSink()))
+    //    goto Exit;
 
     // 
     // advise ITfTextLayoutSink to the document context.
@@ -410,12 +410,12 @@ void ImeWrapper::CCandidateList::_EndCandidateList()
        _pRangeComposition = NULL;
     }
 
-    if (_pContextCandidateWindow)
-    {
-       _UnadviseContextKeyEventSink();
-       _pContextCandidateWindow->Release();
-       _pContextCandidateWindow = NULL;
-    }
+    //if (_pContextCandidateWindow)
+    //{
+    //   _UnadviseContextKeyEventSink();
+    //   _pContextCandidateWindow->Release();
+    //   _pContextCandidateWindow = NULL;
+    //}
 
     if (_pContextDocument)
     {
@@ -438,37 +438,37 @@ void ImeWrapper::CCandidateList::_EndCandidateList()
 //
 //----------------------------------------------------------------------------
 
-BOOL ImeWrapper::CCandidateList::_IsContextCandidateWindow(ITfContext *pContext)
-{
-    return (_pContextCandidateWindow == pContext) ? TRUE : FALSE;
-}
+//BOOL ImeWrapper::CCandidateList::_IsContextCandidateWindow(ITfContext *pContext)
+//{
+//    //return (_pContextCandidateWindow == pContext) ? TRUE : FALSE;
+//}
 
 //+---------------------------------------------------------------------------
 //
 // AdviseContextKeyEventSink
 //
 //----------------------------------------------------------------------------
-
-HRESULT ImeWrapper::CCandidateList::_AdviseContextKeyEventSink()
-{
-    HRESULT hr;
-    ITfSource *pSource = NULL;
-
-    hr = E_FAIL;
-
-    if (FAILED(_pContextCandidateWindow->QueryInterface(IID_ITfSource, (void **)&pSource)))
-        goto Exit;
-
-    if (FAILED(pSource->AdviseSink(IID_ITfContextKeyEventSink, (ITfContextKeyEventSink *)this, &_dwCookieContextKeyEventSink)))
-        goto Exit;
-
-    hr = S_OK;
-
-Exit:
-    if (pSource != NULL)
-        pSource->Release();
-    return hr;
-}
+//
+//HRESULT ImeWrapper::CCandidateList::_AdviseContextKeyEventSink()
+//{
+//    HRESULT hr;
+//    ITfSource *pSource = NULL;
+//
+//    hr = E_FAIL;
+//
+//    if (FAILED(_pContextCandidateWindow->QueryInterface(IID_ITfSource, (void **)&pSource)))
+//        goto Exit;
+//
+//    if (FAILED(pSource->AdviseSink(IID_ITfContextKeyEventSink, (ITfContextKeyEventSink *)this, &_dwCookieContextKeyEventSink)))
+//        goto Exit;
+//
+//    hr = S_OK;
+//
+//Exit:
+//    if (pSource != NULL)
+//        pSource->Release();
+//    return hr;
+//}
 
 //+---------------------------------------------------------------------------
 //
@@ -476,29 +476,29 @@ Exit:
 //
 //----------------------------------------------------------------------------
 
-HRESULT ImeWrapper::CCandidateList::_UnadviseContextKeyEventSink()
-{
-    HRESULT hr;
-    ITfSource *pSource = NULL;
-
-    hr = E_FAIL;
-
-    if (_pContextCandidateWindow == NULL)
-        goto Exit;
-
-    if (FAILED(_pContextCandidateWindow->QueryInterface(IID_ITfSource, (void **)&pSource)))
-        goto Exit;
-
-    if (FAILED(pSource->UnadviseSink(_dwCookieContextKeyEventSink)))
-        goto Exit;
-
-    hr = S_OK;
-
-Exit:
-    if (pSource != NULL)
-        pSource->Release();
-    return hr;
-}
+//HRESULT ImeWrapper::CCandidateList::_UnadviseContextKeyEventSink()
+//{
+//    HRESULT hr;
+//    ITfSource *pSource = NULL;
+//
+//    hr = E_FAIL;
+//
+    //if (_pContextCandidateWindow == NULL)
+    //    goto Exit;
+//
+//    if (FAILED(_pContextCandidateWindow->QueryInterface(IID_ITfSource, (void **)&pSource)))
+//        goto Exit;
+//
+//    if (FAILED(pSource->UnadviseSink(_dwCookieContextKeyEventSink)))
+//        goto Exit;
+//
+//    hr = S_OK;
+//
+//Exit:
+//    if (pSource != NULL)
+//        pSource->Release();
+//    return hr;
+//}
 
 //+---------------------------------------------------------------------------
 //

@@ -62,12 +62,16 @@ static const WCHAR c_szPKeyStatusSwitch[]    = L"Function 6";
 BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &event)
 {
     // if the keyboard is disabled, keys are not consumed.
-    if (_IsKeyboardDisabled())
+    if (_IsKeyboardDisabled()) {
+		MessageBox(NULL, "KeyboardDisabled!", NULL, MB_OK);
         return FALSE;
+	}
 
     // if the keyboard is closed, keys are not consumed.
-    if (!_IsKeyboardOpen())
+    if (!_IsKeyboardOpen()) {
+		MessageBox(NULL, "KeyboardClosed!", NULL, MB_OK);
         return FALSE;
+	}
 
 	// TODO: use Preserved Keys to enable some function keys.
 	// we block all CTRL events to enable CTRL+A/X/C/V and other edit functions.
@@ -191,6 +195,11 @@ STDAPI CTextService::OnSetFocus(BOOL fForeground)
 static bool IsKeyDownHandled(CKeyEvent &event)
 {
 	if (event.modifiers) {
+		// handle SHIFT+A
+		if (event.modifiers & IM_SHIFT_MASK 
+			&& event.code != 0) {
+			return TRUE;
+		}
 		return FALSE;
 	}
 	return TRUE;
@@ -199,6 +208,11 @@ static bool IsKeyDownHandled(CKeyEvent &event)
 static bool IsKeyDownEaten(CKeyEvent &event)
 {
 	if (event.modifiers) {
+		// handle SHIFT+A
+		if (event.modifiers & IM_SHIFT_MASK 
+			&& event.code != 0) {
+			return TRUE;
+		}
 		return FALSE;
 	}
 	return TRUE;
@@ -211,6 +225,9 @@ static bool IsKeyUpHandled(CKeyEvent &event)
 
 static bool IsKeyUpEaten(CKeyEvent &event)
 {
+	if (event.modifiers) {
+		return FALSE;
+	}
 	return TRUE;
 }
 

@@ -41,8 +41,10 @@ STDAPI CTextService::OnInitDocumentMgr(ITfDocumentMgr *pDocMgr)
 STDAPI CTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 {
 	pDocMgr;
-    return S_OK;
+    return E_NOTIMPL;
 }
+
+#define TRACE() fprintf(fp, "%s: %d\n", __FILE__, __LINE__)
 
 //+---------------------------------------------------------------------------
 //
@@ -61,35 +63,56 @@ STDAPI CTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pD
 	pDocMgrPrevFocus;
     _InitTextEditSink(pDocMgrFocus);
 
+	FILE *fp = fp = fopen("e:/log.txt", "a");
+	if (fp) {
+		if (pDocMgrFocus == NULL) {
+			fprintf(fp, "DocMgrFocus is NULL!\n");
+			fflush(fp);
+		} else {
+			fprintf(fp, "DocMgrFocus is: %p\n", pDocMgrFocus);
+			fflush(fp);
+		}
+	}
+
+	TRACE();
 	if (_pCandidateList) {
+		TRACE();
 		ITfDocumentMgr* pCandidateListDocumentMgr = nullptr;
 		ITfContext* pTfContext = _pCandidateList->_GetContextDocument();
         if ((nullptr != pTfContext) && SUCCEEDED(pTfContext->GetDocumentMgr(&pCandidateListDocumentMgr)))
         {
+			TRACE();
             if (pCandidateListDocumentMgr != pDocMgrFocus)
             {
+				TRACE();
 				// Hide Candidate Window
 				_pCandidateList->OnKillThreadFocus();
             }
             else 
             {
+				TRACE();
 				// TODO: Show Candidate Window
 				_pCandidateList->OnSetThreadFocus();
             }
-
+			TRACE();
             pCandidateListDocumentMgr->Release();
         }
 	}
+	TRACE();
 	if (_pDocMgrLastFocused)
     {
+		TRACE();
         _pDocMgrLastFocused->Release();
 		_pDocMgrLastFocused = nullptr;
     }
 
+	TRACE();
     _pDocMgrLastFocused = pDocMgrFocus;
 
+	TRACE();
     if (_pDocMgrLastFocused)
     {
+		TRACE();
         _pDocMgrLastFocused->AddRef();
     }
 
@@ -105,7 +128,7 @@ STDAPI CTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pD
 
 STDAPI CTextService::OnPushContext(ITfContext *pContext)
 {
-    return S_OK;
+    return E_NOTIMPL;
 }
 
 //+---------------------------------------------------------------------------
@@ -117,7 +140,7 @@ STDAPI CTextService::OnPushContext(ITfContext *pContext)
 
 STDAPI CTextService::OnPopContext(ITfContext *pContext)
 {
-    return S_OK;
+    return E_NOTIMPL;
 }
 
 //+---------------------------------------------------------------------------

@@ -132,6 +132,10 @@ STDAPI CTextService::QueryInterface(REFIID riid, void **ppvObj)
     {
         *ppvObj = (ITfKeyEventSink *)this;
     }
+	else if (IsEqualIID(riid, IID_ITfThreadFocusSink))
+    {
+        *ppvObj = (ITfThreadFocusSink *)this;
+    }
     else if (IsEqualIID(riid, IID_ITfCompositionSink))
     {
         *ppvObj = (ITfKeyEventSink *)this;
@@ -199,6 +203,11 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     //
     if (!_InitThreadMgrEventSink())
         goto ExitError;
+
+	if (!_InitThreadFocusSink())
+    {
+        goto ExitError;
+    }
 
     // 
     //  If there is the focus document manager already,
@@ -277,6 +286,8 @@ STDAPI CTextService::Deactivate()
     // Uninitialize Language Bar.
     //
     _UninitLanguageBar();
+
+	_UninitThreadFocusSink();
 
     //
     // Uninitialize KeyEventSink

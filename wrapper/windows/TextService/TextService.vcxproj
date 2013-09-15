@@ -215,6 +215,7 @@
     <ClCompile Include="sunpinyin_engine.cpp" />
     <ClCompile Include="TextEditSink.cpp" />
     <ClCompile Include="TextService.cpp" />
+    <ClCompile Include="ThreadFocusSink.cpp" />
     <ClCompile Include="ThreadMgrEventSink.cpp" />
   </ItemGroup>
   <ItemGroup>
