@@ -103,7 +103,6 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
 {
  	WCHAR wch = ConvertVKey((UINT)wParam);
-	UINT state = 0;
 
 	wParam &= 0xff;
     switch (wParam)
@@ -155,10 +154,6 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
         break;
 	}
 
-	if (wch != 0) {
-		wch = wch;
-	}
-
 	// high-order bit : key down
     // low-order bit  : toggled
     SHORT sksMenu = GetKeyState(VK_MENU);
@@ -167,27 +162,14 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
 
 	if (sksMenu) {
 		oEvent.modifiers |= IM_ALT_MASK;
-		
-		state = IM_VK_ALT;
 	}
 
 	if (sksCtrl) {
 		oEvent.modifiers |= IM_CTRL_MASK;
-
-		if (GetKeyState(VK_LCONTROL)) {
-			state = IM_VK_CONTROL_L;
-		} else if (GetKeyState(VK_RCONTROL)) {
-			state = IM_VK_CONTROL_R;
-		}
 	}
 
 	if (sksShft) {
 		oEvent.modifiers |= IM_SHIFT_MASK;
-		if (GetKeyState(VK_LSHIFT)) {
-			state = IM_VK_SHIFT_L;
-		} else if (GetKeyState(VK_RSHIFT)) {
-			state = IM_VK_SHIFT_R;
-		}
 	}
 
     return TRUE;
@@ -241,6 +223,8 @@ static bool IsKeyUpEaten(CKeyEvent &event)
 
 STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
+	Global::UpdateModifiers(wParam, lParam);
+
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
     _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
@@ -263,6 +247,8 @@ STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM l
 
 STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
+	Global::UpdateModifiers(wParam, lParam);
+
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
     _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
@@ -290,6 +276,8 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
 
 STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
+	Global::UpdateModifiers(wParam, lParam);
+
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
 	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
@@ -312,6 +300,8 @@ STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 
 STDAPI CTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
+	Global::UpdateModifiers(wParam, lParam);
+
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
 	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
@@ -332,6 +322,25 @@ STDAPI CTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
 
 //+---------------------------------------------------------------------------
 //
+// CheckShiftKeyOnly
+//
+//----------------------------------------------------------------------------
+
+BOOL CTextService::CheckShiftKeyOnly(_In_ const TF_PRESERVEDKEY *ptfPsvKey)
+{
+    if ((/*(ptfPsvKey->uModifiers & (_TF_MOD_ON_KEYUP_SHIFT_ONLY & 0xffff0000)) && */!Global::IsShiftKeyDownOnly)/* ||
+        ((ptfPsvKey->uModifiers & (_TF_MOD_ON_KEYUP_CONTROL_ONLY & 0xffff0000)) && !Global::IsControlKeyDownOnly) ||
+        ((ptfPsvKey->uModifiers & (_TF_MOD_ON_KEYUP_ALT_ONLY & 0xffff0000)) && !Global::IsAltKeyDownOnly)*/)
+    {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+
+//+---------------------------------------------------------------------------
+//
 // OnPreservedKey
 //
 // Called when a hotkey (registered by us, or by the system) is typed.
@@ -348,6 +357,12 @@ STDAPI CTextService::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *p
     }
     else if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_F6))
 	{
+		if (!CheckShiftKeyOnly(&c_pkeyF6))
+        {
+            *pfEaten = FALSE;
+            return S_OK;
+        }
+
 		CKeyEvent event(0, 0, IM_SHIFT_MASK);
 		_InvokeKeyHandler(pContext, event);
 		*pfEaten = TRUE;

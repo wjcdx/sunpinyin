@@ -38,6 +38,13 @@ void DllRelease();
 #define LANGBAR_ITEM_DESC   L"Sample Text Service Button"
 #define LANGBAR_MENU_DESC   L"Sample Text Service Menu"
 
+//---------------------------------------------------------------------
+// defined modifier
+//---------------------------------------------------------------------
+#define _TF_MOD_ON_KEYUP_SHIFT_ONLY    (0x00010000 | TF_MOD_ON_KEYUP)
+#define _TF_MOD_ON_KEYUP_CONTROL_ONLY  (0x00020000 | TF_MOD_ON_KEYUP)
+#define _TF_MOD_ON_KEYUP_ALT_ONLY      (0x00040000 | TF_MOD_ON_KEYUP)
+
 //+---------------------------------------------------------------------------
 //
 // SafeStringCopy
@@ -74,5 +81,16 @@ extern const GUID c_guidDisplayAttributeConverted;
 WCHAR ConvertVKey(UINT code);
 
 int CharToWchar(WCHAR *wchStr, const char *chStr);
+
+namespace Global {
+
+BOOL CheckModifiers(UINT uModCurrent, UINT uMod);
+BOOL UpdateModifiers(WPARAM wParam, LPARAM lParam);
+
+extern USHORT ModifiersValue;
+extern BOOL IsShiftKeyDownOnly;
+extern BOOL IsControlKeyDownOnly;
+extern BOOL IsAltKeyDownOnly;
+};
 
 #endif // GLOBALS_H

@@ -122,6 +122,7 @@ private:
     // initialize and uninitialize PreservedKey.
     BOOL _InitPreservedKey();
     void _UninitPreservedKey();
+	BOOL CheckShiftKeyOnly(_In_ const TF_PRESERVEDKEY *ptfPsvKey);
 
     // utility function for KeyEventSink
 	BOOL _IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &event);

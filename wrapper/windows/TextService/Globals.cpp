@@ -117,3 +117,209 @@ int CharToWchar(WCHAR *wchStr, const char *chStr)
 	return i ? (i + 1) : 0;
 }
 
+namespace Global {
+//+---------------------------------------------------------------------------
+//
+// CheckModifiers
+//
+//----------------------------------------------------------------------------
+
+#define TF_MOD_ALLALT     (TF_MOD_RALT | TF_MOD_LALT | TF_MOD_ALT)
+#define TF_MOD_ALLCONTROL (TF_MOD_RCONTROL | TF_MOD_LCONTROL | TF_MOD_CONTROL)
+#define TF_MOD_ALLSHIFT   (TF_MOD_RSHIFT | TF_MOD_LSHIFT | TF_MOD_SHIFT)
+#define TF_MOD_RLALT      (TF_MOD_RALT | TF_MOD_LALT)
+#define TF_MOD_RLCONTROL  (TF_MOD_RCONTROL | TF_MOD_LCONTROL)
+#define TF_MOD_RLSHIFT    (TF_MOD_RSHIFT | TF_MOD_LSHIFT)
+
+#define CheckMod(m0, m1, mod)        \
+    if (m1 & TF_MOD_ ## mod ##)      \
+{ \
+    if (!(m0 & TF_MOD_ ## mod ##)) \
+{      \
+    return FALSE;   \
+}      \
+} \
+    else       \
+{ \
+    if ((m1 ^ m0) & TF_MOD_RL ## mod ##)    \
+{      \
+    return FALSE;   \
+}      \
+} \
+
+
+
+BOOL CheckModifiers(UINT modCurrent, UINT mod)
+{
+    mod &= ~TF_MOD_ON_KEYUP;
+
+    if (mod & TF_MOD_IGNORE_ALL_MODIFIER)
+    {
+        return TRUE;
+    }
+
+    if (modCurrent == mod)
+    {
+        return TRUE;
+    }
+
+    if (modCurrent && !mod)
+    {
+        return FALSE;
+    }
+
+    CheckMod(modCurrent, mod, ALT);
+    CheckMod(modCurrent, mod, SHIFT);
+    CheckMod(modCurrent, mod, CONTROL);
+
+    return TRUE;
+}
+
+//+---------------------------------------------------------------------------
+//
+// UpdateModifiers
+//
+//    wParam - virtual-key code
+//    lParam - [0-15]  Repeat count
+//  [16-23] Scan code
+//  [24]    Extended key
+//  [25-28] Reserved
+//  [29]    Context code
+//  [30]    Previous key state
+//  [31]    Transition state
+//----------------------------------------------------------------------------
+
+USHORT ModifiersValue = 0;
+BOOL   IsShiftKeyDownOnly = FALSE;
+BOOL   IsControlKeyDownOnly = FALSE;
+BOOL   IsAltKeyDownOnly = FALSE;
+
+BOOL UpdateModifiers(WPARAM wParam, LPARAM lParam)
+{
+    // high-order bit : key down
+    // low-order bit  : toggled
+    SHORT sksMenu = GetKeyState(VK_MENU);
+    SHORT sksCtrl = GetKeyState(VK_CONTROL);
+    SHORT sksShft = GetKeyState(VK_SHIFT);
+
+    switch (wParam & 0xff)
+    {
+    case VK_MENU:
+        // is VK_MENU down?
+        if (sksMenu & 0x8000)
+        {
+            // is extended key?
+            if (lParam & 0x01000000)
+            {
+                ModifiersValue |= (TF_MOD_RALT | TF_MOD_ALT);
+            }
+            else
+            {
+                ModifiersValue |= (TF_MOD_LALT | TF_MOD_ALT);
+            }
+
+            // is previous key state up?
+            if (!(lParam & 0x40000000))
+            {
+                // is VK_CONTROL and VK_SHIFT up?
+                if (!(sksCtrl & 0x8000) && !(sksShft & 0x8000))
+                {
+                    IsAltKeyDownOnly = TRUE;
+                }
+                else
+                {
+                    IsShiftKeyDownOnly = FALSE;
+                    IsControlKeyDownOnly = FALSE;
+                    IsAltKeyDownOnly = FALSE;
+                }
+            }
+        }
+        break;
+
+    case VK_CONTROL:
+        // is VK_CONTROL down?
+        if (sksCtrl & 0x8000)    
+        {
+            // is extended key?
+            if (lParam & 0x01000000)
+            {
+                ModifiersValue |= (TF_MOD_RCONTROL | TF_MOD_CONTROL);
+            }
+            else
+            {
+                ModifiersValue |= (TF_MOD_LCONTROL | TF_MOD_CONTROL);
+            }
+
+            // is previous key state up?
+            if (!(lParam & 0x40000000))
+            {
+                // is VK_SHIFT and VK_MENU up?
+                if (!(sksShft & 0x8000) && !(sksMenu & 0x8000))
+                {
+                    IsControlKeyDownOnly = TRUE;
+                }
+                else
+                {
+                    IsShiftKeyDownOnly = FALSE;
+                    IsControlKeyDownOnly = FALSE;
+                    IsAltKeyDownOnly = FALSE;
+                }
+            }
+        }
+        break;
+
+    case VK_SHIFT:
+        // is VK_SHIFT down?
+        if (sksShft & 0x8000)    
+        {
+            // is scan code 0x36(right shift)?
+            if (((lParam >> 16) & 0x00ff) == 0x36)
+            {
+                ModifiersValue |= (TF_MOD_RSHIFT | TF_MOD_SHIFT);
+            }
+            else
+            {
+                ModifiersValue |= (TF_MOD_LSHIFT | TF_MOD_SHIFT);
+            }
+
+            // is previous key state up?
+            if (!(lParam & 0x40000000))
+            {
+                // is VK_MENU and VK_CONTROL up?
+                if (!(sksMenu & 0x8000) && !(sksCtrl & 0x8000))
+                {
+                    IsShiftKeyDownOnly = TRUE;
+                }
+                else
+                {
+                    IsShiftKeyDownOnly = FALSE;
+                    IsControlKeyDownOnly = FALSE;
+                    IsAltKeyDownOnly = FALSE;
+                }
+            }
+        }
+        break;
+
+    default:
+        IsShiftKeyDownOnly = FALSE;
+        IsControlKeyDownOnly = FALSE;
+        IsAltKeyDownOnly = FALSE;
+        break;
+    }
+
+    if (!(sksMenu & 0x8000))
+    {
+        ModifiersValue &= ~TF_MOD_ALLALT;
+    }
+    if (!(sksCtrl & 0x8000))
+    {
+        ModifiersValue &= ~TF_MOD_ALLCONTROL;
+    }
+    if (!(sksShft & 0x8000))
+    {
+        ModifiersValue &= ~TF_MOD_ALLSHIFT;
+    }
+
+    return TRUE;
+}
+};
