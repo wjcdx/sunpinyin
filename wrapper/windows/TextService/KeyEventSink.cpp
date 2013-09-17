@@ -158,21 +158,15 @@ BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
         break;
 	}
 
-	// high-order bit : key down
-    // low-order bit  : toggled
-    SHORT sksMenu = GetKeyState(VK_MENU);
-    SHORT sksCtrl = GetKeyState(VK_CONTROL);
-    SHORT sksShft = GetKeyState(VK_SHIFT);
-
-	if (sksMenu) {
+	if (Global::ModifiersValue & TF_MOD_ALLALT) {
 		oEvent.modifiers |= IM_ALT_MASK;
 	}
 
-	if (sksCtrl) {
+	if (Global::ModifiersValue & TF_MOD_ALLCONTROL) {
 		oEvent.modifiers |= IM_CTRL_MASK;
 	}
 
-	if (sksShft) {
+	if (Global::ModifiersValue & TF_MOD_ALLSHIFT) {
 		oEvent.modifiers |= IM_SHIFT_MASK;
 	}
 
