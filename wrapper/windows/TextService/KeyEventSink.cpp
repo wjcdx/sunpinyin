@@ -63,13 +63,11 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 {
     // if the keyboard is disabled, keys are not consumed.
     if (_IsKeyboardDisabled()) {
-		MessageBox(NULL, "KeyboardDisabled!", NULL, MB_OK);
         return FALSE;
 	}
 
     // if the keyboard is closed, keys are not consumed.
     if (!_IsKeyboardOpen()) {
-		MessageBox(NULL, "KeyboardClosed!", NULL, MB_OK);
         return FALSE;
 	}
 
@@ -78,8 +76,8 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 	if (event.modifiers & IM_CTRL_MASK)
 		return FALSE;
 
-	//if (!_pEngine->is_chinese_mode() && !_pEngine->is_mode_switch_key(event))
-	//	return FALSE;
+	if (Global::IsShiftKeyDownOnly)
+		return FALSE;
 
 	wParam &= 0xff;
     switch (wParam)
@@ -101,7 +99,7 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 			return FALSE;
 	}
 
-	return TRUE;
+	return _pEngine->is_key_event_handled(event);
 }
 
 BOOL CTextService::PrepareKeyEvent(CKeyEvent &oEvent, WPARAM wParam)
@@ -186,44 +184,6 @@ STDAPI CTextService::OnSetFocus(BOOL fForeground)
     return S_OK;
 }
 
-static bool IsKeyDownHandled(CKeyEvent &event)
-{
-	if (event.modifiers) {
-		// handle SHIFT+A
-		if (event.modifiers & IM_SHIFT_MASK 
-			&& event.code != 0) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-	return TRUE;
-}
-
-static bool IsKeyDownEaten(CKeyEvent &event)
-{
-	if (event.modifiers) {
-		// handle SHIFT+A
-		if (event.modifiers & IM_SHIFT_MASK 
-			&& event.code != 0) {
-			return TRUE;
-		}
-		return FALSE;
-	}
-	return TRUE;
-}
-
-static bool IsKeyUpHandled(CKeyEvent &event)
-{
-	return FALSE;
-}
-
-static bool IsKeyUpEaten(CKeyEvent &event)
-{
-	if (event.modifiers) {
-		return FALSE;
-	}
-	return TRUE;
-}
 
 //+---------------------------------------------------------------------------
 //
@@ -239,10 +199,6 @@ STDAPI CTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM l
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
     _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
-	
-	if (_bKeyEaten) {
-		_bKeyEaten = IsKeyDownEaten(event);
-	}
 
 	*pfEaten = _bKeyEaten;
     return S_OK;
@@ -265,11 +221,6 @@ STDAPI CTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
     _bKeyEaten = _IsKeyEaten(pContext, wParam, event);
 
 	if (_bKeyEaten) {
-		_bKeyEaten = IsKeyDownEaten(event);
-	}
-
-	if (_bKeyEaten && IsKeyDownHandled(event))
-    {
 		// let the handler judge if it's eaten.
         _InvokeKeyHandler(pContext, event);
     }
@@ -292,10 +243,6 @@ STDAPI CTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lPa
 	CKeyEvent event(0, 0, 0);
 	PrepareKeyEvent(event, wParam);
 	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
-	
-	if (_bKeyEaten) {
-		_bKeyEaten = IsKeyUpEaten(event);
-	}
 
 	*pfEaten = _bKeyEaten;
     return S_OK;
@@ -317,15 +264,7 @@ STDAPI CTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
 	PrepareKeyEvent(event, wParam);
 	_bKeyEaten = _IsKeyEaten(pContext, wParam, event);
 
-	if (_bKeyEaten) {
-		_bKeyEaten = IsKeyUpEaten(event);
-	}
-
-	if (_bKeyEaten && IsKeyUpHandled(event))
-    {
-		// let the handler judge if it's eaten.
-        _InvokeKeyHandler(pContext, event);
-    }
+	// do not handle key event within key up.
 
 	*pfEaten = _bKeyEaten;
     return S_OK;

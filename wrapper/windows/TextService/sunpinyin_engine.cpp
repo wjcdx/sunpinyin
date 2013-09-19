@@ -104,6 +104,24 @@ static bool translate_key(CKeyEvent &oEvent)
 	return true;
 }
 
+bool SunPinyinEngine::is_key_event_handled(CKeyEvent &event)
+{
+	assert(m_pv != NULL);
+	translate_key(event);
+
+	// the engine can not handle english mode itself,
+	// it needs help of the wrapper.
+	if (!m_pv->getStatusAttrValue(CIMIWinHandler::STATUS_ID_CN)) {
+        // we are in English input mode
+        if (!m_hotkey_profile->isModeSwitchKey(event)) {
+            return FALSE;
+        }
+    } else if (m_hotkey_profile->isModeSwitchKey(event)) {
+        return TRUE;
+    }
+	return m_pv->isKeyEventHandled(event);
+}
+
 bool SunPinyinEngine::process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event)
 {
 	m_pContext = pContext;

@@ -34,6 +34,7 @@ public:
 	// called by TextServiceFramework
 	bool is_mode_switch_key (CKeyEvent &event);
 	bool is_chinese_mode ();
+	bool is_key_event_handled(CKeyEvent &event);
 	bool process_key_event (TfEditCookie ec, ITfContext *pContext, CKeyEvent &event);
 
 	// CALLBACKS of CWinHandler
