@@ -107,6 +107,132 @@ CIMIClassicView::updateWindows(unsigned mask)
     }
 }
 
+
+bool
+CIMIClassicView::isKeyEventHandled(const CKeyEvent& key)
+{
+    unsigned changeMasks = 0;
+
+    unsigned keycode = key.code;
+    unsigned keyvalue = key.value;
+    unsigned modifiers = key.modifiers;
+
+#ifdef DEBUG
+    printf("Classic View got a key (0x%x-0x%x-0x%x)...",
+           keycode, keyvalue, modifiers);
+    if (((modifiers & IM_CTRL_MASK) != 0) &&
+        (keyvalue == 'P' || keyvalue == 'p'))
+        m_pIC->printLattice();
+#endif
+
+    if (m_pHotkeyProfile && m_pHotkeyProfile->isModeSwitchKey(key)) {
+        changeMasks |= KEYEVENT_USED;
+        if (!m_pIC->isEmpty()) {
+            changeMasks |= CANDIDATE_MASK | PREEDIT_MASK;
+        }
+    } else if (m_pHotkeyProfile && m_pHotkeyProfile->isPunctSwitchKey(key)) {
+        // On CTRL+. switch Full/Half punc
+        changeMasks |= KEYEVENT_USED;
+    } else if (m_pHotkeyProfile && m_pHotkeyProfile->isSymbolSwitchKey(key)) {
+        // On SHIFT+SPACE switch Full/Half symbol
+        changeMasks |= KEYEVENT_USED;
+    } else if (modifiers == IM_CTRL_MASK && keycode == IM_VK_LEFT) {
+        // move left
+        if (!m_pIC->isEmpty()) {
+            changeMasks |= KEYEVENT_USED;
+        }
+    } else if (modifiers == IM_CTRL_MASK && keycode == IM_VK_RIGHT) {
+        // move right
+        if (!m_pIC->isEmpty()) {
+            changeMasks |= KEYEVENT_USED;
+        }
+    } else if (((modifiers == 0 && keycode == IM_VK_PAGE_UP)
+                || (m_pHotkeyProfile && m_pHotkeyProfile->isPageUpKey(key)))
+               && !m_pIC->isEmpty()) {
+        changeMasks |= KEYEVENT_USED;
+    } else if (((modifiers == 0 && keycode == IM_VK_PAGE_DOWN)
+                || (m_pHotkeyProfile && m_pHotkeyProfile->isPageDownKey(key)))
+               && !m_pIC->isEmpty()) {
+        changeMasks |= KEYEVENT_USED;
+    } else if (m_pHotkeyProfile
+              && m_pHotkeyProfile->isCandiDeleteKey(key, m_candiWindowSize)
+              && !m_pIC->isEmpty()) {
+        changeMasks |= KEYEVENT_USED;
+        goto PROCESSED;
+    } else if ((modifiers &
+                (IM_CTRL_MASK | IM_ALT_MASK | IM_SUPER_MASK |
+                 IM_RELEASE_MASK)) == 0) {
+        if ((keyvalue >= '0' && keyvalue <= '9')
+            && (m_candiWindowSize >= 10
+                || keyvalue < ('1' + m_candiWindowSize))) {
+            // try to make selection
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            } else if (m_smartPunct) {
+            }
+            goto PROCESSED;
+        }
+
+        if (keyvalue > 0x60 && keyvalue < 0x7b) {
+            /* islower(keyvalue) */
+            changeMasks |= KEYEVENT_USED;
+        } else if (keyvalue > 0x20 && keyvalue < 0x7f) {
+            /* isprint(keyvalue) && !isspace(keyvalue) */
+            changeMasks |= KEYEVENT_USED;
+        } else if (keycode == IM_VK_BACK_SPACE || keycode == IM_VK_DELETE) {
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            }
+        } else if (keycode == IM_VK_SPACE) {
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            } else {
+                wstring wstr = (CFullCharManager::fullPuncOp())(keyvalue);
+                if (wstr.size()) {
+                    changeMasks |= KEYEVENT_USED;
+                }
+            }
+        } else if (keycode == IM_VK_ENTER) {
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED | CANDIDATE_MASK | PREEDIT_MASK;
+            }
+        } else if (keycode == IM_VK_ESCAPE) {
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED | CANDIDATE_MASK | PREEDIT_MASK;
+            }
+        } else if (keycode == IM_VK_LEFT) { // move left syllable
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            }
+        } else if (keycode == IM_VK_RIGHT) { // move right syllable
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            }
+        } else if (keycode == IM_VK_HOME) { // move home
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            }
+        } else if (keycode == IM_VK_END) { // move end
+            if (!m_pIC->isEmpty()) {
+                changeMasks |= KEYEVENT_USED;
+            }
+        }
+    } else {
+        goto RETURN;
+    }
+
+PROCESSED:;
+    ;
+
+RETURN:;
+
+#ifdef DEBUG
+    printf("   |-->(Mask=0x%x)\n", changeMasks);
+#endif
+
+    return changeMasks & KEYEVENT_USED;
+}
+
 bool
 CIMIClassicView::onKeyEvent(const CKeyEvent& key)
 {
@@ -125,6 +251,7 @@ CIMIClassicView::onKeyEvent(const CKeyEvent& key)
 #endif
 
     if (m_pHotkeyProfile && m_pHotkeyProfile->isModeSwitchKey(key)) {
+        changeMasks |= KEYEVENT_USED;
         setStatusAttrValue(CIMIWinHandler::STATUS_ID_CN, (!m_bCN) ? 1 : 0);
         if (!m_pIC->isEmpty()) {
             changeMasks |= CANDIDATE_MASK | PREEDIT_MASK;

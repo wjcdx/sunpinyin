@@ -149,6 +149,7 @@ public:
     bool getSmartPunct() const { return m_smartPunct; }
 
     virtual unsigned clearIC(void) { m_pIC->clear(); return 0; }
+    virtual bool isKeyEventHandled(const CKeyEvent&) { return false; }
     virtual bool onKeyEvent(const CKeyEvent&) { return false; }
 
     virtual void setStatusAttrValue(int key, int value);
