@@ -71,8 +71,8 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
         return FALSE;
 	}
 
-	// shift key is handled while up by Preserved Keys.
-	if (Global::IsShiftKeyDownOnly)
+	// mode switch key is handled while up by Preserved Keys.
+	if (_pEngine->is_mode_switch_key(event))
 		return FALSE;
 
 	wParam &= 0xff;
