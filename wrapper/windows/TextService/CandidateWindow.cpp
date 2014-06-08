@@ -19,7 +19,6 @@
 
 #define CAND_WIDTH     400
 #define CAND_HEIGHT    40
-#define CAND_LENGTH    30
 
 ATOM CCandidateWindow::_atomWndClass = 0;
 TCHAR CCandidateWindow::_rgPreeditString[128] = { 0 };
@@ -56,9 +55,10 @@ BOOL CCandidateWindow::_InitWindowClass()
     wc.hInstance = g_hInst;
     wc.hIcon = NULL;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+    //wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	wc.hbrBackground = (HBRUSH)CreateSolidBrush(RGB(153, 204, 51));
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = TEXT("TextServiceCandidateWindow");
+    wc.lpszClassName = TEXT("Text Service Candidate Window");
 
     _atomWndClass = RegisterClass(&wc);
 
@@ -215,7 +215,11 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
         case WM_PAINT:
 
 			hdc = BeginPaint(hwnd, &ps);
-            SetBkMode(hdc, TRANSPARENT);
+			
+			//SetBkColor(hdc, RGB(153, 204, 51));
+			SetBkMode(hdc, TRANSPARENT);
+
+			//SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) | WS_SIZEBOX); 
 
 			GetTextMetrics(hdc, &tm);
 			int x = tm.tmAveCharWidth;
@@ -227,14 +231,12 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
 			TextOut(hdc, 0, 0, _rgPreeditString, uiPreeditLength);
 			TextOut(hdc, 0, y, _rgCandidatesString, uiCandidateLength);
 
-			UINT uiWndWidth = max(uiPreeditLength, uiCandidateLength);
-			uiWndWidth = max(uiWndWidth, CAND_LENGTH);
-
             EndPaint(hwnd, &ps);
 
+			UINT uiWndWidth = max(uiPreeditLength, uiCandidateLength);
 			// adjust the size of the window according to the text out.
 			SetWindowPos(hwnd, 0, 0, 0,
-				x * (uiWndWidth + 2 ),
+				x * (uiWndWidth + 2),
 				2 * y + 2, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
 
             return 0;

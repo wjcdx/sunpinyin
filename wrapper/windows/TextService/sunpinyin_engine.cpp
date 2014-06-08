@@ -206,6 +206,7 @@ void SunPinyinEngine::update_candidates(const ICandidateList& cl)
         cand_str += TWCHAR('.');
         cand_str += pcand;
         cand_str += TWCHAR(' ');
+		cand_str += TWCHAR(' ');
     }
 
 #ifdef HAVE_ICONV_H
