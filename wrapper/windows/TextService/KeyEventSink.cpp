@@ -20,16 +20,8 @@
 //
 // GUID for the preserved keys.
 //
-/* 6a0bde41-6adf-11d7-a6ea-00065b84435c */
-static const GUID GUID_PRESERVEDKEY_ONOFF = { 
-    0x6a0bde41,
-    0x6adf,
-    0x11d7,
-    {0xa6, 0xea, 0x00, 0x06, 0x5b, 0x84, 0x43, 0x5c}
-  };
-
 /* 6a0bde42-6adf-11d7-a6ea-00065b84435c */
-static const GUID GUID_PRESERVEDKEY_STATUS_SWITCH = { 
+static const GUID GUID_PRESERVEDKEY_STATUS_SWITCH = {
     0x6a0bde42,
     0x6adf,
     0x11d7,
@@ -43,15 +35,12 @@ static const GUID GUID_PRESERVEDKEY_STATUS_SWITCH = {
 // VK_KANJI is the virtual key for Kanji key, which is available in 106
 // Japanese keyboard.
 //
-static const TF_PRESERVEDKEY c_pkeyOnOff0 = { 0xC0, TF_MOD_ALT };
-static const TF_PRESERVEDKEY c_pkeyOnOff1 = { VK_KANJI, TF_MOD_IGNORE_ALL_MODIFIER };
 static const TF_PRESERVEDKEY c_pkeyStatusSwitch =   { VK_SHIFT, TF_MOD_ON_KEYUP };
 
 //
 // the description for the preserved keys
 //
-static const WCHAR c_szPKeyOnOff[] = L"OnOff";
-static const WCHAR c_szPKeyStatusSwitch[]    = L"Function 6";
+static const WCHAR c_szPKeyStatusSwitch[]    = L"Shift";
 
 //+---------------------------------------------------------------------------
 //
@@ -67,9 +56,12 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam, CKeyEvent &e
 	}
 
     // if the keyboard is closed, keys are not consumed.
+	// TODO: it does not work properly, correct it.
+#if 0
     if (!_IsKeyboardOpen()) {
         return FALSE;
 	}
+#endif
 
 	// mode switch key is handled while up by Preserved Keys.
 	if (_pEngine->is_mode_switch_key(event))
@@ -295,13 +287,7 @@ BOOL CTextService::CheckShiftKeyOnly(_In_ const TF_PRESERVEDKEY *ptfPsvKey)
 STDAPI CTextService::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *pfEaten)
 {
 
-    if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_ONOFF))
-    {
-        BOOL fOpen = _IsKeyboardOpen();
-        _SetKeyboardOpen(fOpen ? FALSE : TRUE);
-        *pfEaten = TRUE;
-    }
-    else if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_STATUS_SWITCH))
+    if (IsEqualGUID(rguid, GUID_PRESERVEDKEY_STATUS_SWITCH))
 	{
 		if (!CheckShiftKeyOnly(&c_pkeyStatusSwitch))
         {
@@ -377,20 +363,6 @@ BOOL CTextService::_InitPreservedKey()
     if (_pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr) != S_OK)
         return FALSE;
 
-    // register Alt+~ key
-    hr = pKeystrokeMgr->PreserveKey(_tfClientId, 
-                                    GUID_PRESERVEDKEY_ONOFF,
-                                    &c_pkeyOnOff0,
-                                    c_szPKeyOnOff,
-                                    wcslen(c_szPKeyOnOff));
-
-    // register KANJI key
-    hr = pKeystrokeMgr->PreserveKey(_tfClientId, 
-                                    GUID_PRESERVEDKEY_ONOFF,
-                                    &c_pkeyOnOff1,
-                                    c_szPKeyOnOff,
-                                    wcslen(c_szPKeyOnOff));
-
     // register SHIFT key
     hr = pKeystrokeMgr->PreserveKey(_tfClientId, 
                                     GUID_PRESERVEDKEY_STATUS_SWITCH,
@@ -417,8 +389,6 @@ void CTextService::_UninitPreservedKey()
     if (_pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr) != S_OK)
         return;
 
-    pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_ONOFF, &c_pkeyOnOff0);
-    pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_ONOFF, &c_pkeyOnOff1);
 	pKeystrokeMgr->UnpreserveKey(GUID_PRESERVEDKEY_STATUS_SWITCH, &c_pkeyStatusSwitch);
 
     pKeystrokeMgr->Release();
