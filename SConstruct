@@ -264,12 +264,17 @@ AddOption('--enable-plugins', dest='enable_plugins', action='store_true',
 AddOption('--disable-plugins', dest='enable_plugins', action='store_false',
           default=False, help='disable plugin mechanism at libsunpinyin layer')
 
+AddOption('--target_arch', dest='target_arch', metavar='DIR',
+          help='target arch, eg. x86, x86_64')
+
+
 # save the options
 opts = Variables('configure.conf')
 opts.Add('PREFIX', default='/usr/local')
 opts.Add('LIBDIR', default='/usr/local/lib')
 opts.Add('DATADIR', default='/usr/local/share')
 opts.Add('ENABLE_PLUGINS', default=False)
+opts.Add('TARGET_ARCH', default='')
 
 #
 #==============================environment==============================
@@ -309,9 +314,10 @@ def CreateEnvironment():
     libln_builder = Builder(action='cd ${TARGET.dir} && ln -s ${SOURCE.name} ${TARGET.name}')
     env = Environment(ENV = os.environ, CFLAGS = cflags, CXXFLAGS = cflags,
                       LINKFLAGS = linkflags,
-                      MAKE = make, WGET = wget, TAR = tar,
+                      MAKE = make, WGET = wget, TAR = tar, TARGET_ARCH = target_arch,
                       CPPPATH = ['.'] + allinc(),
                       tools = ['default', 'textfile'])
+
     env.Append(BUILDERS = {'InstallAsSymlink': libln_builder})
     env['ENDIANNESS'] = "be" if sys.byteorder == "big" else "le"
     return env
@@ -321,6 +327,12 @@ def PassVariables(envvar, env):
         if x in os.environ:
             print 'Warning: you\'ve set %s in the environmental variable!' % x
             env[y] = os.environ[x]
+
+# TARGET_ARCH must be passed as an argument to the Environment() constructor;
+# setting it later has no effect.
+target_arch = ''
+if GetOption('target_arch') is not None:
+    target_arch = GetOption('target_arch')
 
 env = CreateEnvironment()
 opts.Update(env)
@@ -370,6 +382,7 @@ env.MergeFlags(['-DHAVE_CONFIG_H',
 
 if GetOption('rpath') is not None and GetOS() != 'Darwin':
     env.MergeFlags('-Wl,-R -Wl,%s' % GetOption('rpath'))
+
 
 #
 #==============================configure================================
@@ -521,12 +534,18 @@ env.Substfile('sunpinyin-2.0.pc.in', SUBST_DICT={
                                allinc())),
         })
 
-libname_default = '%ssunpinyin%s' % (env.subst('${SHLIBPREFIX}'),
+libname_raw = 'sunpinyin'
+if target_arch != '':
+    libname_raw = 'sunpinyin-%s' % target_arch
+
+libname_default = '%s%s%s' % (env.subst('${SHLIBPREFIX}'), libname_raw,
                                      env.subst('${SHLIBSUFFIX}'))
 libname_link = libname_default
 libname_soname = '%s.%d' % (libname_link, abi_major)
 libname = '%s.%d' % (libname_soname, abi_minor)
 lib = None
+
+print 'libname: %s' % libname
 
 if GetOS() != 'Darwin':
     #lib = env.StaticLibrary(libname, SHLIBSUFFIX='', source=imesource,
@@ -537,6 +556,7 @@ else:
     lib = env.StaticLibrary('sunpinyin', source=imesource)
 
 def DoInstall():
+    os.system("cl")
     lib_target = None
     if GetOS() == 'Darwin':
         lib_target = env.Install(libdir, lib)
