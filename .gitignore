@@ -37,4 +37,6 @@ configure.conf
 *.lib
 *.pdb
 Spy.*
+*.dll
+*.bak
 
