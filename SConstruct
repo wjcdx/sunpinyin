@@ -98,7 +98,6 @@ imesource = [
     'src/ime-core/options/scheme_policy_sp.cpp',
     'src/ime-core/options/scheme_policy_xh.cpp',
 #    'src/ime-core/options/session_factory.cpp',
-    'src/ime-core/options/a.cpp',
     ]
 
 headers = [
