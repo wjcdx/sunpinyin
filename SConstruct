@@ -92,7 +92,6 @@ imesource = [
     'src/ime-core/imi_winHandler.cpp',
     'src/ime-core/options/imi_option_event.cpp',
     'src/ime-core/options/lang_policy_cn.cpp',
-    'src/ime-core/options/lang_policy_cn_xh.cpp',
     'src/ime-core/options/scheme_policy_hp.cpp',
     'src/ime-core/options/scheme_policy_qp.cpp',
     'src/ime-core/options/scheme_policy_sp.cpp',
@@ -151,7 +150,6 @@ headers = [
     'src/ime-core/options/imi_option_event.h',
     'src/ime-core/options/imi_option_keys.h',
     'src/ime-core/options/lang_policy_cn.h',
-    'src/ime-core/options/lang_policy_cn_xh.h',
     'src/ime-core/options/profile_class.h',
     'src/ime-core/options/profile_interface.h',
     'src/ime-core/options/scheme_policy_hp.h',
@@ -251,9 +249,6 @@ AddOption('--prefix', dest='prefix', metavar='DIR',
 AddOption('--libdir', dest='libdir', metavar='DIR',
           help='installation libdir')
 
-AddOption('--datadir', dest='datadir', metavar='DIR',
-          help='installation data dir')
-
 AddOption('--rpath', dest='rpath', metavar='DIR',
           help='encode rpath in the executables')
 
@@ -344,9 +339,6 @@ if GetOption('prefix') is not None:
 if GetOption('libdir') is not None:
     env['LIBDIR'] = GetOption('libdir')
 
-if GetOption('datadir') is not None:
-    env['DATADIR'] = GetOption('datadir')
-
 env['ENABLE_PLUGINS'] = GetOption('enable_plugins')
 
 opts.Save('configure.conf', env)
@@ -356,7 +348,6 @@ mandir = os.path.join(env['PREFIX'], 'share/man')
 man1dir = os.path.join(mandir, 'man1')
 docdir = os.path.join(env['PREFIX'], 'share/doc/sunpinyin')
 headersdir = os.path.join(env['PREFIX'], 'include/sunpinyin-2.0')
-datadir = os.path.join(env['DATADIR'], 'sunpinyin')
 libdir = env['LIBDIR']
 
 # pass through environmental variables
@@ -376,8 +367,7 @@ if env['ENABLE_PLUGINS']:
     headers += headers_plugin
 
 # merge some of critical compile flags
-env.MergeFlags(['-DHAVE_CONFIG_H',
-               '-D\\\"SUNPINYIN_DATA_DIR=\\\\\\"\"%s\"\\\\\\"\\\"' % datadir])
+env.MergeFlags(['-DHAVE_CONFIG_H'])
 
 if GetOption('rpath') is not None and GetOS() != 'Darwin':
     env.MergeFlags('-Wl,-R -Wl,%s' % GetOption('rpath'))
@@ -585,7 +575,6 @@ def DoInstall():
     env.Alias('install-man1', man1_target)
     env.Alias('install-doc', doc_target)
     env.Alias('install-lib', lib_target + [lib_pkgconfig_target])
-    Mkdir(datadir)
 
 DoInstall()
 env.Alias('install', [

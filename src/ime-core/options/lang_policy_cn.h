@@ -56,7 +56,6 @@ public:
 };
 
 typedef SingletonHolder<CSimplifiedChinesePolicy> ASimplifiedChinesePolicy;
-typedef SingletonHolder<CSimplifiedChinesePolicy> APySimplifiedChinesePolicy;
 
 #endif
 

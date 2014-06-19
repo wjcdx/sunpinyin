@@ -22,23 +22,15 @@ CSimplifiedChinesePolicy::loadResources()
     if (m_bLoaded || m_bTried)
         return m_bLoaded;
 
+	if (m_data_dir.empty() || m_user_data_dir.empty())
+		return false;
+
     bool suc = true;
-	std::string data_dir = m_data_dir.size() ? m_data_dir : SUNPINYIN_DATA_DIR;
-	std::string lm_path = data_dir + "/lm_sc.t3g.py";
-    std::string dict_path = data_dir + "/dict3_sc.bin.py";
+	std::string data_dir = m_data_dir;
+	std::string lm_path = data_dir + "/lm_sc.t3g";
+    std::string dict_path = data_dir + "/dict3_sc.bin";
 
     suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
-
-    if (!m_user_data_dir.size()) {
-        char path[256];
-        const char *home = getenv("HOME");
-        snprintf(path,
-                 sizeof(path),
-                 "%s/%s",
-                 home,
-                 SUNPINYIN_USERDATA_DIR_PREFIX);
-        m_user_data_dir = path;
-    }
 
     char * tmp = strdup(m_user_data_dir.c_str());
     createDirectory(tmp);
@@ -91,7 +83,7 @@ string_pairs
 CSimplifiedChinesePolicy::getDefaultPunctMapping() const
 {
     static struct u8_code punc_map[] = {
-    	/* " " */  {0x20, 0x00}, {0xe3, 0x80, 0x80, 0x00},
+      /* " " */  {0x20, 0x00}, {0xe3, 0x80, 0x80, 0x00},
       /* "," */  {0x2c, 0x00}, {0xef, 0xbc, 0x8c, 0x00},
       /* ";" */  {0x3b, 0x00}, {0xef, 0xbc, 0x9b, 0x00},
       /* "!" */  {0x21, 0x00}, {0xef, 0xbc, 0x81, 0x00},
