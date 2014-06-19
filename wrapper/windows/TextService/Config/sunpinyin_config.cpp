@@ -36,6 +36,7 @@
 #include <cassert>
 #include <vector>
 #include <sunpinyin.h>
+#include "../Globals.h"
 #include "sunpinyin_config_keys.h"
 #include "sunpinyin_config.h"
 #include "ConfigWindow.h"
@@ -44,13 +45,13 @@ using namespace std;
 
 
 SunPinyinConfig::SunPinyinConfig()
-	: m_config_file(std::string("D:/cygwin/home/wjcdx/git/spy/wrapper/windows/TextService/Config/configs.dat")),
-	m_pConfigWindow(NULL)
+	: m_pConfigWindow(NULL)
 {
     m_scheme_names["QuanPin"]    = CSunpinyinSessionFactory::QUANPIN;
     m_scheme_names["ShuangPin"]  = CSunpinyinSessionFactory::SHUANGPIN;
     m_scheme_names["XingHua"]  = CSunpinyinSessionFactory::XINGHUA;
 
+	m_config_file = g_szHomePath + "/config/configs.dat";
 	init_configs(m_config_pairs);
 }
 

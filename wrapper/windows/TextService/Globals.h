@@ -78,9 +78,11 @@ extern const GUID c_guidLangBarItemMenu;
 extern const GUID c_guidDisplayAttributeInput;
 extern const GUID c_guidDisplayAttributeConverted;
 
-WCHAR ConvertVKey(UINT code);
+extern std::string g_szHomePath;
 
+WCHAR ConvertVKey(UINT code);
 int CharToWchar(WCHAR *wchStr, const char *chStr);
+BOOL GetHomePath(std::string &path);
 
 namespace Global {
 

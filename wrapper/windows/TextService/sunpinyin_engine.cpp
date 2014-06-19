@@ -15,13 +15,10 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 {
 	CSunpinyinSessionFactory& factory = CSunpinyinSessionFactory::getFactory();
 
-	//factory.createQuanpinView();
-    factory.createXinghuaView();
-
+	//1. Configurations define the profile comes first;
 	CSunpinyinSessionFactory::EScheme pinyin_scheme = //CSunpinyinSessionFactory::XINGHUA;
         m_config.get_py_scheme(CSunpinyinSessionFactory::XINGHUA);
-
-    factory.setPinyinScheme(pinyin_scheme);
+    factory.setScheme(pinyin_scheme);
     if (pinyin_scheme == CSunpinyinSessionFactory::QUANPIN) {
         update_fuzzy_pinyins();
         update_correction_pinyins();
@@ -29,8 +26,11 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	} else if (pinyin_scheme == CSunpinyinSessionFactory::SHUANGPIN) {
         update_shuangpin_type();
     }
+
+	update_data_dir();
     update_user_data_dir();
 
+	//2. Construct the session;
     m_pv = factory.createSession();
     if (!m_pv)
         return;
@@ -41,11 +41,11 @@ SunPinyinEngine::SunPinyinEngine(CTextService *pTextService)
 	m_wh = new CWinHandler(this);
     factory.initSession(m_wh);
 
+	//3. Configurations to initialize the new session;
 	update_config();
 
-	// init language bare items
 	setup_langbar_items();
-	// init status of lang bar and engine with configs
+	//init status of lang bar and engine with configs
 	enable();
 }
 
@@ -54,7 +54,7 @@ SunPinyinEngine::~SunPinyinEngine()
 	if (m_pv) {
         CSunpinyinSessionFactory& factory =
             CSunpinyinSessionFactory::getFactory();
-        factory.destroySession(m_pv);
+        factory.destroySession();
     }
 
     delete m_wh;
@@ -611,12 +611,25 @@ SunPinyinEngine::update_punct_mappings()
 }
 
 void
+SunPinyinEngine::update_data_dir()
+{
+	std::string data_dir = m_config.get(SYSTEM_DATA_DIR, std::string(""));
+	if (data_dir.empty()) {
+		data_dir = g_szHomePath + "/dict";
+		m_config.set(SYSTEM_DATA_DIR, data_dir);
+	}
+	ASimplifiedChinesePolicy::instance().setDataDir(data_dir);
+}
+
+void
 SunPinyinEngine::update_user_data_dir()
 {
-    //std::stringstream user_data_dir;
-    //user_data_dir << g_get_home_dir()
-    //              << G_DIR_SEPARATOR_S << ".sunpinyin";
-    //ASimplifiedChinesePolicy::instance().setUserDataDir(user_data_dir.str());
+	std::string user_data_dir = m_config.get(USER_DATA_DIR, std::string(""));
+	if (user_data_dir.empty()) {
+		user_data_dir = g_szHomePath + "/.sunpinyin";
+		m_config.set(USER_DATA_DIR, user_data_dir);
+	}
+	ASimplifiedChinesePolicy::instance().setUserDataDir(user_data_dir);
 }
 
 void

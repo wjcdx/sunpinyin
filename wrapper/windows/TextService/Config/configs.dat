@@ -1,3 +1,14 @@
+General/DataDir 3 
+General/UserDataDir 3 
+
+#General/PunctMapping/Enabled
+#General/PunctMapping/Mappings
+#Pinyin/ShuangPinType
+#QuanPin/AutoCorrection/Enabled
+#QuanPin/AutoCorrection/Pinyins
+#QuanPin/Fuzzy/Enabled
+#QuanPin/Fuzzy/Pinyins
+
 General/Charset 3 GBK
 General/InitialStatus/Letter 3 Half
 General/InitialStatus/Mode 3 Chinese

@@ -240,6 +240,12 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
         goto ExitError;
 
 	//
+	// Initialize the home path global variable.
+	//
+	if (!GetHomePath(g_szHomePath))
+		goto ExitError;
+
+	//
 	// Initialize the sunpinyin engine.
 	//
 	_pEngine = new SunPinyinEngine(this);
@@ -307,6 +313,9 @@ STDAPI CTextService::Deactivate()
     }
 
     _tfClientId = TF_CLIENTID_NULL;
+
+	if (!g_szHomePath.empty())
+		g_szHomePath.clear();
 
 	if (_pEngine != NULL)
 	{

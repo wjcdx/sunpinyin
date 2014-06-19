@@ -72,6 +72,8 @@ const GUID c_guidDisplayAttributeConverted = {
     {0xa6, 0xec, 0x00, 0x06, 0x5b, 0x84, 0x43, 0x5c}
   };
 
+std::string g_szHomePath;
+
 //+---------------------------------------------------------------------------
 //
 // ConvertVKey
@@ -115,6 +117,27 @@ int CharToWchar(WCHAR *wchStr, const char *chStr)
 		wchStr[i] = chStr[i];
 	}
 	return i ? (i + 1) : 0;
+}
+
+BOOL GetHomePath(std::string &path)
+{
+	HKEY hKey;
+	DWORD dwRet;
+	TCHAR tcPath[MAX_PATH] = {0};
+	DWORD dwLen = MAX_PATH * sizeof(TCHAR);
+	LPCTSTR lpszSubKey = "SOFTWARE\\XHua";
+
+	dwRet = RegOpenKey(HKEY_LOCAL_MACHINE, lpszSubKey, &hKey);
+	if(dwRet != ERROR_SUCCESS)
+	{
+		return FALSE;
+	}
+	dwRet = RegQueryValueEx(hKey, TEXT("Path"), NULL, NULL, (BYTE *)tcPath, &dwLen);
+	if (dwRet == ERROR_SUCCESS) {
+		path = tcPath;
+	}
+	RegCloseKey(hKey);
+	return (dwRet == ERROR_SUCCESS);
 }
 
 namespace Global {

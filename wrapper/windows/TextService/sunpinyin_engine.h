@@ -81,6 +81,7 @@ private:
     void update_max_tail_candidate();
 
     void update_charset_level();
+    void update_data_dir();
     void update_user_data_dir();
     void update_punct_mappings();
     void update_fuzzy_pinyins();
@@ -124,3 +125,4 @@ private:
 };
 
 #endif
+
