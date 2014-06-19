@@ -17,6 +17,12 @@ call :RstDir %DictDstDir%
 copy %DictSrcDir%\dict3_sc.bin.xh %DictDstDir%
 copy %DictSrcDir%\lm_sc.t3g.xh %DictDstDir%
 
+::install configurations
+set ConfDstDir=%PkgDir%\config
+set ConfSrcDir=TextService\Config
+call :RstDir %ConfDstDir%
+copy %ConfSrcDir%\configs.dat %ConfDstDir%
+
 goto Done
 
 :RstDir
