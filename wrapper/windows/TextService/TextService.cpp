@@ -88,6 +88,8 @@ CTextService::CTextService()
 	//
 	_pEngine = NULL;
 
+	_pDocMgrLastFocused = NULL;
+
     _cRef = 1;
 }
 
