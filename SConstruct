@@ -52,6 +52,7 @@ slmsource = [
 
 imesource = [
     'src/portability.cpp',
+    'src/extern/sqlite3/sqlite3.c',
     'src/slm/slm.cpp',
     'src/common/lexicon/trie.cpp',
     'src/common/lexicon/CUnitData.cpp',
@@ -95,7 +96,6 @@ imesource = [
     'src/ime-core/options/scheme_policy_qp.cpp',
     'src/ime-core/options/scheme_policy_sp.cpp',
     'src/ime-core/options/scheme_policy_xh.cpp',
-#    'src/ime-core/options/session_factory.cpp',
     ]
 
 headers = [

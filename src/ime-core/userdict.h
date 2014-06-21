@@ -39,7 +39,7 @@
 #ifndef SUNPY_USERDICT_H
 #define SUNPY_USERDICT_H
 
-//#include <sqlite3.h>
+#include "extern/sqlite3/sqlite3.h"
 #include "portability.h"
 #include "pinyin/input/syllable.h"
 #include "common/lexicon/trie.h"
@@ -76,7 +76,7 @@ private:
     bool _createIndexes();
 
     char                       *m_fname;
-//    sqlite3                    *m_db;
+    sqlite3                    *m_db;
     std::map<unsigned, wstring> m_dict;
 };
 
