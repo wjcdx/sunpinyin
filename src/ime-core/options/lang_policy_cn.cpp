@@ -32,6 +32,7 @@ CSimplifiedChinesePolicy::loadResources()
 
     suc &= m_coreData.loadResource(lm_path.c_str(), dict_path.c_str());
 
+#if 0
     char * tmp = strdup(m_user_data_dir.c_str());
     createDirectory(tmp);
     free(tmp);
@@ -40,7 +41,9 @@ CSimplifiedChinesePolicy::loadResources()
     suc &= m_historyCache.loadFromFile(history_path.c_str());
 
     std::string user_dict_path = m_user_data_dir + "/userdict";
+	// user dict depends on sqlite3 which does not exist for now
     suc &= m_userDict.load(user_dict_path.c_str());
+#endif
 
     m_bTried = true;
     return m_bLoaded = suc;

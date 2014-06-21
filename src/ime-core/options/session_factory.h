@@ -9,7 +9,6 @@
 #include "scheme_policy_sp.h"
 #include "scheme_policy_xh.h"
 #include "style_policy_classic.h"
-#include "style_policy_xh.h"
 
 //#define trace() printf("%s(%d): %s\n", __FILE__, __LINE__, __func__)
 //#define trace() system("echo abc >> /tmp/ibus")
@@ -30,7 +29,6 @@ public:
     typedef enum {
         MSPY_STYLE,
         CLASSIC_STYLE,
-        XH_STYLE,
     } EInputStyle;
 
     typedef enum {
@@ -98,7 +96,7 @@ private:
             new CSunpinyinProfile <ASimplifiedChinesePolicy,
                                    AShuangpinSchemePolicy, AClassicStylePolicy> ();
         m_profiles [_policiesToKey(SIMPLIFIED_CHINESE, XINGHUA,
-                                   XH_STYLE)] =
+                                   CLASSIC_STYLE)] =
             new CSunpinyinProfile <ASimplifiedChinesePolicy,
                                    AXhSchemePolicy, AClassicStylePolicy> ();
     }
