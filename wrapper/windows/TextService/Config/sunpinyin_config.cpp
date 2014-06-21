@@ -119,9 +119,6 @@ SunPinyinConfig::get_scheme(const std::string& name)
 bool
 SunPinyinConfig::get(const char* key, bool val)
 {
-    assert(m_config != NULL);
-    
-    //ConfigItem item(key);
     GVariant value = config_get_value(key);
     bool result = val;
 	if (value.TypeEquals(GVariant::G_VARIANT_CLASS_BOOLEAN)) {
@@ -133,8 +130,6 @@ SunPinyinConfig::get(const char* key, bool val)
 void
 SunPinyinConfig::set(const char* key, bool val)
 {
-    assert(m_config != NULL);
-    
     GVariant value(val);
     config_set_value(key, value);
 }
@@ -142,8 +137,6 @@ SunPinyinConfig::set(const char* key, bool val)
 std::string
 SunPinyinConfig::get(const char* key, const std::string& val)
 {
-    assert(m_config != NULL);
-    
     GVariant value = config_get_value(key);
     string result = val;
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_STRING)) {
@@ -155,8 +148,6 @@ SunPinyinConfig::get(const char* key, const std::string& val)
 void
 SunPinyinConfig::set(const char* key, const std::string& val)
 {
-    assert(m_config != NULL);
-    
     GVariant value(val);
     config_set_value(key, value);
 }
@@ -164,8 +155,6 @@ SunPinyinConfig::set(const char* key, const std::string& val)
 int
 SunPinyinConfig::get(const char* key, int val)
 {
-    assert(m_config != NULL);
-    
     GVariant value = config_get_value(key);
     int result = val;
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_INT32)) {
@@ -177,8 +166,6 @@ SunPinyinConfig::get(const char* key, int val)
 void 
 SunPinyinConfig::set(const char* key, int val)
 {
-    assert(m_config != NULL);
-    
     GVariant value(val);
     config_set_value(key, value);
 }
@@ -186,8 +173,6 @@ SunPinyinConfig::set(const char* key, int val)
 std::vector<std::string>
 SunPinyinConfig::get(const char* key, const std::vector<std::string>& val)
 {
-    assert(m_config != NULL);
-    
     GVariant value = config_get_value(key);
     vector<string> result(val);
     if (value.TypeEquals(GVariant::G_VARIANT_CLASS_ARRAY)) {
